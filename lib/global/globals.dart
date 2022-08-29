@@ -1,0 +1,1 @@
+export 'preferencias_global.dart';
