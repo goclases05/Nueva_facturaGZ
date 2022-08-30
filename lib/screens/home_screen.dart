@@ -1,4 +1,5 @@
 import 'package:factura_gozeri/global/globals.dart';
+import 'package:factura_gozeri/screens/screens.dart';
 import 'package:factura_gozeri/services/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +11,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     final authService = Provider.of<AuthService>(context, listen: false);
-    //final _depa = Provider.of<DepartamentoService>(context, listen: false);
+    final _depa = Provider.of<DepartamentoService>(context, listen: false);
     String name = Preferencias.name;
     String apellido = Preferencias.apellido;
     String data_usuario = Preferencias.data_usuario;
@@ -139,7 +140,7 @@ class HomeScreen extends StatelessWidget {
                 ),
             ),
             Container(
-              margin: EdgeInsets.only(top: size.height * 0.45),
+              margin: EdgeInsets.only(top: size.height * 0.50),
               decoration: const BoxDecoration(
                   color: Color.fromARGB(210, 255, 255, 255),
                   borderRadius: BorderRadius.only(
@@ -147,7 +148,7 @@ class HomeScreen extends StatelessWidget {
                       topRight: Radius.circular(20))),
             ),
             Container(
-              margin: EdgeInsets.only(top: size.height * 0.33),
+              margin: EdgeInsets.only(top: size.height * 0.38),
               decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(20),
@@ -162,14 +163,14 @@ class HomeScreen extends StatelessWidget {
                 itemBuilder: (context, index) => GestureDetector(
                   onTap: () {
                     if (index == 0) {
-                      //_depa.isLoading=true;
-                      //_depa.LoadDepa();
-                     /* Navigator.push(
+                      _depa.isLoading=true;
+                      _depa.LoadDepa();
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                ProductosActualScreen()),
-                      );*/
+                                ViewTabsScreen()),
+                      );
                     }
                   },
                   child: Card(

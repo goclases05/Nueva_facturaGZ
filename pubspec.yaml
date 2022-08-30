@@ -39,6 +39,9 @@ dependencies:
   flutter_secure_storage: ^6.0.0
   http: ^0.13.5
   awesome_snackbar_content: ^0.0.8 #aleras tipo toast
+  bubble_tab_indicator: ^0.1.6 #tabs
+  pull_to_refresh_plus: ^2.0.3 #pull to 
+  count_stepper: ^0.0.4 #contador de productos
 
 dev_dependencies:
   flutter_test:

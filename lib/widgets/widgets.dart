@@ -1,0 +1,1 @@
+export 'articulo_horizontal_widget.dart';
