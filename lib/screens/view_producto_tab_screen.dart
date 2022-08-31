@@ -8,7 +8,10 @@ import '../models/producto_x_departamento_models.dart';
 
 class ViewProductoTab extends StatefulWidget {
   String id_departamento;
-  ViewProductoTab({Key? key, required this.id_departamento}) : super(key: key);
+  String id_tmp;
+  ViewProductoTab(
+      {Key? key, required this.id_departamento, required this.id_tmp})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _viewproductotab();
@@ -17,11 +20,12 @@ class ViewProductoTab extends StatefulWidget {
 class _viewproductotab extends State<ViewProductoTab> {
   List<Producto> list_producto = [];
 
-  final RefreshController refreshController =RefreshController(initialRefresh: true);
+  final RefreshController refreshController =
+      RefreshController(initialRefresh: true);
 
   Future<bool> getCursosData({bool isRefresh = false}) async {
     // Read all values
-    final empresa=Preferencias.data_empresa;
+    final empresa = Preferencias.data_empresa;
     print(
         "https://app.gozeri.com/flutter_gozeri/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=0");
     final Uri uri = Uri.parse(
@@ -72,46 +76,48 @@ class _viewproductotab extends State<ViewProductoTab> {
           ],
         ),
       ),*/
-      color:Colors.grey[100],
-      child:  Scaffold(
-          backgroundColor: Colors.transparent,
-          body: 
-          SmartRefresher(
-              physics: const BouncingScrollPhysics(),
-              header: const WaterDropMaterialHeader(
-                color: Colors.white,
-                backgroundColor: Colors.cyan,
-              ),
-              controller: refreshController,
-              enablePullUp: false,
-              onRefresh: () async {
-                final result = await getCursosData(isRefresh: true);
-                if (result) {
-                  refreshController.refreshCompleted();
-                } else {
-                  refreshController.refreshFailed();
-                }
-              },
-              onLoading: () async {
-                final result = await getCursosData();
-                if (result) {
-                  refreshController.loadComplete();
-                } else {
-                  refreshController.loadFailed();
-                }
-              },
-              child: ListView.builder(
-                itemCount: list_producto.length,
-                itemBuilder: (context, index) {
-                  final producto = list_producto[index];
+      color: Colors.grey[100],
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SmartRefresher(
+          physics: const BouncingScrollPhysics(),
+          header: const WaterDropMaterialHeader(
+            color: Colors.white,
+            backgroundColor: Colors.cyan,
+          ),
+          controller: refreshController,
+          enablePullUp: false,
+          onRefresh: () async {
+            final result = await getCursosData(isRefresh: true);
+            if (result) {
+              refreshController.refreshCompleted();
+            } else {
+              refreshController.refreshFailed();
+            }
+          },
+          onLoading: () async {
+            final result = await getCursosData();
+            if (result) {
+              refreshController.loadComplete();
+            } else {
+              refreshController.loadFailed();
+            }
+          },
+          child: ListView.builder(
+            itemCount: list_producto.length,
+            itemBuilder: (context, index) {
+              final producto = list_producto[index];
 
-                  return Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: ArticleHorizontal(listProd: producto));
-                },
-              ),
-            ),
+              return Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: ArticleHorizontal(
+                    listProd: producto,
+                    id_tmp: widget.id_tmp,
+                  ));
+            },
+          ),
         ),
+      ),
     );
   }
 }

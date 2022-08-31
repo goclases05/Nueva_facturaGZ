@@ -1,4 +1,5 @@
 import 'package:factura_gozeri/providers/carshop_provider.dart';
+import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -6,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'global/globals.dart';
 import 'screens/screens.dart';
 import 'services/services.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +25,10 @@ class AppState extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => DepartamentoService()),
-        ChangeNotifierProvider(create: (_)=>Cart())
+        ChangeNotifierProvider(create: (_) => Cart()),
+        ChangeNotifierProvider(
+          create: (context) => Facturacion(),
+        )
       ],
       child: const MyApp(),
     );

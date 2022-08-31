@@ -1,5 +1,3 @@
-
-
 import 'package:count_stepper/count_stepper.dart';
 import 'package:factura_gozeri/models/producto_x_departamento_models.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
@@ -7,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class VistaArticulos extends StatefulWidget {
-  const VistaArticulos({Key? key}) : super(key: key);
+  VistaArticulos({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<VistaArticulos> createState() => _VistaArticulosState();
@@ -31,16 +31,19 @@ class _VistaArticulosState extends State<VistaArticulos> {
 }
 
 class ArticleHorizontal extends StatefulWidget {
-  const ArticleHorizontal({Key? key, required this.listProd}) : super(key: key);
+  const ArticleHorizontal(
+      {Key? key, required this.listProd, required this.id_tmp})
+      : super(key: key);
   final Producto listProd;
-  
+  final String id_tmp;
 
   @override
   State<ArticleHorizontal> createState() => _ArticleHorizontalState();
 }
 
 class _ArticleHorizontalState extends State<ArticleHorizontal> {
-  late int _counterValue=1;
+  late int _counterValue = 1;
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -157,30 +160,30 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                     onPressed: (value) {
                       setState(() {
                         _counterValue = value;
-                        
                       });
                     },
                   ),
                 ),
-                Consumer<Cart>(builder: (context, cart, child){
+                Consumer<Cart>(builder: (context, cart, child) {
                   return GestureDetector(
-                      onTap: () {
-                        cart.add(_counterValue,widget.listProd.idProd);
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.all(5),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            //color: Theme.of(context).primaryColor,
-                            color: Colors.cyan,
-                            borderRadius: BorderRadius.circular(15)),
-                        child: const Icon(
-                          Icons.add_shopping_cart,
-                          color: Colors.white,
-                          size: 25,
-                        ),
+                    onTap: () {
+                      cart.add(
+                          _counterValue, widget.listProd.idProd, widget.id_tmp);
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          //color: Theme.of(context).primaryColor,
+                          color: Colors.cyan,
+                          borderRadius: BorderRadius.circular(15)),
+                      child: const Icon(
+                        Icons.add_shopping_cart,
+                        color: Colors.white,
+                        size: 25,
                       ),
-                    );
+                    ),
+                  );
                 }),
               ],
             ),

@@ -43,6 +43,8 @@ dependencies:
   pull_to_refresh_plus: ^2.0.3 #pull to 
   count_stepper: ^0.0.4 #contador de productos
   badges: ^2.0.3 #badge circulo de notificacion sobre icon 
+  esc_pos_bluetooth: ^0.4.1 #impresora termica
+  esc_pos_utils: ^1.1.0
 
 dev_dependencies:
   flutter_test:
