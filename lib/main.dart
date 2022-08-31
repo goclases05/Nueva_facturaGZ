@@ -1,3 +1,4 @@
+import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,8 @@ class AppState extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
-        ChangeNotifierProvider(create: (_) => DepartamentoService())
+        ChangeNotifierProvider(create: (_) => DepartamentoService()),
+        ChangeNotifierProvider(create: (_)=>Cart())
       ],
       child: const MyApp(),
     );

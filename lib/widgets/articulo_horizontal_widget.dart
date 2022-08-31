@@ -2,7 +2,9 @@
 
 import 'package:count_stepper/count_stepper.dart';
 import 'package:factura_gozeri/models/producto_x_departamento_models.dart';
+import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class VistaArticulos extends StatefulWidget {
   const VistaArticulos({Key? key}) : super(key: key);
@@ -31,15 +33,16 @@ class _VistaArticulosState extends State<VistaArticulos> {
 class ArticleHorizontal extends StatefulWidget {
   const ArticleHorizontal({Key? key, required this.listProd}) : super(key: key);
   final Producto listProd;
+  
 
   @override
   State<ArticleHorizontal> createState() => _ArticleHorizontalState();
 }
 
 class _ArticleHorizontalState extends State<ArticleHorizontal> {
+  late int _counterValue=1;
   @override
   Widget build(BuildContext context) {
-    int _counterValue = 1;
     return Card(
       elevation: 5,
       margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -154,25 +157,31 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                     onPressed: (value) {
                       setState(() {
                         _counterValue = value;
+                        
                       });
                     },
                   ),
                 ),
-                GestureDetector(
-                  child: Container(
-                    margin: const EdgeInsets.all(5),
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        //color: Theme.of(context).primaryColor,
-                        color: Colors.cyan,
-                        borderRadius: BorderRadius.circular(15)),
-                    child: const Icon(
-                      Icons.add_shopping_cart,
-                      color: Colors.white,
-                      size: 25,
-                    ),
-                  ),
-                ),
+                Consumer<Cart>(builder: (context, cart, child){
+                  return GestureDetector(
+                      onTap: () {
+                        cart.add(_counterValue,widget.listProd.idProd);
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.all(5),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            //color: Theme.of(context).primaryColor,
+                            color: Colors.cyan,
+                            borderRadius: BorderRadius.circular(15)),
+                        child: const Icon(
+                          Icons.add_shopping_cart,
+                          color: Colors.white,
+                          size: 25,
+                        ),
+                      ),
+                    );
+                }),
               ],
             ),
           ),

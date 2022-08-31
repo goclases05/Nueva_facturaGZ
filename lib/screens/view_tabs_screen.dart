@@ -1,8 +1,11 @@
-import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
-import 'package:factura_gozeri/screens/screens.dart';
-import 'package:factura_gozeri/services/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:badges/badges.dart';
+import 'package:factura_gozeri/providers/carshop_provider.dart';
+import 'package:factura_gozeri/screens/screens.dart';
+import 'package:factura_gozeri/services/services.dart';
+
+
 
 class ViewTabsScreen extends StatefulWidget {
   const ViewTabsScreen({Key? key}) : super(key: key);
@@ -39,7 +42,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
     }
     
     return Scaffold(
-      appBar: appBarra(size),
+      appBar: appBarra(size,context),
       body: SafeArea(
         child: CustomTabView(
           initPosition: initPosition,
@@ -54,15 +57,15 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
           },
           onScroll: (position) => print('$position'), stub: Text(''),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
+      )
+      /*floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
             data.add('Page ${data.length}');
           });
         },
         child: Icon(Icons.add),
-      ),
+      ),*/
     );
 
    
@@ -70,7 +73,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
 }
 
 
-AppBar appBarra(size) {
+AppBar appBarra(size,context) {
   return AppBar(
     foregroundColor: Colors.white,
     elevation: 0,
@@ -107,12 +110,21 @@ AppBar appBarra(size) {
       ),
       CircleAvatar(
         backgroundColor: Colors.cyan[300],
-        child: IconButton(
-          onPressed: () {},
-          icon: const Icon(
-            Icons.shopping_cart,
-            color: Colors.white,
-          ),
+        child: 
+         Consumer<Cart>(builder: (context, cart, child){
+            return Badge(
+              showBadge: (cart.count==0)?false:true,
+              badgeContent:Text('${cart.count}', style: TextStyle(color: Colors.white),),
+              child:IconButton(
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.shopping_cart,
+                  color: Colors.white,
+                ),
+              ),
+            );
+            return Text('${cart.count}', style: TextStyle(color: Colors.white),);
+          }
         ),
       ),
       const SizedBox(

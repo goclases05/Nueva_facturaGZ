@@ -1,4 +1,5 @@
 import 'package:factura_gozeri/global/globals.dart';
+import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/screens/screens.dart';
 import 'package:factura_gozeri/services/services.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ class HomeScreen extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     final authService = Provider.of<AuthService>(context, listen: false);
     final _depa = Provider.of<DepartamentoService>(context, listen: false);
+    final _cart = Provider.of<Cart>(context, listen: false);
     String name = Preferencias.name;
     String apellido = Preferencias.apellido;
     String data_usuario = Preferencias.data_usuario;
@@ -164,6 +166,7 @@ class HomeScreen extends StatelessWidget {
                   onTap: () {
                     if (index == 0) {
                       _depa.isLoading=true;
+                      _cart.cantidad=0;
                       _depa.LoadDepa();
                       Navigator.push(
                         context,

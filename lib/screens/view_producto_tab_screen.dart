@@ -75,12 +75,7 @@ class _viewproductotab extends State<ViewProductoTab> {
       color:Colors.grey[100],
       child:  Scaffold(
           backgroundColor: Colors.transparent,
-          body: /*SizedBox(
-            height: double.infinity,
-            child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Text('holi')),
-          )*/
+          body: 
           SmartRefresher(
               physics: const BouncingScrollPhysics(),
               header: const WaterDropMaterialHeader(
