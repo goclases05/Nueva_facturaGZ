@@ -1,4 +1,5 @@
 import 'package:count_stepper/count_stepper.dart';
+import 'package:custom_bottom_sheet/custom_bottom_sheet.dart';
 import 'package:factura_gozeri/models/producto_x_departamento_models.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class _VistaArticulosState extends State<VistaArticulos> {
 }
 
 class ArticleHorizontal extends StatefulWidget {
-  const ArticleHorizontal(
+  ArticleHorizontal(
       {Key? key, required this.listProd, required this.id_tmp})
       : super(key: key);
   final Producto listProd;
@@ -43,6 +44,15 @@ class ArticleHorizontal extends StatefulWidget {
 
 class _ArticleHorizontalState extends State<ArticleHorizontal> {
   late int _counterValue = 1;
+  void customBottomSheet(BuildContext context) {
+    SlideDialog.showSlideDialog(
+      context: context,
+      backgroundColor: Colors.white,
+      pillColor: Colors.yellow,
+      transitionDuration: Duration(milliseconds: 200),
+      child: Text('Your code'),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +67,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
               padding: const EdgeInsets.all(5),
               child: GestureDetector(
                 onTap: () {
+                  customBottomSheet(context);
                   /*Navigator.of(context).push(PageRouteBuilder(pageBuilder: (context,animation,__){
                         return FadeTransition(
                           opacity: animation,
@@ -112,20 +123,25 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                 ),
               ),
             ),
-            /*Positioned(
+            const Positioned(
                 top: 0,
                 right: 0,
-                child: Container(
+                child: 
+                  Chip(
+                    backgroundColor: Color.fromARGB(255, 200, 230, 201),
+                    label: Text('Stock: 10', style: TextStyle(color: Colors.white),),
+                  )
+                /*Container(
                   padding:const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Color.fromARGB(255, 134, 185, 135).withOpacity(0.9),
                     shape:BoxShape.circle,
                   ),
                   child:const Icon(Icons.favorite,
                     color: Colors.red,
                   ),
-                )
-              )*/
+                )*/
+              )
           ]),
           Container(
             padding: const EdgeInsets.only(bottom: 10, right: 10),

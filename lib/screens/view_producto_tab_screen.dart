@@ -112,11 +112,11 @@ class _viewproductotab extends State<ViewProductoTab> {
                   padding: const EdgeInsets.all(10),
                   child: ArticleHorizontal(
                     listProd: producto,
-                    id_tmp: widget.id_tmp,
+                    id_tmp: widget.id_tmp
                   ));
             },
           ),
-        ),
+        )
       ),
     );
   }

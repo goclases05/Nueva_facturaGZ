@@ -45,6 +45,7 @@ dependencies:
   badges: ^2.0.3 #badge circulo de notificacion sobre icon 
   esc_pos_bluetooth: ^0.4.1 #impresora termica
   esc_pos_utils: ^1.1.0
+  custom_bottom_sheet: ^1.1.2
 
 dev_dependencies:
   flutter_test:

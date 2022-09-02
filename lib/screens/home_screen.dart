@@ -124,13 +124,13 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       Image.network(
                         '${foto_empresa}',
-                        width: size.width * 0.2,
+                        width: size.width * 0.1,
                       ),
                       Text(
                         "${nombre_empresa}",
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 10.0,
+                            fontSize: 18.0,
                             color: Colors.white54),
                         textAlign: TextAlign.center,
                       ),
