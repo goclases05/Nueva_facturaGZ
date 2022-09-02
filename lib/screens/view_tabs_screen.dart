@@ -121,7 +121,7 @@ AppBar appBarra(size, context, id_tmp) {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => Print(
+                        builder: (_) => PrintScreen(
                               id_tmp: id_tmp,
                             )));
               },

@@ -42,10 +42,10 @@ dependencies:
   bubble_tab_indicator: ^0.1.6 #tabs
   pull_to_refresh_plus: ^2.0.3 #pull to 
   count_stepper: ^0.0.4 #contador de productos
-  badges: ^2.0.3 #badge circulo de notificacion sobre icon 
-  esc_pos_bluetooth: ^0.4.1 #impresora termica
-  esc_pos_utils: ^1.1.0
+  badges: ^2.0.3 
   custom_bottom_sheet: ^1.1.2
+  intl: ^0.17.0
+  bluetooth_print: ^3.0.1
 
 dev_dependencies:
   flutter_test:

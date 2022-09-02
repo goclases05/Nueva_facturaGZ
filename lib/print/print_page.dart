@@ -1,0 +1,105 @@
+import 'package:bluetooth_print/bluetooth_print.dart';
+import 'package:bluetooth_print/bluetooth_print_model.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+//import 'package:intl/intl.dart';
+
+class PrintPage extends StatefulWidget {
+  List<Map<String, dynamic>> data;
+  PrintPage(this.data);
+
+  @override
+  State<PrintPage> createState() => _PrintPageState();
+}
+
+class _PrintPageState extends State<PrintPage> {
+  @override
+  BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
+  List<BluetoothDevice> _devices = [];
+  String _devicesMsg = "";
+  final f = NumberFormat("\$###,###.00", "en_US");
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {});
+    initBluetooth();
+  }
+
+  Future<void> initBluetooth() async {
+    bluetoothPrint.startScan(timeout: Duration(seconds: 4));
+
+    if (!mounted) return;
+    bluetoothPrint.scanResults.listen((event) {
+      if (!mounted) return;
+      setState(() {
+        _devices = event;
+      });
+      if (_devices.isEmpty)
+        setState(() {
+          _devicesMsg = "No se encontraron dispositivos";
+        });
+    });
+  }
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Select Printer'),
+          backgroundColor: Colors.cyan,
+        ),
+        body: _devices.isEmpty
+            ? Container(
+                child: Center(
+                  child: Text(_devicesMsg ?? ''),
+                ),
+              )
+            : Scaffold(
+                body: ListView.builder(
+                itemCount: _devices.length,
+                itemBuilder: (c, i) {
+                  return ListTile(
+                    leading: Icon(Icons.print),
+                    title: Text("${_devices[i].name}"),
+                    subtitle: Text("${_devices[i].address}"),
+                    onTap: () {
+                      _startPrint(_devices[i]);
+                    },
+                  );
+                },
+              )));
+  }
+
+  Future<void> _startPrint(BluetoothDevice device) async {
+    if (device != null && device.address != null) {
+      await bluetoothPrint.connect(device);
+
+      Map<String, dynamic> config = Map();
+      List<LineText> list = [];
+
+      list.add(LineText(
+          type: LineText.TYPE_TEXT,
+          content: "Facturación Gozeri",
+          weight: 2,
+          width: 2,
+          height: 2,
+          align: LineText.ALIGN_CENTER,
+          linefeed: 1));
+      for (var i = 0; i < widget.data.length; i++) {
+        list.add(LineText(
+            type: LineText.TYPE_TEXT,
+            content: widget.data[i]['title'],
+            weight: 0,
+            align: LineText.ALIGN_LEFT,
+            linefeed: 1));
+        list.add(LineText(
+            type: LineText.TYPE_TEXT,
+            content:
+                "${f.format(this.widget.data[i]['price'])} x ${this.widget.data[i]['qty']}",
+            weight: 0,
+            align: LineText.ALIGN_LEFT,
+            linefeed: 1));
+      }
+    }
+  }
+}
