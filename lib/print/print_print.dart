@@ -59,7 +59,7 @@ class PrintScreen extends StatelessWidget {
                     child: TextButton.icon(
                   onPressed: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => PrintPage(data)));
+                        MaterialPageRoute(builder: (_) => Print(data)));
                   },
                   icon: const Icon(Icons.print),
                   label: const Text('Print'),
