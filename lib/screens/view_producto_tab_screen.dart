@@ -22,14 +22,16 @@ class _viewproductotab extends State<ViewProductoTab> {
 
   final RefreshController refreshController =
       RefreshController(initialRefresh: true);
+  int i = 0;
 
   Future<bool> getCursosData({bool isRefresh = false}) async {
     // Read all values
     final empresa = Preferencias.data_empresa;
+    i = i + 10;
     print(
-        "https://app.gozeri.com/flutter_gozeri/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=0");
+        "https://app.gozeri.com/flutter_gozeri/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/flutter_gozeri/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=0");
+        "https://app.gozeri.com/flutter_gozeri/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}");
     final response = await http.get(uri);
 
     if (response.statusCode == 200) {
@@ -78,46 +80,43 @@ class _viewproductotab extends State<ViewProductoTab> {
       ),*/
       color: Colors.grey[100],
       child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: SmartRefresher(
-          physics: const BouncingScrollPhysics(),
-          header: const WaterDropMaterialHeader(
-            color: Colors.white,
-            backgroundColor: Colors.cyan,
-          ),
-          controller: refreshController,
-          enablePullUp: false,
-          onRefresh: () async {
-            final result = await getCursosData(isRefresh: true);
-            if (result) {
-              refreshController.refreshCompleted();
-            } else {
-              refreshController.refreshFailed();
-            }
-          },
-          onLoading: () async {
-            final result = await getCursosData();
-            if (result) {
-              refreshController.loadComplete();
-            } else {
-              refreshController.loadFailed();
-            }
-          },
-          child: ListView.builder(
-            itemCount: list_producto.length,
-            itemBuilder: (context, index) {
-              final producto = list_producto[index];
-
-              return Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: ArticleHorizontal(
-                    listProd: producto,
-                    id_tmp: widget.id_tmp
-                  ));
+          backgroundColor: Colors.transparent,
+          body: SmartRefresher(
+            physics: const BouncingScrollPhysics(),
+            header: const WaterDropMaterialHeader(
+              color: Colors.white,
+              backgroundColor: Colors.cyan,
+            ),
+            controller: refreshController,
+            enablePullUp: true,
+            onRefresh: () async {
+              final result = await getCursosData(isRefresh: true);
+              if (result) {
+                refreshController.refreshCompleted();
+              } else {
+                refreshController.refreshFailed();
+              }
             },
-          ),
-        )
-      ),
+            onLoading: () async {
+              final result = await getCursosData();
+              if (result) {
+                refreshController.loadComplete();
+              } else {
+                refreshController.loadFailed();
+              }
+            },
+            child: ListView.builder(
+              itemCount: list_producto.length,
+              itemBuilder: (context, index) {
+                final producto = list_producto[index];
+
+                return Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: ArticleHorizontal(
+                        listProd: producto, id_tmp: widget.id_tmp));
+              },
+            ),
+          )),
     );
   }
 }
