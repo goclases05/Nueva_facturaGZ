@@ -111,20 +111,23 @@ class HomeScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(
-                  height: 8.0,
+                  height: 2,
                 ),
                 Container(
                   padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
+                  /*decoration: BoxDecoration(
                       color: const Color.fromARGB(63, 255, 255, 255),
-                      borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10)),*/
                   child: Wrap(
                     crossAxisAlignment: WrapCrossAlignment.center,
                     direction: Axis.horizontal,
                     children: [
-                      Image.network(
+                      /*Image.network(
                         '${foto_empresa}',
                         width: size.width * 0.1,
+                      ),
+                      SizedBox(
+                        width: 10,
                       ),
                       Text(
                         "${nombre_empresa}",
@@ -133,7 +136,22 @@ class HomeScreen extends StatelessWidget {
                             fontSize: 18.0,
                             color: Colors.white54),
                         textAlign: TextAlign.center,
-                      ),
+                      ),*/
+                      Chip(
+                        backgroundColor:Color.fromARGB(124, 0, 187, 212),
+                        /*avatar: Image.network(
+                        '${foto_empresa}',
+                        width: size.width * 0.1,
+                      ),*/
+                        label: Text(
+                        "${nombre_empresa}",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18.0,
+                            color: Colors.white54),
+                        textAlign: TextAlign.center,
+                      )
+                      )
                     ],
                   ),
                 ),
@@ -212,9 +230,9 @@ class HomeScreen extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 Image.asset((index == 0)
-                                    ? 'assets/factura_create.png'
+                                    ? 'assets/add_factura_2.png'
                                     : (index == 1)
-                                        ? 'assets/h_factura.png'
+                                        ? 'assets/fhistorial_2.png'
                                         : 'gozeri_blanco.png'),
                                 Text(
                                   (index == 0)

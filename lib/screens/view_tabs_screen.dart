@@ -1,4 +1,5 @@
 import 'package:factura_gozeri/print/print_print.dart';
+import 'package:factura_gozeri/search/items_search.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:badges/badges.dart';
@@ -84,7 +85,10 @@ AppBar appBarra(size, context, id_tmp) {
       CircleAvatar(
         backgroundColor: Colors.cyan[300],
         child: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            ItemsSearch.id_tmp=id_tmp;
+            showSearch(context: context, delegate: ItemsSearch());
+          },
           icon: const Icon(
             Icons.search,
             color: Colors.white,
