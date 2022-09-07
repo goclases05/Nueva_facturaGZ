@@ -56,23 +56,47 @@ class HomeScreen extends StatelessWidget {
                 backgroundColor: Colors.transparent,
                 elevation: 0,
                 actions: [
-                  PopupMenuButton(
-                      // Callback that sets the selected popup menu item.
-                      onSelected: (value) {
-                        if (value == 'exit') {
-                          authService.logout();
-                          Navigator.pushReplacementNamed(context, 'checking');
-                        }
-                      },
-                      itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                            const PopupMenuItem(
-                              value: "exit",
-                              child: ListTile(
-                                title: Text("Cerrar Sesión"),
-                                trailing: Icon(Icons.logout),
-                              ),
-                            ),
-                          ])
+                  CircleAvatar(
+                    backgroundColor: Colors.white38,
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.print),
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  CircleAvatar(
+                      backgroundColor: Colors.white38,
+                      child: PopupMenuButton(
+                          icon: const Icon(
+                            Icons.more_vert,
+                            color: Colors.white,
+                          ),
+                          // Callback that sets the selected popup menu item.
+                          onSelected: (value) {
+                            if (value == 'exit') {
+                              authService.logout();
+                              Navigator.pushReplacementNamed(
+                                  context, 'checking');
+                            }
+                          },
+                          itemBuilder: (BuildContext context) =>
+                              <PopupMenuEntry>[
+                                const PopupMenuItem(
+                                  value: "exit",
+                                  child: ListTile(
+                                    title: Text("Cerrar Sesión"),
+                                    trailing: Icon(
+                                      Icons.logout,
+                                    ),
+                                  ),
+                                ),
+                              ])),
+                  const SizedBox(
+                    width: 20,
+                  ),
                 ]),
             body: Column(
               children: [
@@ -138,20 +162,19 @@ class HomeScreen extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),*/
                       Chip(
-                        backgroundColor:Color.fromARGB(124, 0, 187, 212),
-                        /*avatar: Image.network(
+                          backgroundColor: Color.fromARGB(124, 0, 187, 212),
+                          /*avatar: Image.network(
                         '${foto_empresa}',
                         width: size.width * 0.1,
                       ),*/
-                        label: Text(
-                        "${nombre_empresa}",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18.0,
-                            color: Colors.white54),
-                        textAlign: TextAlign.center,
-                      )
-                      )
+                          label: Text(
+                            "${nombre_empresa}",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                                color: Colors.white54),
+                            textAlign: TextAlign.center,
+                          ))
                     ],
                   ),
                 ),

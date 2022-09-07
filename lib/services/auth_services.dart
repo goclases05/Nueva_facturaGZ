@@ -38,6 +38,7 @@ class AuthService extends ChangeNotifier {
       Preferencias.foto_empresa = decodeResp['message']['FOTO_EMPRESA'];
       Preferencias.data_id = decodeResp['message']['ID_USUARIO'];
       Preferencias.data_empresa = decodeResp['message']['ID_EMPRESA'];
+      Preferencias.moneda = decodeResp['message']['MONEDA'];
 
       return null;
     } else {

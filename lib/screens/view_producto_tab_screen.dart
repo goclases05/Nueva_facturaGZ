@@ -105,27 +105,34 @@ class _viewproductotab extends State<ViewProductoTab> {
                 refreshController.loadFailed();
               }
             },
-            child: (list_producto.length==0)?Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children:[
-                  Image.asset('assets/data_null.png'),
-                  const Text("No se encontraron datos relacionados")
-                ]
-              ),
-            ):
-            ListView.builder(
-              itemCount: list_producto.length,
-              itemBuilder: (context, index) {
-                final producto = list_producto[index];
-
-                return Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ArticleHorizontal(
-                        listProd: producto, id_tmp: widget.id_tmp));
-              },
-            ),
+            child: (list_producto.length == 0)
+                ? Center(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.asset('assets/data_null.png'),
+                          const Text("No se encontraron datos relacionados")
+                        ]),
+                  )
+                : ListView.builder(
+                    itemCount: list_producto.length,
+                    itemBuilder: (context, index) {
+                      final producto = list_producto[index];
+                      final List<String> list = [
+                        producto.precio,
+                        producto.precio_2,
+                        producto.precio_3,
+                        producto.precio_4,
+                      ];
+                      return Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: ArticleHorizontal(
+                            listProd: producto,
+                            id_tmp: widget.id_tmp,
+                          ));
+                    },
+                  ),
           )),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:count_stepper/count_stepper.dart';
 import 'package:custom_bottom_sheet/custom_bottom_sheet.dart';
+import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/models/producto_x_departamento_models.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:flutter/material.dart';
@@ -32,8 +33,7 @@ class _VistaArticulosState extends State<VistaArticulos> {
 }
 
 class ArticleHorizontal extends StatefulWidget {
-  ArticleHorizontal(
-      {Key? key, required this.listProd, required this.id_tmp})
+  ArticleHorizontal({Key? key, required this.listProd, required this.id_tmp})
       : super(key: key);
   final Producto listProd;
   final String id_tmp;
@@ -43,7 +43,12 @@ class ArticleHorizontal extends StatefulWidget {
 }
 
 class _ArticleHorizontalState extends State<ArticleHorizontal> {
+  List<String> precios_list = [];
   late int _counterValue = 1;
+
+  String? _dropdownValue = '';
+  int position = 0;
+
   void customBottomSheet(BuildContext context) {
     SlideDialog.showSlideDialog(
       context: context,
@@ -56,6 +61,34 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> _do = []; //= ['One', 'Two', 'Free', 'Four'];
+
+    if (_do.contains(widget.listProd.precio) == false) {
+      _do.add("${widget.listProd.precio}");
+    }
+    if (_do.contains(widget.listProd.precio_2) == false) {
+      _do.add("${widget.listProd.precio_2}");
+    }
+    if (_do.contains(widget.listProd.precio_3) == false) {
+      _do.add("${widget.listProd.precio_3}");
+    }
+    if (_do.contains(widget.listProd.precio_4) == false) {
+      _do.add("${widget.listProd.precio_4}");
+    }
+
+    /*_do.add("${widget.listProd.precio}");
+    _do.add("${widget.listProd.precio_2}");
+    _do.add("${widget.listProd.precio_3}");
+    _do.add("${widget.listProd.precio_4}");*/
+    /*_do = [
+      "${widget.listProd.precio}",
+      "${widget.listProd.precio_2}",
+      "${widget.listProd.precio_3}",
+      "${widget.listProd.precio_4}"
+    ];*/
+    /*_dropdownValue =
+        (widget.listProd.precio.isEmpty) ? "0.00" : widget.listProd.precio;*/
+    //_itemselect = precios_list[0];
     return Card(
       elevation: 5,
       margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -107,12 +140,36 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                               style: const TextStyle(
                                   fontSize: 15, color: Colors.black45),
                             ),
-                            Text(
-                              widget.listProd.precio,
-                              style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(255, 4, 146, 165)),
+                            Row(
+                              children: [
+                                Text(
+                                  "${Preferencias.moneda}",
+                                  style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromARGB(255, 4, 146, 165)),
+                                ),
+                                Expanded(
+                                  child: DropdownButton<String>(
+                                      isExpanded: true,
+                                      hint: Text("0.00"),
+                                      items: _do.map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                        /*(position == 0) ? position : position++;
+                                        setState(() {});*/
+                                        return DropdownMenuItem<String>(
+                                          value: value, //position.toString(),
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
+                                      value: (_dropdownValue == '')
+                                          ? _do[0]
+                                          : _dropdownValue,
+                                      onChanged: ((value) => setState(() {
+                                            _dropdownValue = value;
+                                          }))),
+                                )
+                              ],
                             ),
                             //const SizedBox(height: 10,),
                           ],
@@ -126,11 +183,13 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
             const Positioned(
                 top: 0,
                 right: 0,
-                child: 
-                  Chip(
-                    backgroundColor: Color.fromARGB(255, 200, 230, 201),
-                    label: Text('Stock: 10', style: TextStyle(color: Colors.white),),
-                  )
+                child: Chip(
+                  backgroundColor: Color.fromARGB(255, 200, 230, 201),
+                  label: Text(
+                    'Stock: 10',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )
                 /*Container(
                   padding:const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -141,7 +200,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                     color: Colors.red,
                   ),
                 )*/
-              )
+                )
           ]),
           Container(
             padding: const EdgeInsets.only(bottom: 10, right: 10),
