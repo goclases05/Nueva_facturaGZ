@@ -3,6 +3,7 @@ import 'package:custom_bottom_sheet/custom_bottom_sheet.dart';
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/models/producto_x_departamento_models.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
+import 'package:factura_gozeri/widgets/articulo_sheet_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -42,10 +43,10 @@ class ArticleHorizontal extends StatefulWidget {
   State<ArticleHorizontal> createState() => _ArticleHorizontalState();
 }
 
-
 class _ArticleHorizontalState extends State<ArticleHorizontal> {
   List<String> precios_list = [];
   late int _counterValue = 1;
+  String _counterString = '';
 
   String? _dropdownValue = '';
   int position = 0;
@@ -54,11 +55,12 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
     SlideDialog.showSlideDialog(
       context: context,
       backgroundColor: Colors.white,
-      pillColor: Colors.yellow,
+      pillColor: Colors.cyan,
       transitionDuration: Duration(milliseconds: 200),
-      child: Text('Your code'),
+      child: ArticuloSheet(listProd: widget.listProd),
     );
   }
+
   final myController = TextEditingController();
 
   @override
@@ -79,7 +81,6 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
   _printLatestValue() {
     return 2020;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -111,10 +112,9 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
     /*_dropdownValue =
         (widget.listProd.precio.isEmpty) ? "0.00" : widget.listProd.precio;*/
     //_itemselect = precios_list[0];
-    myController.text=_counterValue.toString();
+    myController.text = _counterValue.toString();
     myController.selection = TextSelection.fromPosition(
-      TextPosition(offset: myController.text.length)
-    ); 
+        TextPosition(offset: myController.text.length));
     return Card(
       elevation: 5,
       margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -139,24 +139,26 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                 },
                 child: Column(
                   children: [
-                    const SizedBox(height: 15,),
+                    const SizedBox(
+                      height: 15,
+                    ),
                     Row(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          
-                          child: Hero(
+                            borderRadius: BorderRadius.circular(15),
+                            child: Hero(
                               tag: 'List_${widget.listProd.idProd}',
                               child: /*Image.network(
                                   widget.listProd.url + widget.listProd.foto,
                                   width: MediaQuery.of(context).size.width * 0.3))*/
                                   FadeInImage(
-                                    placeholder:const AssetImage('assets/productos_gz.jpg'), 
-                                    image: NetworkImage(widget.listProd.url + widget.listProd.foto),
-                                    width: MediaQuery.of(context).size.width * 0.3
-                                  ),
-                          )     
-                        ),
+                                      placeholder: const AssetImage(
+                                          'assets/productos_gz.jpg'),
+                                      image: NetworkImage(widget.listProd.url +
+                                          widget.listProd.foto),
+                                      width: MediaQuery.of(context).size.width *
+                                          0.3),
+                            )),
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(10),
@@ -185,18 +187,21 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                       style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
-                                          color: Color.fromARGB(255, 4, 146, 165)),
+                                          color:
+                                              Color.fromARGB(255, 4, 146, 165)),
                                     ),
                                     Expanded(
                                       child: DropdownButton<String>(
                                           isExpanded: true,
                                           hint: Text("0.00"),
-                                          items: _do.map<DropdownMenuItem<String>>(
-                                              (String value) {
+                                          items: _do
+                                              .map<DropdownMenuItem<String>>(
+                                                  (String value) {
                                             /*(position == 0) ? position : position++;
                                             setState(() {});*/
                                             return DropdownMenuItem<String>(
-                                              value: value, //position.toString(),
+                                              value:
+                                                  value, //position.toString(),
                                               child: Text(value),
                                             );
                                           }).toList(),
@@ -220,14 +225,14 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                 ),
               ),
             ),
-             Positioned(
+            Positioned(
                 top: 0,
                 left: 5,
                 child: Chip(
                   backgroundColor: Color.fromARGB(243, 200, 230, 201),
                   label: Text(
                     'Stock: ${widget.listProd.stock}',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.black54),
                   ),
                 )
                 /*Container(
@@ -252,7 +257,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                 const SizedBox(
                   width: 10,
                 ),
-               /* Container(
+                /* Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                       color: Colors.grey[200],
@@ -280,40 +285,45 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                   ),
                 ),*/
                 Container(
-                  padding: EdgeInsets.only(left: 4,right: 4),
+                  padding: EdgeInsets.only(left: 4, right: 4),
                   decoration: BoxDecoration(
                       //color: Theme.of(context).primaryColor,
                       color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(20)
-                  ),
+                      borderRadius: BorderRadius.circular(20)),
                   child: Row(
                     children: [
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           setState(() {
-                            print(_counterValue);
-                            if(_counterValue<=0){
-                              _counterValue++;
-                              print(_counterValue);
-                              myController.text=_counterValue.toString();
-                            }else if(_counterValue>1){
+                            if (widget.listProd.facturar == '1') {
                               _counterValue--;
                               print(_counterValue);
-                              myController.text=_counterValue.toString();
+                              myController.text = _counterValue.toString();
+                            } else {
+                              if (_counterValue <= 0) {
+                                _counterValue++;
+                                print(_counterValue);
+                                myController.text = _counterValue.toString();
+                              } else if (_counterValue > 1) {
+                                _counterValue--;
+                                print(_counterValue);
+                                myController.text = _counterValue.toString();
+                              }
                             }
+
                             myController.selection = TextSelection.fromPosition(
-                              TextPosition(offset: myController.text.length)
-                            ); 
+                                TextPosition(offset: myController.text.length));
                           });
                         },
                         child: Container(
                           margin: const EdgeInsets.all(0),
                           padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                               //color: Theme.of(context).primaryColor,
-                              color: Colors.red[400],
-                              borderRadius:const BorderRadius.only(topLeft: Radius.circular(15),bottomLeft: Radius.circular(15))
-                          ),
+                              color: Color.fromARGB(255, 247, 114, 112),
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(15),
+                                  bottomLeft: Radius.circular(15))),
                           child: const Icon(
                             Icons.remove,
                             color: Colors.white,
@@ -321,28 +331,47 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                           ),
                         ),
                       ),
-
                       Container(
                         color: Colors.white,
                         margin: EdgeInsets.symmetric(vertical: 2),
-                        width: MediaQuery.of(context).size.width*0.2,
+                        width: MediaQuery.of(context).size.width * 0.2,
                         child: TextField(
                           controller: myController,
                           //initialValue: myController.text,
                           textAlign: TextAlign.center,
-                          keyboardType: TextInputType.phone,
-                          onChanged:(value){
-                            print(value);
-                            setState(() {
-                              myController.text = value; 
-                              // this changes cursor position 
-                              myController.selection = TextSelection.fromPosition(
-                                TextPosition(offset: myController.text.length)
-                              ); 
-                              setState(() {});
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) {
+                            if (value == '') {
+                              myController.text = value;
+                              setState(() {
+                                _counterString = value;
+                                _counterValue = 0;
+                              });
+                            } else {
+                              setState(() {
+                                _counterString = value;
+                                print(_counterString);
+                                if (widget.listProd.facturar == 1) {
+                                  _counterValue = int.parse(value);
+                                } else {
+                                  if (int.parse(value) <= 1) {
+                                    _counterValue = 1;
+                                  } else if (int.parse(value) >=
+                                      int.parse(widget.listProd.stock)) {
+                                    _counterValue =
+                                        int.parse(widget.listProd.stock);
+                                  } else {
+                                    _counterValue = int.parse(value);
+                                  }
+                                }
 
-                            });
-                            
+                                /* myController.text = value.toString();
+                                // this changes cursor position
+                                myController.selection =
+                                    TextSelection.fromPosition(TextPosition(
+                                        offset: myController.text.length));*/
+                              });
+                            }
                           },
                           /*validator: (value) {
                             /*if (value != null && value.length >= 1) {
@@ -361,29 +390,36 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           setState(() {
-                            print(_counterValue);
-                            if(_counterValue>=int.parse(widget.listProd.stock)){
-                              _counterValue=int.parse(widget.listProd.stock);
-                              print(_counterValue);
-                            }else{
+                            if (widget.listProd.facturar == '1') {
                               _counterValue++;
+                            } else {
                               print(_counterValue);
+                              if (_counterValue >=
+                                  int.parse(widget.listProd.stock)) {
+                                _counterValue =
+                                    int.parse(widget.listProd.stock);
+                                print(_counterValue);
+                              } else {
+                                _counterValue++;
+                                print(_counterValue);
+                              }
                             }
+
                             myController.selection = TextSelection.fromPosition(
-                              TextPosition(offset: myController.text.length)
-                            ); 
+                                TextPosition(offset: myController.text.length));
                           });
                         },
                         child: Container(
                           margin: const EdgeInsets.all(0),
                           padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                               //color: Theme.of(context).primaryColor,
-                              color: Colors.green[400],
-                              borderRadius:const BorderRadius.only(topRight: Radius.circular(15),bottomRight: Radius.circular(15))
-                          ),
+                              color: Color.fromARGB(255, 18, 202, 172),
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(15),
+                                  bottomRight: Radius.circular(15))),
                           child: const Icon(
                             Icons.add,
                             color: Colors.white,
@@ -397,12 +433,55 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                 Consumer<Cart>(builder: (context, cart, child) {
                   return GestureDetector(
                     onTap: () {
-                      cart.add(
-                          _counterValue, widget.listProd.idProd, widget.id_tmp);
+                      if (widget.listProd.facturar == '1') {
+                        const snackBar = SnackBar(
+                          padding: EdgeInsets.all(20),
+                          content: Text(
+                            'Item agregado al carrito!',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Colors.green,
+                        );
+                        cart.add(_counterValue, widget.listProd.idProd,
+                            widget.id_tmp);
+                        // Find the ScaffoldMessenger in the widget tree
+                        // and use it to show a SnackBar.
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      } else {
+                        if (_counterValue > int.parse(widget.listProd.stock)) {
+                          const snackBar = SnackBar(
+                            padding: EdgeInsets.all(20),
+                            content: Text(
+                              'Articulo sin Stock!',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.red,
+                          );
+
+                          // Find the ScaffoldMessenger in the widget tree
+                          // and use it to show a SnackBar.
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        } else {
+                          const snackBar = SnackBar(
+                            padding: EdgeInsets.all(20),
+                            content: Text(
+                              'Item agregado al carrito!',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.green,
+                          );
+
+                          // Find the ScaffoldMessenger in the widget tree
+                          // and use it to show a SnackBar.
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          cart.add(_counterValue, widget.listProd.idProd,
+                              widget.id_tmp);
+                        }
+                      }
                     },
                     child: Container(
                       margin: const EdgeInsets.all(5),
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                           //color: Theme.of(context).primaryColor,
                           color: Colors.cyan,

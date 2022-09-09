@@ -8,8 +8,10 @@ import 'package:factura_gozeri/screens/screens.dart';
 import 'package:factura_gozeri/services/services.dart';
 
 class ViewTabsScreen extends StatefulWidget {
-  const ViewTabsScreen({Key? key, required this.id_tmp}) : super(key: key);
+  const ViewTabsScreen({Key? key, required this.id_tmp, required this.clave})
+      : super(key: key);
   final id_tmp;
+  final clave;
   @override
   State<ViewTabsScreen> createState() => _ViewTabsScreen();
 }
@@ -28,6 +30,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    bool facturar_check = false;
     final departamentoService = Provider.of<DepartamentoService>(context);
     List<String> data = [];
     List<String> data_id = [];
@@ -82,28 +85,18 @@ AppBar appBarra(size, context, id_tmp) {
       width: size.width * 0.25,
     ),
     actions: [
-      CircleAvatar(
-        backgroundColor: Colors.cyan[300],
-        child: IconButton(
-          onPressed: () {
-            ItemsSearch.id_tmp=id_tmp;
-            showSearch(context: context, delegate: ItemsSearch());
-          },
-          icon: const Icon(
-            Icons.search,
-            color: Colors.white,
-          ),
-        ),
-      ),
       const SizedBox(
         width: 15,
       ),
       CircleAvatar(
         backgroundColor: Colors.cyan[300],
         child: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            ItemsSearch.id_tmp = id_tmp;
+            showSearch(context: context, delegate: ItemsSearch());
+          },
           icon: const Icon(
-            Icons.receipt_long,
+            Icons.search,
             color: Colors.white,
           ),
         ),

@@ -40,6 +40,7 @@ class Producto {
     required this.descComp,
     required this.precio,
     required this.modo_venta,
+    required this.facturar,
     required this.stock,
     required this.foto,
     required this.url,
@@ -55,6 +56,7 @@ class Producto {
   String descComp;
   String precio;
   String modo_venta;
+  String facturar;
   String stock;
   String foto;
   String url;
@@ -74,6 +76,7 @@ class Producto {
         descComp: json["DESC_COMP"],
         precio: json["PRECIO"],
         modo_venta: json["MODO_VENTA"],
+        facturar: json["FACTURAR"],
         stock: json["STOCK"],
         foto: json["FOTO"],
         url: json["URL"],
@@ -90,6 +93,7 @@ class Producto {
         "DESC_COMP": descComp,
         "PRECIO": precio,
         "MODO_VENTA": modo_venta,
+        "FACTURAR": facturar,
         "STOCK": stock,
         "FOTO": foto,
         "URL": url,

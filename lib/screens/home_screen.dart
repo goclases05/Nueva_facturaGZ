@@ -206,7 +206,8 @@ class HomeScreen extends StatelessWidget {
                           final _facturacion =
                               Provider.of<Facturacion>(context, listen: false);
                           final factuProv = await _facturacion.new_tmpFactura();
-
+                          print('factura no: ${factuProv[0]}');
+                          print('clave : ${factuProv[1]}');
                           if (index == 0) {
                             _depa.isLoading = true;
                             _cart.cantidad = 0;
@@ -233,11 +234,13 @@ class HomeScreen extends StatelessWidget {
                               ScaffoldMessenger.of(context)
                                   .showSnackBar(snackBar);
                             } else {
+                              // ignore: use_build_context_synchronously
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        ViewTabsScreen(id_tmp: factuProv)),
+                                    builder: (context) => ViewTabsScreen(
+                                        id_tmp: factuProv[0],
+                                        clave: factuProv[1])),
                               );
                             }
                           }

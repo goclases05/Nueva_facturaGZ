@@ -9,7 +9,7 @@ class Facturacion extends ChangeNotifier {
   final String _baseUrl = "app.gozeri.com";
   bool tmp_creada = false;
 
-  Future<String> new_tmpFactura() async {
+  Future<dynamic> new_tmpFactura() async {
     tmp_creada = false;
     notifyListeners();
 
@@ -30,8 +30,9 @@ class Facturacion extends ChangeNotifier {
       notifyListeners();
 
       final id = add['id_tmp'];
-      print('${id}');
-      return id;
+      final array = [id, add['clave']];
+      print(array);
+      return array;
     } else {
       return add['error'];
     }
