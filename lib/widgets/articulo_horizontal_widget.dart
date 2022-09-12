@@ -1,10 +1,14 @@
+import 'dart:ui';
+
 import 'package:count_stepper/count_stepper.dart';
 import 'package:custom_bottom_sheet/custom_bottom_sheet.dart';
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/models/producto_x_departamento_models.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/widgets/articulo_sheet_widget.dart';
+import 'package:factura_gozeri/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
 class VistaArticulos extends StatefulWidget {
@@ -56,8 +60,13 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
       context: context,
       backgroundColor: Colors.white,
       pillColor: Colors.cyan,
-      transitionDuration: Duration(milliseconds: 200),
-      child: ArticuloSheet(listProd: widget.listProd),
+      transitionDuration: const Duration(milliseconds: 200),
+      child: ListView(
+        physics: BouncingScrollPhysics(),
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        children: [ArticuloSheet(listProd: widget.listProd)]
+        )
     );
   }
 
@@ -250,184 +259,185 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
           Container(
             padding: const EdgeInsets.only(bottom: 10, right: 10),
             width: double.infinity,
-            child: Row(
+            child: (widget.listProd.modo_venta=='2')?
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton.icon(
+                  icon: const Icon(
+                    Icons.add_shopping_cart_rounded,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    customBottomSheet(context);
+                  },
+                  style: TextButton.styleFrom(
+                    primary: Colors.white,
+                    backgroundColor: Colors.cyan),
+                  label: const Text("Agregar al carrito")
+                )
+              ],
+            )
+            :
+            Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 const SizedBox(
                   width: 10,
                 ),
-                /* Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(15)),
-                  child: CountStepper(
-                    iconDecrement: Icon(
-                      Icons.remove,
-                      color: Colors.red[100],
-                    ),
-                    iconIncrement: Icon(
-                      Icons.add,
-                      color: Colors.cyan[700],
-                    ),
-                    iconColor: Colors.cyan[700],
-                    defaultValue: _counterValue,
-                    max: 10,
-                    min: 1,
-                    iconDecrementColor: Colors.cyan[700],
-                    splashRadius: 25,
-                    onPressed: (value) {
-                      setState(() {
-                        _counterValue = value;
-                      });
-                    },
-                  ),
-                ),*/
                 Container(
-                  padding: EdgeInsets.only(left: 4, right: 4),
+                  padding:const EdgeInsets.all(1),
                   decoration: BoxDecoration(
-                      //color: Theme.of(context).primaryColor,
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(20)),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            if (widget.listProd.facturar == '1') {
-                              _counterValue--;
-                              print(_counterValue);
-                              myController.text = _counterValue.toString();
-                            } else {
-                              if (_counterValue <= 0) {
-                                _counterValue++;
-                                print(_counterValue);
-                                myController.text = _counterValue.toString();
-                              } else if (_counterValue > 1) {
+                        //color: Theme.of(context).primaryColor,
+                        color: Colors.blueGrey[100],
+                        borderRadius: BorderRadius.circular(20)),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        //color: Theme.of(context).primaryColor,
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (widget.listProd.facturar == '1') {
                                 _counterValue--;
                                 print(_counterValue);
                                 myController.text = _counterValue.toString();
-                              }
-                            }
-
-                            myController.selection = TextSelection.fromPosition(
-                                TextPosition(offset: myController.text.length));
-                          });
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.all(0),
-                          padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(
-                              //color: Theme.of(context).primaryColor,
-                              color: Color.fromARGB(255, 247, 114, 112),
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(15),
-                                  bottomLeft: Radius.circular(15))),
-                          child: const Icon(
-                            Icons.remove,
-                            color: Colors.white,
-                            size: 25,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        color: Colors.white,
-                        margin: EdgeInsets.symmetric(vertical: 2),
-                        width: MediaQuery.of(context).size.width * 0.2,
-                        child: TextField(
-                          controller: myController,
-                          //initialValue: myController.text,
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
-                            if (value == '') {
-                              myController.text = value;
-                              setState(() {
-                                _counterString = value;
-                                _counterValue = 0;
-                              });
-                            } else {
-                              setState(() {
-                                _counterString = value;
-                                print(_counterString);
-                                if (widget.listProd.facturar == 1) {
-                                  _counterValue = int.parse(value);
-                                } else {
-                                  if (int.parse(value) <= 1) {
-                                    _counterValue = 1;
-                                  } else if (int.parse(value) >=
-                                      int.parse(widget.listProd.stock)) {
-                                    _counterValue =
-                                        int.parse(widget.listProd.stock);
-                                  } else {
-                                    _counterValue = int.parse(value);
-                                  }
-                                }
-
-                                /* myController.text = value.toString();
-                                // this changes cursor position
-                                myController.selection =
-                                    TextSelection.fromPosition(TextPosition(
-                                        offset: myController.text.length));*/
-                              });
-                            }
-                          },
-                          /*validator: (value) {
-                            /*if (value != null && value.length >= 1) {
-                              return null;
-                            } else {
-                              return 'Inserte un Usuario| Correo ';
-                            }*/
-                          },*/
-                          cursorColor: Colors.cyan,
-                          decoration: const InputDecoration(
-                            fillColor: Colors.white,
-                            hintText: "0.00",
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            if (widget.listProd.facturar == '1') {
-                              _counterValue++;
-                            } else {
-                              print(_counterValue);
-                              if (_counterValue >=
-                                  int.parse(widget.listProd.stock)) {
-                                _counterValue =
-                                    int.parse(widget.listProd.stock);
-                                print(_counterValue);
                               } else {
-                                _counterValue++;
-                                print(_counterValue);
+                                if (_counterValue <= 0) {
+                                  _counterValue++;
+                                  print(_counterValue);
+                                  myController.text = _counterValue.toString();
+                                } else if (_counterValue > 1) {
+                                  _counterValue--;
+                                  print(_counterValue);
+                                  myController.text = _counterValue.toString();
+                                }
                               }
-                            }
-
-                            myController.selection = TextSelection.fromPosition(
-                                TextPosition(offset: myController.text.length));
-                          });
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.all(0),
-                          padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(
-                              //color: Theme.of(context).primaryColor,
-                              color: Color.fromARGB(255, 18, 202, 172),
-                              borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(15),
-                                  bottomRight: Radius.circular(15))),
-                          child: const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                            size: 25,
+                
+                              myController.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: myController.text.length));
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.all(0),
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                                //color: Theme.of(context).primaryColor,
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    bottomLeft: Radius.circular(15))),
+                            child: const Icon(
+                              Icons.remove,
+                              color: Colors.cyan,
+                              size: 25,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        Container(
+                          color: Colors.white,
+                          margin: EdgeInsets.symmetric(vertical: 2),
+                          width: MediaQuery.of(context).size.width * 0.2,
+                          child: TextField(
+                            controller: myController,
+                            //initialValue: myController.text,
+                            textAlign: TextAlign.center,
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              if (value == '') {
+                                myController.text = value;
+                                setState(() {
+                                  _counterString = value;
+                                  _counterValue = 0;
+                                });
+                              } else {
+                                setState(() {
+                                  _counterString = value;
+                                  print(_counterString);
+                                  if (widget.listProd.facturar == 1) {
+                                    _counterValue = int.parse(value);
+                                  } else {
+                                    if (int.parse(value) <= 1) {
+                                      _counterValue = 1;
+                                    } else if (int.parse(value) >=
+                                        int.parse(widget.listProd.stock)) {
+                                      _counterValue =
+                                          int.parse(widget.listProd.stock);
+                                    } else {
+                                      _counterValue = int.parse(value);
+                                    }
+                                  }
+                
+                                  /* myController.text = value.toString();
+                                  // this changes cursor position
+                                  myController.selection =
+                                      TextSelection.fromPosition(TextPosition(
+                                          offset: myController.text.length));*/
+                                });
+                              }
+                            },
+                            /*validator: (value) {
+                              /*if (value != null && value.length >= 1) {
+                                return null;
+                              } else {
+                                return 'Inserte un Usuario| Correo ';
+                              }*/
+                            },*/
+                            cursorColor: Colors.cyan,
+                            decoration: const InputDecoration(
+                              fillColor: Colors.white,
+                              hintText: "0.00",
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (widget.listProd.facturar == '1') {
+                                _counterValue++;
+                              } else {
+                                print(_counterValue);
+                                if (_counterValue >=
+                                    int.parse(widget.listProd.stock)) {
+                                  _counterValue =
+                                      int.parse(widget.listProd.stock);
+                                  print(_counterValue);
+                                } else {
+                                  _counterValue++;
+                                  print(_counterValue);
+                                }
+                              }
+                
+                              myController.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: myController.text.length));
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.all(0),
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                                //color: Theme.of(context).primaryColor,
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(15),
+                                    bottomRight: Radius.circular(15))),
+                            child: const Icon(
+                              Icons.add,
+                              color: Colors.cyan,
+                              size: 25,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Consumer<Cart>(builder: (context, cart, child) {

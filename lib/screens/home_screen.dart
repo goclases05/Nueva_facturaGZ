@@ -110,9 +110,12 @@ class HomeScreen extends StatelessWidget {
                           shape: BoxShape.circle,
                           border:
                               Border.all(color: Colors.white60, width: 2.0)),
-                      child: CircleAvatar(
-                        backgroundImage: NetworkImage(foto_usuario),
-                      ),
+                      child:(foto_usuario=='' || foto_usuario=='https://imagenes.gozeri.com/ImagenesGozeri/siluetas_perfil.gif')?const CircleAvatar(
+                        backgroundImage:AssetImage('assets/perfil_user.png'),
+                      ):
+                      CircleAvatar(
+                        backgroundImage:NetworkImage(foto_usuario),
+                      )
                     ),
                   ],
                 ),

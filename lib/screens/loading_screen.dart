@@ -8,6 +8,7 @@ class LoadingScreen extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         foregroundColor: Colors.white,
         title:Image.asset(
           'assets/gozeri_blanco2.png',
@@ -26,21 +27,7 @@ class LoadingScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(
-            width: 15,
-          ),
-          CircleAvatar(
-            backgroundColor: Colors.cyan[300],
-            child: IconButton(
-              onPressed: () {
-                
-              },
-              icon:const Icon(
-                Icons.receipt_long,
-                color: Colors.white,
-              ),
-            ),
-          ),
+          
           const SizedBox(
             width: 15,
           ),

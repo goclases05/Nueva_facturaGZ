@@ -1,4 +1,5 @@
 import 'package:factura_gozeri/models/producto_x_departamento_models.dart';
+import 'package:factura_gozeri/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 class ArticuloSheet extends StatefulWidget {
@@ -32,28 +33,36 @@ class _ArticuloSheetState extends State<ArticuloSheet> {
                         width: MediaQuery.of(context).size.width * 0.3),
               )),
           Expanded(
-              child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.listProd.producto,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              height: 1,
-                              letterSpacing: 0,
-                              wordSpacing: 0,
-                              fontSize: 15),
-                        ),
-                        Text(
-                          widget.listProd.descBreve,
-                          maxLines: 2,
-                          style: const TextStyle(
-                              fontSize: 15, color: Colors.black45),
-                        ),
-                      ])))
-        ])
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.listProd.producto,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          height: 1,
+                          letterSpacing: 0,
+                          wordSpacing: 0,
+                          fontSize: 15),
+                    ),
+                    Text(
+                      widget.listProd.descBreve,
+                      maxLines: 2,
+                      style: const TextStyle(
+                          fontSize: 15, color: Colors.black45),
+                    ),
+
+                  ]
+                )
+              )
+            )
+        ]),
+        (widget.listProd.modo_venta=='2')?
+        ModoVenta2()
+        :
+        Text('')
       ]),
     );
   }
