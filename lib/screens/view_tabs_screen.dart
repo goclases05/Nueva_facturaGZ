@@ -38,15 +38,168 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
 
     if (departamentoService.isLoading) return const LoadingScreen();
 
+    List<Tab> _tabs = [];
+    List<Widget> _views = [];
+
     for (int i = 0; i < departamentoService.depa.length; i++) {
       data.add(departamentoService.depa[i].departamento);
       data_id.add(departamentoService.depa[i].id);
+
+      _tabs.add(
+        Tab(
+          text: departamentoService.depa[i].departamento,
+        ),
+      );
+
+      _views.add(ViewProductoTab(
+        id_departamento: departamentoService.depa[i].id,
+        id_tmp: widget.id_tmp,
+      ));
     }
 
-    return Scaffold(
-        appBar: appBarra(size, context, widget.id_tmp),
+    return DefaultTabController(
+      length: _tabs.length,
+      child: Scaffold(
+        appBar: AppBar(
+          foregroundColor: Colors.white,
+          elevation: 0,
+          title: Image.asset(
+            'assets/gozeri_blanco2.png',
+            width: size.width * 0.25,
+          ),
+          actions: [
+            const SizedBox(
+              width: 15,
+            ),
+            CircleAvatar(
+              backgroundColor: Colors.cyan[300],
+              child: IconButton(
+                onPressed: () {
+                  ItemsSearch.id_tmp = widget.id_tmp;
+                  showSearch(context: context, delegate: ItemsSearch());
+                },
+                icon: const Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 15,
+            ),
+            CircleAvatar(
+              backgroundColor: Colors.cyan[300],
+              child: Consumer<Cart>(builder: (context, cart, child) {
+                return Badge(
+                  showBadge: (cart.count == 0) ? false : true,
+                  badgeContent: Text(
+                    '${cart.count}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => PrintScreen(
+                                    id_tmp: widget.id_tmp,
+                                  )));
+                    },
+                    icon: const Icon(
+                      Icons.shopping_cart,
+                      color: Colors.white,
+                    ),
+                  ),
+                );
+                return Text(
+                  '${cart.count}',
+                  style: TextStyle(color: Colors.white),
+                );
+              }),
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+          ],
+          bottom: TabBar(
+            labelColor: Colors.white,
+            unselectedLabelColor: Color.fromARGB(255, 219, 219, 219),
+            isScrollable: true,
+            tabs: _tabs,
+          ),
+        ),
+        body: TabBarView(
+          children: _views,
+        ),
+      ),
+    );
+
+    /*return Scaffold(
+        //appBar: appBarra(size, context, widget.id_tmp),
+        appBar: AppBar(
+          foregroundColor: Colors.white,
+          elevation: 0,
+          title: Image.asset(
+            'assets/gozeri_blanco2.png',
+            width: size.width * 0.25,
+          ),
+          actions: [
+            const SizedBox(
+              width: 15,
+            ),
+            CircleAvatar(
+              backgroundColor: Colors.cyan[300],
+              child: IconButton(
+                onPressed: () {
+                  ItemsSearch.id_tmp = widget.id_tmp;
+                  showSearch(context: context, delegate: ItemsSearch());
+                },
+                icon: const Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 15,
+            ),
+            CircleAvatar(
+              backgroundColor: Colors.cyan[300],
+              child: Consumer<Cart>(builder: (context, cart, child) {
+                return Badge(
+                  showBadge: (cart.count == 0) ? false : true,
+                  badgeContent: Text(
+                    '${cart.count}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => PrintScreen(
+                                    id_tmp: widget.id_tmp,
+                                  )));
+                    },
+                    icon: const Icon(
+                      Icons.shopping_cart,
+                      color: Colors.white,
+                    ),
+                  ),
+                );
+                return Text(
+                  '${cart.count}',
+                  style: TextStyle(color: Colors.white),
+                );
+              }),
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+          ],
+        ),
         body: SafeArea(
-          child: CustomTabView(
+          /*child: CustomTabView(
             initPosition: initPosition,
             itemCount: data.length,
             tabBuilder: (context, index) => Tab(text: data[index]),
@@ -62,17 +215,9 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
             },
             onScroll: (position) => print('$position'),
             stub: Text(''),
-          ),
-        )
-        /*floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            data.add('Page ${data.length}');
-          });
-        },
-        child: Icon(Icons.add),
-      ),*/
-        );
+          ),*/
+
+        ));*/
   }
 }
 

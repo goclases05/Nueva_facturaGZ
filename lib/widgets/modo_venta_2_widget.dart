@@ -11,12 +11,20 @@ class _ModoVenta2State extends State<ModoVenta2> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children:const [
-        TextField(
-          decoration: InputDecoration(
-            border: OutlineInputBorder()
-          )
-        ),
+      children: const [
+        Text('Costo'),
+        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
+        Text('Cantidad'),
+        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
+        Text('Monto'),
+        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
+        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
+        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
+        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
+        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
+        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
+        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
+        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
       ],
     );
   }
