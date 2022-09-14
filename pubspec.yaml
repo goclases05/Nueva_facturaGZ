@@ -49,7 +49,7 @@ dependencies:
   esc_pos_utils: ^1.1.0
   flutter_bluetooth_basic: ^0.1.7
   image: ^3.2.0
-  flutter_switch: ^0.3.2
+  tutorial_coach_mark: ^1.2.4
 
 dev_dependencies:
   flutter_test:

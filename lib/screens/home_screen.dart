@@ -6,9 +6,29 @@ import 'package:factura_gozeri/screens/screens.dart';
 import 'package:factura_gozeri/services/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+//Crie suas global keys e adicione aos componentes que deverão ser
+//localizados e exibidos.
+  late TutorialCoachMark tutorialCoachMark;
+  GlobalKey keyButton = GlobalKey();
+  GlobalKey keyFacturar = GlobalKey();
+  GlobalKey keyHistorial = GlobalKey();
+  //Iniciando o estado.
+  @override
+  void initState() {
+    createTutorial();
+    Future.delayed(Duration.zero, showTutorial);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +79,7 @@ class HomeScreen extends StatelessWidget {
                   CircleAvatar(
                     backgroundColor: Colors.white38,
                     child: IconButton(
+                      key: keyButton,
                       onPressed: () {},
                       icon: Icon(Icons.print),
                       color: Colors.white,
@@ -104,19 +125,22 @@ class HomeScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      width: 100.0,
-                      height: 100.0,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border:
-                              Border.all(color: Colors.white60, width: 2.0)),
-                      child:(foto_usuario=='' || foto_usuario=='https://imagenes.gozeri.com/ImagenesGozeri/siluetas_perfil.gif')?const CircleAvatar(
-                        backgroundImage:AssetImage('assets/perfil_user.png'),
-                      ):
-                      CircleAvatar(
-                        backgroundImage:NetworkImage(foto_usuario),
-                      )
-                    ),
+                        width: 100.0,
+                        height: 100.0,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border:
+                                Border.all(color: Colors.white60, width: 2.0)),
+                        child: (foto_usuario == '' ||
+                                foto_usuario ==
+                                    'https://imagenes.gozeri.com/ImagenesGozeri/siluetas_perfil.gif')
+                            ? const CircleAvatar(
+                                backgroundImage:
+                                    AssetImage('assets/perfil_user.png'),
+                              )
+                            : CircleAvatar(
+                                backgroundImage: NetworkImage(foto_usuario),
+                              )),
                   ],
                 ),
                 const SizedBox(
@@ -249,12 +273,13 @@ class HomeScreen extends StatelessWidget {
                           }
                         },
                         child: Card(
+                          key: (index == 0) ? keyFacturar : keyHistorial,
                           shape: const RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15))),
                           child: Container(
                             color: Colors.white,
-                            margin: EdgeInsets.all(4.0),
+                            margin: const EdgeInsets.all(4.0),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
@@ -284,5 +309,209 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
     ));
+  }
+
+  void showTutorial() {
+    tutorialCoachMark.show(context: context);
+  }
+
+  void createTutorial() {
+    tutorialCoachMark = TutorialCoachMark(
+      targets: _createTargets(),
+      colorShadow: Colors.black45,
+      textSkip: "Saltar Presentación",
+      paddingFocus: 10,
+      opacityShadow: 0.8,
+      onFinish: () {
+        print('termino');
+      },
+      onClickTarget: (target) {
+        print('onClickTarget: $target');
+      },
+      onClickTargetWithTapPosition: (target, tapDetails) {
+        print("target: $target");
+        print(
+            "clicked at position local: ${tapDetails.localPosition} - global: ${tapDetails.globalPosition}");
+      },
+      onClickOverlay: (target) {
+        print('onClickOverlay: $target');
+      },
+      onSkip: () {
+        print("skip");
+      },
+    );
+  }
+
+  List<TargetFocus> _createTargets() {
+    List<TargetFocus> targets = [];
+    targets.add(
+      TargetFocus(
+        identify: "Target 1",
+        keyTarget: keyButton,
+        color: Colors.black54,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) {
+              return Container(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const Text(
+                      "Impresoras",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 20.0,
+                      ),
+                    ),
+                    const Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: Text(
+                        "Predetermina tu impresora de preferencia",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    ElevatedButton.icon(
+                        icon: const Icon(
+                          Icons.chevron_left,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          controller.previous();
+                        },
+                        style: TextButton.styleFrom(
+                            primary: Colors.white,
+                            backgroundColor: Colors.cyan),
+                        label: const Text("Ver Anterior"))
+                  ],
+                ),
+              );
+            },
+          )
+        ],
+        shape: ShapeLightFocus.RRect,
+        radius: 5,
+      ),
+    );
+
+    targets.add(
+      TargetFocus(
+        identify: "Target 2",
+        keyTarget: keyFacturar,
+        color: Colors.black54,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) {
+              return Container(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const Text(
+                      "Facturar:",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 20.0,
+                      ),
+                    ),
+                    const Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: Text(
+                        "Realiza tus facturas.",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    ElevatedButton.icon(
+                        icon: const Icon(
+                          Icons.chevron_left,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          controller.previous();
+                        },
+                        style: TextButton.styleFrom(
+                            primary: Colors.white,
+                            backgroundColor: Colors.cyan),
+                        label: const Text("Ver Anterior"))
+                  ],
+                ),
+              );
+            },
+          )
+        ],
+        shape: ShapeLightFocus.RRect,
+        radius: 5,
+      ),
+    );
+
+    targets.add(
+      TargetFocus(
+        identify: "Target 3",
+        keyTarget: keyHistorial,
+        color: Colors.black54,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) {
+              return Container(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const Text(
+                      "Historial",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 20.0,
+                      ),
+                    ),
+                    const Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: Text(
+                        "Área asignada para el registro de las facturas realizadas (terminadas y pendientes de terminar).",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    ElevatedButton.icon(
+                        icon: const Icon(
+                          Icons.chevron_left,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          controller.previous();
+                        },
+                        style: TextButton.styleFrom(
+                            primary: Colors.white,
+                            backgroundColor: Colors.cyan),
+                        label: const Text("Ver Anterior"))
+                  ],
+                ),
+              );
+            },
+          )
+        ],
+        shape: ShapeLightFocus.RRect,
+        radius: 5,
+      ),
+    );
+
+    return targets;
   }
 }
