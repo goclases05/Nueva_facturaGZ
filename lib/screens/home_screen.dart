@@ -193,7 +193,7 @@ class HomeScreen extends StatelessWidget {
                     topRight: Radius.circular(20))),
           ),
           Container(
-            margin: EdgeInsets.only(top: size.height * 0.38),
+            margin: EdgeInsets.only(top: size.height * 0.33),
             decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),

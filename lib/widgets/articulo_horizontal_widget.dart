@@ -308,10 +308,10 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                 top: 0,
                 left: 5,
                 child: Chip(
-                  backgroundColor: Color.fromARGB(243, 200, 230, 201),
+                  backgroundColor:(widget.listProd.modo_venta=='2' || widget.listProd.stock.contains(RegExp('-'), 0))?const Color.fromARGB(243, 200, 230, 201):(int.parse(widget.listProd.stock)<=0)?const Color.fromARGB(243, 240, 144, 132): const Color.fromARGB(243, 200, 230, 201),
                   label: Text(
                     'Stock: ${widget.listProd.stock}',
-                    style: TextStyle(color: Colors.black54),
+                    style:const TextStyle(color: Colors.black54),
                   ),
                 )
                 /*Container(

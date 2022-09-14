@@ -38,7 +38,7 @@ class LoadingScreen extends StatelessWidget {
                 
               },
               icon:const Icon(
-                Icons.shopping_cart,
+                Icons.receipt_long,
                 color: Colors.white,
               ),
             ),

@@ -106,7 +106,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                                   )));
                     },
                     icon: const Icon(
-                      Icons.shopping_cart,
+                      Icons.receipt_long,
                       color: Colors.white,
                     ),
                   ),
@@ -268,7 +268,7 @@ AppBar appBarra(size, context, id_tmp) {
                             )));
               },
               icon: const Icon(
-                Icons.shopping_cart,
+                Icons.receipt_long,
                 color: Colors.white,
               ),
             ),
@@ -286,7 +286,7 @@ AppBar appBarra(size, context, id_tmp) {
   );
 }
 
-class CustomTabView extends StatefulWidget {
+/*class CustomTabView extends StatefulWidget {
   final int itemCount;
   final IndexedWidgetBuilder tabBuilder;
   final IndexedWidgetBuilder pageBuilder;
@@ -434,3 +434,4 @@ class _CustomTabsState extends State<CustomTabView>
     }
   }
 }
+*/
