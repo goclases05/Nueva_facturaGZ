@@ -357,8 +357,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const Text(
+                  children: const <Widget>[
+                    Text(
                       "Impresoras",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -366,29 +366,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontSize: 20.0,
                       ),
                     ),
-                    const Padding(
+                    Padding(
                       padding: const EdgeInsets.only(top: 10.0),
                       child: Text(
                         "Predetermina tu impresora de preferencia",
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
-                    const SizedBox(
+                    SizedBox(
                       height: 20,
-                    ),
-                    ElevatedButton.icon(
-                        icon: const Icon(
-                          Icons.chevron_left,
-                          size: 20,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          controller.previous();
-                        },
-                        style: TextButton.styleFrom(
-                            primary: Colors.white,
-                            backgroundColor: Colors.cyan),
-                        label: const Text("Ver Anterior"))
+                    )
                   ],
                 ),
               );

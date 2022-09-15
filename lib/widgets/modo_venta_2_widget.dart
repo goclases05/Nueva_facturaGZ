@@ -11,20 +11,54 @@ class _ModoVenta2State extends State<ModoVenta2> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: const [
-        Text('Costo'),
-        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
-        Text('Cantidad'),
-        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
-        Text('Monto'),
-        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
-        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
-        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
-        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
-        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
-        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
-        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
-        TextField(decoration: InputDecoration(border: OutlineInputBorder())),
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+                width: MediaQuery.of(context).size.width * 0.3,
+                child: const Text(
+                  'Precio:',
+                  style: TextStyle(),
+                )),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.6,
+              child: const TextField(
+                  decoration: InputDecoration(border: OutlineInputBorder())),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Container(
+                width: MediaQuery.of(context).size.width * 0.3,
+                child: const Text(
+                  'Cantidad:',
+                  style: TextStyle(),
+                )),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.6,
+              child: const TextField(
+                  decoration: InputDecoration(border: OutlineInputBorder())),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Container(
+                width: MediaQuery.of(context).size.width * 0.3,
+                child: const Text(
+                  'Monto:',
+                  style: TextStyle(),
+                )),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.6,
+              child: const TextField(
+                  decoration: InputDecoration(border: OutlineInputBorder())),
+            ),
+          ],
+        ),
       ],
     );
   }
