@@ -35,6 +35,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
     List<String> data = [];
     List<String> data_id = [];
     int initPosition = 0;
+    Color ColPrimary = Colors.cyan;
 
     if (departamentoService.isLoading) return const LoadingScreen();
 
@@ -52,15 +53,16 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
       );
 
       _views.add(ViewProductoTab(
-        id_departamento: departamentoService.depa[i].id,
-        id_tmp: widget.id_tmp,
-      ));
+          id_departamento: departamentoService.depa[i].id,
+          id_tmp: widget.id_tmp,
+          colPrimary: ColPrimary));
     }
 
     return DefaultTabController(
       length: _tabs.length,
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: ColPrimary,
           foregroundColor: Colors.white,
           elevation: 0,
           title: Image.asset(
@@ -72,7 +74,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
               width: 15,
             ),
             CircleAvatar(
-              backgroundColor: Colors.cyan[300],
+              backgroundColor: Colors.white38,
               child: IconButton(
                 onPressed: () {
                   ItemsSearch.id_tmp = widget.id_tmp;
@@ -88,7 +90,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
               width: 15,
             ),
             CircleAvatar(
-              backgroundColor: Colors.cyan[300],
+              backgroundColor: Colors.white38,
               child: Consumer<Cart>(builder: (context, cart, child) {
                 return Badge(
                   showBadge: (cart.count == 0) ? false : true,
@@ -221,7 +223,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
   }
 }
 
-AppBar appBarra(size, context, id_tmp) {
+AppBar appBarra(size, context, id_tmp, ColPrimary) {
   return AppBar(
     foregroundColor: Colors.white,
     elevation: 0,

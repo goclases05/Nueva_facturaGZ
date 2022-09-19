@@ -38,10 +38,15 @@ class _VistaArticulosState extends State<VistaArticulos> {
 }
 
 class ArticleHorizontal extends StatefulWidget {
-  ArticleHorizontal({Key? key, required this.listProd, required this.id_tmp})
+  ArticleHorizontal(
+      {Key? key,
+      required this.listProd,
+      required this.id_tmp,
+      required this.colorPrimary})
       : super(key: key);
   final Producto listProd;
   final String id_tmp;
+  Color colorPrimary;
 
   @override
   State<ArticleHorizontal> createState() => _ArticleHorizontalState();
@@ -124,7 +129,9 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                     child: Column(
                                       children: [
                                         ArticuloSheet(
-                                            listProd: widget.listProd),
+                                          listProd: widget.listProd,
+                                          colorPrimary: widget.colorPrimary,
+                                        ),
                                       ],
                                     ))),
                       ],
@@ -263,11 +270,10 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                   children: [
                                     Text(
                                       "${Preferencias.moneda}",
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
-                                          color:
-                                              Color.fromARGB(255, 4, 146, 165)),
+                                          color: widget.colorPrimary),
                                     ),
                                     Expanded(
                                       child: DropdownButton<String>(
@@ -308,10 +314,15 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                 top: 0,
                 left: 5,
                 child: Chip(
-                  backgroundColor:(widget.listProd.modo_venta=='2' || widget.listProd.stock.contains(RegExp('-'), 0))?const Color.fromARGB(243, 200, 230, 201):(int.parse(widget.listProd.stock)<=0)?const Color.fromARGB(243, 240, 144, 132): const Color.fromARGB(243, 200, 230, 201),
+                  backgroundColor: (widget.listProd.modo_venta == '2' ||
+                          widget.listProd.stock.contains(RegExp('-'), 0))
+                      ? const Color.fromARGB(243, 200, 230, 201)
+                      : (int.parse(widget.listProd.stock) <= 0)
+                          ? const Color.fromARGB(243, 240, 144, 132)
+                          : const Color.fromARGB(243, 200, 230, 201),
                   label: Text(
                     'Stock: ${widget.listProd.stock}',
-                    style:const TextStyle(color: Colors.black54),
+                    style: const TextStyle(color: Colors.black54),
                   ),
                 )
                 /*Container(
@@ -345,7 +356,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                           },
                           style: TextButton.styleFrom(
                               primary: Colors.white,
-                              backgroundColor: Colors.cyan),
+                              backgroundColor: widget.colorPrimary),
                           label: const Text("Agregar al carrito"))
                     ],
                   )
@@ -405,9 +416,9 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                       borderRadius: BorderRadius.only(
                                           topLeft: Radius.circular(15),
                                           bottomLeft: Radius.circular(15))),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.remove,
-                                    color: Colors.cyan,
+                                    color: widget.colorPrimary,
                                     size: 25,
                                   ),
                                 ),
@@ -462,7 +473,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                 return 'Inserte un Usuario| Correo ';
                               }*/
                             },*/
-                                  cursorColor: Colors.cyan,
+                                  cursorColor: widget.colorPrimary,
                                   decoration: const InputDecoration(
                                     fillColor: Colors.white,
                                     hintText: "0.00",
@@ -503,9 +514,9 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                       borderRadius: BorderRadius.only(
                                           topRight: Radius.circular(15),
                                           bottomRight: Radius.circular(15))),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.add,
-                                    color: Colors.cyan,
+                                    color: widget.colorPrimary,
                                     size: 25,
                                   ),
                                 ),
@@ -572,7 +583,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                                 //color: Theme.of(context).primaryColor,
-                                color: Colors.cyan,
+                                color: widget.colorPrimary,
                                 borderRadius: BorderRadius.circular(15)),
                             child: const Icon(
                               Icons.add_shopping_cart,

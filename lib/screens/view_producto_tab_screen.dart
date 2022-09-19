@@ -9,8 +9,12 @@ import '../models/producto_x_departamento_models.dart';
 class ViewProductoTab extends StatefulWidget {
   String id_departamento;
   String id_tmp;
+  Color colPrimary;
   ViewProductoTab(
-      {Key? key, required this.id_departamento, required this.id_tmp})
+      {Key? key,
+      required this.id_departamento,
+      required this.id_tmp,
+      required this.colPrimary})
       : super(key: key);
 
   @override
@@ -83,9 +87,9 @@ class _viewproductotab extends State<ViewProductoTab> {
           backgroundColor: Colors.transparent,
           body: SmartRefresher(
             physics: const BouncingScrollPhysics(),
-            header: const WaterDropMaterialHeader(
+            header: WaterDropMaterialHeader(
               color: Colors.white,
-              backgroundColor: Colors.cyan,
+              backgroundColor: widget.colPrimary,
             ),
             controller: refreshController,
             enablePullUp: true,
@@ -130,6 +134,7 @@ class _viewproductotab extends State<ViewProductoTab> {
                           child: ArticleHorizontal(
                             listProd: producto,
                             id_tmp: widget.id_tmp,
+                            colorPrimary: widget.colPrimary,
                           ));
                     },
                   ),

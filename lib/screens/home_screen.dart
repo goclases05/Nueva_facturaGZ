@@ -22,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   GlobalKey keyButton = GlobalKey();
   GlobalKey keyFacturar = GlobalKey();
   GlobalKey keyHistorial = GlobalKey();
+
   //Iniciando o estado.
   @override
   void initState() {
@@ -46,6 +47,9 @@ class _HomeScreenState extends State<HomeScreen> {
     String data_empresa = Preferencias.data_empresa;
     String nombre_empresa = Preferencias.nombre_empresa;
 
+    Color ColPrimary = Colors.cyan;
+    //Color ColPrimary =Color.fromARGB(int.parse('251'), int.parse('251'), int.parse('251'), 1);
+
     return Scaffold(
         body: Container(
       color: Colors.white,
@@ -61,10 +65,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Container(
-            decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [Color.fromARGB(255, 93, 225, 240), Colors.cyan])),
-          ),
+              decoration: BoxDecoration(
+                  /*gradient: LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 93, 225, 240), 
+                      Colors.cyan
+                  ])),*/
+                  color: ColPrimary //Color.fromARGB(255, 203, 209, 218)
+                  )),
           Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
@@ -189,17 +197,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         textAlign: TextAlign.center,
                       ),*/
                       Chip(
-                          backgroundColor: Color.fromARGB(124, 0, 187, 212),
+                          //backgroundColor: Color.fromARGB(124, 0, 187, 212),
+                          backgroundColor: Colors.white,
                           /*avatar: Image.network(
                         '${foto_empresa}',
                         width: size.width * 0.1,
                       ),*/
                           label: Text(
                             "${nombre_empresa}",
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18.0,
-                                color: Colors.white54),
+                                color: ColPrimary),
                             textAlign: TextAlign.center,
                           ))
                     ],
@@ -294,9 +303,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       : (index == 1)
                                           ? "Historial F."
                                           : '',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: Color.fromARGB(255, 13, 144, 161),
+                                      color: ColPrimary,
                                       fontSize: 18.0),
                                 )
                               ],

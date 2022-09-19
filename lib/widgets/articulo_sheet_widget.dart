@@ -1,10 +1,13 @@
 import 'package:factura_gozeri/models/producto_x_departamento_models.dart';
 import 'package:factura_gozeri/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ArticuloSheet extends StatefulWidget {
-  ArticuloSheet({Key? key, required this.listProd}) : super(key: key);
+  ArticuloSheet({Key? key, required this.listProd, required this.colorPrimary})
+      : super(key: key);
   final Producto listProd;
+  final Color colorPrimary;
 
   @override
   State<ArticuloSheet> createState() => _ArticuloSheetState();
@@ -16,7 +19,13 @@ class _ArticuloSheetState extends State<ArticuloSheet> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10),
       child: Column(children: [
-        Chip(label: Text(widget.listProd.codigo)),
+        Chip(
+          label: Text(widget.listProd.codigo),
+          avatar: Icon(
+            Icons.key,
+            color: widget.colorPrimary,
+          ),
+        ),
         Row(children: [
           ClipRRect(
               borderRadius: BorderRadius.circular(15),
@@ -47,15 +56,91 @@ class _ArticuloSheetState extends State<ArticuloSheet> {
                               wordSpacing: 0,
                               fontSize: 15),
                         ),
-                        Text(
-                          widget.listProd.descBreve,
-                          maxLines: 2,
-                          style: const TextStyle(
-                              fontSize: 15, color: Colors.black45),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        RatingBar.builder(
+                          itemSize: 20,
+                          initialRating: 3,
+                          minRating: 1,
+                          direction: Axis.horizontal,
+                          allowHalfRating: true,
+                          itemCount: 5,
+                          itemPadding:
+                              const EdgeInsets.symmetric(horizontal: 4.0),
+                          itemBuilder: (context, _) => const Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
+                          onRatingUpdate: (rating) {
+                            print(rating);
+                          },
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Chip(
+                                backgroundColor: (widget.listProd.modo_venta ==
+                                            '2' ||
+                                        widget.listProd.stock
+                                            .contains(RegExp('-'), 0))
+                                    ? const Color.fromARGB(243, 200, 230, 201)
+                                    : (int.parse(widget.listProd.stock) <= 0)
+                                        ? const Color.fromARGB(
+                                            243, 240, 144, 132)
+                                        : const Color.fromARGB(
+                                            243, 200, 230, 201),
+                                label: Text(
+                                  'Stock: ${widget.listProd.stock}',
+                                  style: const TextStyle(color: Colors.white),
+                                ))
+                          ],
                         ),
                       ])))
         ]),
-        (widget.listProd.modo_venta == '2') ? ModoVenta2() : Text('')
+        Container(
+          height: 3,
+          margin: const EdgeInsets.symmetric(vertical: 15),
+          color: Color.fromARGB(255, 219, 225, 235),
+        ),
+        Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Descripción:',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Colors.black54,
+                  ),
+                ),
+                //(widget.listProd.descBreve)
+                Text(
+                  widget.listProd.descBreve,
+                  textAlign: TextAlign.justify,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.black45,
+                  ),
+                ),
+                const SizedBox(
+                  height: 25,
+                ),
+                (widget.listProd.modo_venta == '2')
+                    ? ModoVenta2()
+                    : ModoVenta1(
+                        colorPrimary: widget.colorPrimary,
+                      )
+              ],
+            ))
       ]),
     );
   }
