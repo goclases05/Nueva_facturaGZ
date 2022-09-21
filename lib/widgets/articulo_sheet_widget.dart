@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ArticuloSheet extends StatefulWidget {
-  ArticuloSheet({Key? key, required this.listProd, required this.colorPrimary, required this.id_tmp})
+  ArticuloSheet(
+      {Key? key,
+      required this.listProd,
+      required this.colorPrimary,
+      required this.id_tmp})
       : super(key: key);
   final Producto listProd;
   final Color colorPrimary;
@@ -88,7 +92,9 @@ class _ArticuloSheetState extends State<ArticuloSheet> {
                                 backgroundColor: (widget.listProd.modo_venta ==
                                             '2' ||
                                         widget.listProd.stock
-                                            .contains(RegExp('-'), 0))
+                                            .contains(RegExp('-'), 0) ||
+                                        widget.listProd.stock
+                                            .contains(RegExp('.'), 0))
                                     ? const Color.fromARGB(243, 200, 230, 201)
                                     : (int.parse(widget.listProd.stock) <= 0)
                                         ? const Color.fromARGB(
@@ -137,13 +143,16 @@ class _ArticuloSheetState extends State<ArticuloSheet> {
                 ),
                 (widget.listProd.modo_venta == '2')
                     ? ModoVenta2(
-                      colorPrimary: widget.colorPrimary,
-                      listProd: widget.listProd,
-                      id_tmp: widget.id_tmp
-                    )
+                        colorPrimary: widget.colorPrimary,
+                        listProd: widget.listProd,
+                        id_tmp: widget.id_tmp)
                     : SingleChildScrollView(
-                      child: ModoVenta1(id_tmp: widget.id_tmp,listProd: widget.listProd,colorPrimary: widget.colorPrimary,),
-                    )
+                        child: ModoVenta1(
+                          id_tmp: widget.id_tmp,
+                          listProd: widget.listProd,
+                          colorPrimary: widget.colorPrimary,
+                        ),
+                      )
               ],
             ))
       ]),

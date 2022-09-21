@@ -4,7 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ModoVenta2 extends StatefulWidget {
-  ModoVenta2({Key? key, required this.colorPrimary, required this.listProd, required this.id_tmp}) : super(key: key);
+  ModoVenta2(
+      {Key? key,
+      required this.colorPrimary,
+      required this.listProd,
+      required this.id_tmp})
+      : super(key: key);
   Color colorPrimary;
   final Producto listProd;
   final String id_tmp;
@@ -14,7 +19,6 @@ class ModoVenta2 extends StatefulWidget {
 }
 
 class _ModoVenta2State extends State<ModoVenta2> {
-
   final precio_controller_field = TextEditingController();
   final cantidad_controller_field = TextEditingController();
   final monto_controller_field = TextEditingController();
@@ -41,7 +45,6 @@ class _ModoVenta2State extends State<ModoVenta2> {
 
   @override
   Widget build(BuildContext context) {
-
     precio_controller_field.text = _precio_field.toString();
     precio_controller_field.selection = TextSelection.fromPosition(
         TextPosition(offset: precio_controller_field.text.length));
@@ -106,86 +109,83 @@ class _ModoVenta2State extends State<ModoVenta2> {
                 Container(
                   margin: const EdgeInsets.only(right: 20),
                   // ignore: prefer_const_constructors
-                  child: 
-                  (1==2)?
-                  TextField(
-                    controller: precio_controller_field,
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      
-                      setState(() {
+                  child: (1 == 2)
+                      ? TextField(
+                          controller: precio_controller_field,
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) {
+                            setState(() {
+                              _precio_field = value;
 
-                        _precio_field=value;
-
-                        if(_precio_field==''){
-                          
-                        }else{
-                          if(_monto_field=='' && _cantidad_field!=''){
-                            double total_mont=double.parse(_precio_field!)*double.parse(_cantidad_field);
-                            _monto_field=total_mont.toString();
-                          }else if(_monto_field!='' && _cantidad_field=='' || (_monto_field!='' && _cantidad_field!='')){
-                            double total_cant=double.parse(_monto_field)/double.parse(_precio_field!);
-                            _cantidad_field=total_cant.toString();
-                          }
-                        }
-                        
-                        
-                      });
-                      
-                    },
-                    decoration:
-                      const InputDecoration(
-                      border: OutlineInputBorder(), 
-                      hintText: '0.00',
-                      //icon: Text(Preferencias.moneda,style:const TextStyle(fontSize: 20,color: Colors.blueGrey))
-                    )
-                  ):
-
-                  Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                        border: Border.all (
-                        color : Colors.black45,
-                        width : 1.0,
-                        style : BorderStyle.solid,
-                      ),
-                      borderRadius:const BorderRadius.all (
-                        Radius.circular(5.0)
-                      ),
-                    ),
-                    child: DropdownButton<String>(
-                      dropdownColor: Colors.blueGrey[50],
-                      isExpanded: true,
-                      hint: const Text("0.00"),
-                      items: _do
-                      .map<DropdownMenuItem<String>>(
-                        (String value) {
-
-                        return DropdownMenuItem<String>(
-                          value:value, 
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      value: (_precio_field == '')
-                          ? _do[0]
-                          : _precio_field,
-                      onChanged: (
-                        (value) => setState(() {
-                            _precio_field = value;
-                            if(_monto_field=='' && _cantidad_field!=''){
-                              double total_mont=double.parse(_precio_field!)*double.parse(_cantidad_field);
-                              _monto_field=total_mont.toString();
-                            }else if(_monto_field!='' && _cantidad_field=='' || (_monto_field!='' && _cantidad_field!='')){
-                              double total_cant=double.parse(_monto_field)/double.parse(_precio_field!);
-                              _cantidad_field=total_cant.toString();
-                            }
-                        }
-                      )
-                    )),
-                  ),
-
-
-
+                              if (_precio_field == '') {
+                              } else {
+                                if (_monto_field == '' &&
+                                    _cantidad_field != '') {
+                                  double total_mont =
+                                      double.parse(_precio_field!) *
+                                          double.parse(_cantidad_field);
+                                  _monto_field = total_mont.toString();
+                                } else if (_monto_field != '' &&
+                                        _cantidad_field == '' ||
+                                    (_monto_field != '' &&
+                                        _cantidad_field != '')) {
+                                  double total_cant =
+                                      double.parse(_monto_field) /
+                                          double.parse(_precio_field!);
+                                  _cantidad_field = total_cant.toString();
+                                }
+                              }
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: '0.00',
+                            //icon: Text(Preferencias.moneda,style:const TextStyle(fontSize: 20,color: Colors.blueGrey))
+                          ))
+                      : Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black45,
+                              width: 1.0,
+                              style: BorderStyle.solid,
+                            ),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(5.0)),
+                          ),
+                          child: DropdownButton<String>(
+                              dropdownColor: Colors.blueGrey[50],
+                              isExpanded: true,
+                              hint: const Text("0.00"),
+                              items: _do.map<DropdownMenuItem<String>>(
+                                  (String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              value: (_precio_field == '')
+                                  ? _do[0]
+                                  : _precio_field,
+                              onChanged: ((value) => setState(() {
+                                    _precio_field = value;
+                                    if (_monto_field == '' &&
+                                        _cantidad_field != '') {
+                                      double total_mont =
+                                          double.parse(_precio_field!) *
+                                              double.parse(_cantidad_field);
+                                      _monto_field = total_mont.toString();
+                                    } else if (_monto_field != '' &&
+                                            _cantidad_field == '' ||
+                                        (_monto_field != '' &&
+                                            _cantidad_field != '')) {
+                                      double total_cant =
+                                          double.parse(_monto_field) /
+                                              double.parse(_precio_field!);
+                                      _cantidad_field = total_cant.toString();
+                                    }
+                                  }))),
+                        ),
                 ),
               ],
             )),
@@ -219,30 +219,31 @@ class _ModoVenta2State extends State<ModoVenta2> {
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
                         setState(() {
-                          _cantidad_field=value;
-                          double total_monto=0;
-                          if((_precio_field=='' && _cantidad_field=='') || _precio_field=='' || _cantidad_field==''){
-                            
-                          }else{
-                            total_monto=double.parse(_precio_field!)*double.parse(_cantidad_field);
+                          _cantidad_field = value;
+                          double total_monto = 0;
+                          if ((_precio_field == '' && _cantidad_field == '') ||
+                              _precio_field == '' ||
+                              _cantidad_field == '') {
+                          } else {
+                            total_monto = double.parse(_precio_field!) *
+                                double.parse(_cantidad_field);
                           }
-                          _monto_field=total_monto.toString();
-                          monto_controller_field.text=_monto_field.toString();
-                          cantidad_controller_field.text = _cantidad_field.toString();
+                          _monto_field = total_monto.toString();
+                          monto_controller_field.text = _monto_field.toString();
+                          cantidad_controller_field.text =
+                              _cantidad_field.toString();
                         });
-                        if(_cantidad_field==''){
+                        if (_cantidad_field == '') {
                           print('sin cantidad');
-                        }else{
+                        } else {
                           print(_cantidad_field);
                         }
-                        
                       },
-                      decoration:
-                         const InputDecoration(
-                          border: OutlineInputBorder(), 
-                          hintText: '0.00',
-                          //icon: Text(Preferencias.moneda,style:const TextStyle(fontSize: 20,color: Colors.blueGrey))
-                        )),
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: '0.00',
+                        //icon: Text(Preferencias.moneda,style:const TextStyle(fontSize: 20,color: Colors.blueGrey))
+                      )),
                 ),
               ],
             )),
@@ -275,77 +276,42 @@ class _ModoVenta2State extends State<ModoVenta2> {
               controller: monto_controller_field,
               keyboardType: TextInputType.number,
               onChanged: (value) {
-                
                 setState(() {
-                  _monto_field=value;
+                  _monto_field = value;
 
-                  double total_cantidad=0;
-                  if((_precio_field=='' && _monto_field=='') || _precio_field=='' || _monto_field==''){
-                    
-                  }else{
-                    total_cantidad=double.parse(_monto_field)/double.parse(_precio_field!);
+                  double total_cantidad = 0;
+                  if ((_precio_field == '' && _monto_field == '') ||
+                      _precio_field == '' ||
+                      _monto_field == '') {
+                  } else {
+                    total_cantidad = double.parse(_monto_field) /
+                        double.parse(_precio_field!);
                   }
-                  _cantidad_field=total_cantidad.toString();
-                  monto_controller_field.text=_monto_field.toString();
+                  _cantidad_field = total_cantidad.toString();
+                  monto_controller_field.text = _monto_field.toString();
                   cantidad_controller_field.text = _cantidad_field.toString();
                 });
-                if(_cantidad_field==''){
+                if (_cantidad_field == '') {
                   print('sin cantidad');
-                }else{
+                } else {
                   print(_cantidad_field);
                 }
-                
               },
-              decoration:const InputDecoration(
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: '0.00',
-              )
-            ),
+              )),
         ),
-        const SizedBox(
-          height:10
-        ),///agregar al carrito de compras
+        const SizedBox(height: 10),
+
+        ///agregar al carrito de compras
         Container(
-          width: MediaQuery.of(context).size.width*0.9,
-          child: Consumer<Cart>(builder: (context, cart, child) {
-            return TextButton.icon(
-                onPressed: () {
-                  
-                  if (widget.listProd.facturar == '1') {
-                    const snackBar = SnackBar(
-                      padding: EdgeInsets.all(20),
-                      content: Text(
-                        'Item agregado al carrito!',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      backgroundColor: Colors.green,
-                    );
-                    cart.add(1, widget.listProd.idProd,
-                        widget.id_tmp);
-                    // Find the ScaffoldMessenger in the widget tree
-                    // and use it to show a SnackBar.
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(snackBar);
-
-                    Navigator.pop(context);
-                  } else {
-                    if (double.parse(_cantidad_field) >
-                        double.parse(widget.listProd.stock)) {
-                      const snackBar = SnackBar(
-                        padding: EdgeInsets.all(20),
-                        content: Text(
-                          'Articulo sin Stock!',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        backgroundColor: Colors.red,
-                      );
-
-                      // Find the ScaffoldMessenger in the widget tree
-                      // and use it to show a SnackBar.
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(snackBar);
-                    } else {
-                      
+            width: MediaQuery.of(context).size.width * 0.9,
+            child: Consumer<Cart>(
+              builder: (context, cart, child) {
+                return TextButton.icon(
+                  onPressed: () {
+                    if (widget.listProd.facturar == '1') {
                       const snackBar = SnackBar(
                         padding: EdgeInsets.all(20),
                         content: Text(
@@ -354,28 +320,68 @@ class _ModoVenta2State extends State<ModoVenta2> {
                         ),
                         backgroundColor: Colors.green,
                       );
-
+                      cart.add(
+                          1,
+                          widget.listProd.idProd,
+                          widget.id_tmp,
+                          _cantidad_field.toString(),
+                          (_precio_field.toString() == '')
+                              ? _do[0]
+                              : _precio_field.toString());
                       // Find the ScaffoldMessenger in the widget tree
                       // and use it to show a SnackBar.
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(snackBar);
-                      cart.add(int.parse(_cantidad_field), widget.listProd.idProd,
-                          widget.id_tmp);
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
                       Navigator.pop(context);
-                      
-                      
+                    } else {
+                      if (double.parse(_cantidad_field) >
+                          double.parse(widget.listProd.stock)) {
+                        const snackBar = SnackBar(
+                          padding: EdgeInsets.all(20),
+                          content: Text(
+                            'Articulo sin Stock!',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Colors.red,
+                        );
+
+                        // Find the ScaffoldMessenger in the widget tree
+                        // and use it to show a SnackBar.
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      } else {
+                        const snackBar = SnackBar(
+                          padding: EdgeInsets.all(20),
+                          content: Text(
+                            'Item agregado al carrito!',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Colors.green,
+                        );
+
+                        // Find the ScaffoldMessenger in the widget tree
+                        // and use it to show a SnackBar.
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        cart.add(
+                            int.parse(_cantidad_field),
+                            widget.listProd.idProd,
+                            widget.id_tmp,
+                            _cantidad_field.toString(),
+                            _precio_field.toString());
+                        Navigator.pop(context);
+                      }
                     }
-                  }
-                },
-                icon: const Icon(Icons.shopping_bag),
-                label: const Text('Agregar a la Lista'),
-                style: TextButton.styleFrom(
-                  primary: Colors.white,
-                  backgroundColor:widget.colorPrimary,
-                ),
-            );
-          }  ,
-        ))///agregar al carrito de compras
+                  },
+                  icon: const Icon(Icons.shopping_bag),
+                  label: const Text('Agregar a la Lista'),
+                  style: TextButton.styleFrom(
+                    primary: Colors.white,
+                    backgroundColor: widget.colorPrimary,
+                  ),
+                );
+              },
+            ))
+
+        ///agregar al carrito de compras
       ],
     );
   }

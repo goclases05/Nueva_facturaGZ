@@ -112,10 +112,9 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                     child: Column(
                                       children: [
                                         ArticuloSheet(
-                                          listProd: widget.listProd,
-                                          colorPrimary: widget.colorPrimary,
-                                          id_tmp:widget.id_tmp
-                                        ),
+                                            listProd: widget.listProd,
+                                            colorPrimary: widget.colorPrimary,
+                                            id_tmp: widget.id_tmp),
                                       ],
                                     ))),
                       ],
@@ -286,7 +285,8 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                 left: 5,
                 child: Chip(
                   backgroundColor: (widget.listProd.modo_venta == '2' ||
-                          widget.listProd.stock.contains(RegExp('-'), 0))
+                          widget.listProd.stock.contains(RegExp('-'), 0) ||
+                          widget.listProd.stock.contains(RegExp('.'), 0))
                       ? const Color.fromARGB(243, 200, 230, 201)
                       : (int.parse(widget.listProd.stock) <= 0)
                           ? const Color.fromARGB(243, 240, 144, 132)
@@ -413,6 +413,9 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                     } else {
                                       setState(() {
                                         _counterString = value;
+                                        final stock_p =
+                                            double.parse(widget.listProd.stock)
+                                                .round();
                                         print(_counterString);
                                         if (widget.listProd.facturar == 1) {
                                           _counterValue = int.parse(value);
@@ -422,8 +425,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                           } else if (int.parse(value) >=
                                               int.parse(
                                                   widget.listProd.stock)) {
-                                            _counterValue = int.parse(
-                                                widget.listProd.stock);
+                                            _counterValue = stock_p;
                                           } else {
                                             _counterValue = int.parse(value);
                                           }
@@ -508,8 +510,14 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                 ),
                                 backgroundColor: Colors.green,
                               );
-                              cart.add(_counterValue, widget.listProd.idProd,
-                                  widget.id_tmp);
+                              cart.add(
+                                  _counterValue,
+                                  widget.listProd.idProd,
+                                  widget.id_tmp,
+                                  _counterValue.toString(),
+                                  (_dropdownValue.toString() == '')
+                                      ? _do[0]
+                                      : _dropdownValue.toString());
                               // Find the ScaffoldMessenger in the widget tree
                               // and use it to show a SnackBar.
                               ScaffoldMessenger.of(context)
@@ -544,8 +552,12 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                 // and use it to show a SnackBar.
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(snackBar);
-                                cart.add(_counterValue, widget.listProd.idProd,
-                                    widget.id_tmp);
+                                cart.add(
+                                    _counterValue,
+                                    widget.listProd.idProd,
+                                    widget.id_tmp,
+                                    _counterValue.toString(),
+                                    _dropdownValue.toString());
                               }
                             }
                           },

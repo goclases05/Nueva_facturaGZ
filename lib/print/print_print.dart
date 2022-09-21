@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 //import 'package:intl/intl.dart';
 
- /*ListView.builder(
+/*ListView.builder(
       itemCount: data.length,
       itemBuilder: (c, i) {
         return ListTile(
@@ -37,98 +37,104 @@ class _PrintScreenState extends State<PrintScreen> {
     {'title': 'www  wer ewr ', 'price': 150, 'qty': 22},
     {'title': 'eerere ', 'price': 5, 'qty': 442},
   ];
+  Color colorPrimary = Colors.cyan;
 
   final f = NumberFormat("\$###,###.00", "en_US");
-  int open=0;
+  int open = 0;
 
   @override
   Widget build(BuildContext context) {
     int _total = 0;
-    _total = data
+    /*_total = data
         .map((e) => e['price'] * e['qty'])
-        .reduce((value, element) => value + element);
+        .reduce((value, element) => value + element);*/
 
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        foregroundColor: Colors.cyan,
-        backgroundColor: Colors.white,
-        title: Row(
-          children: [
-            Image.asset('assets/gz.png',width: MediaQuery.of(context).size.width*0.08,),
-            Text('Facturar',style: TextStyle(color: Colors.black54,fontSize: 35,fontWeight: FontWeight.bold),)
-          ],
-        ),
-      ),
+          elevation: 0,
+          foregroundColor: Colors.white,
+          backgroundColor: colorPrimary,
+          title:
+              const Text('Facturación', style: TextStyle(color: Colors.white))),
       body: Column(
         children: [
           Expanded(
-            child: Container(
-            color: Colors.white,
-            child:ListView.builder(
-              key: Key('builder ${open.toString()}'),
-                physics: const BouncingScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                shrinkWrap:true,
-                itemCount: 3,
-                itemBuilder: ((context, index) {
-                  return Card(
-                    elevation:3,
-                    margin: const EdgeInsets.all(10),
-                    child: ExpansionTile(
-                      key: Key(index.toString()),
-                      initiallyExpanded:open==index,
-                      leading:CircleAvatar(
-                        backgroundColor: const Color.fromARGB(255, 0, 131, 143),
-                        child: Text('${index+1}',style: const TextStyle(color: Colors.white,fontSize: 25),),
-                      ),
-                      childrenPadding:const EdgeInsets.all(5),
-                      title:(index==0)?const Text('Detalle del Pedido'):(index==1)?const Text('Datos de Cliente'):const Text('Detalle de Pago'),
-                      children: [
-                        (index==0)?ItemsCart():(index==1)?ItemCliente():const Text('')
-                        ,Container(
-                          alignment: Alignment.centerRight,
-                          child: ElevatedButton.icon(
-                            label: const Icon(
-                              Icons.arrow_forward,
-                              size: 20,
-                              color: Colors.white,
+              child: Container(
+                  color: Colors.white,
+                  child: ListView.builder(
+                    key: Key('builder ${open.toString()}'),
+                    physics: const BouncingScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: 3,
+                    itemBuilder: ((context, index) {
+                      return Card(
+                        elevation: 3,
+                        margin: const EdgeInsets.all(10),
+                        child: ExpansionTile(
+                          key: Key(index.toString()),
+                          initiallyExpanded: open == index,
+                          leading: CircleAvatar(
+                            backgroundColor:
+                                const Color.fromARGB(255, 0, 131, 143),
+                            child: Text(
+                              '${index + 1}',
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 25),
                             ),
-                            onPressed: () {
-                             setState(() {
-                              if(index==0){
-                                open=1;
-                              }else if(index==1){
-                                open=2;
-                              }else{
-                                open=0;
-                              }
-                             });
-                             print(open);
-                            },
-                            style: TextButton.styleFrom(
-                                primary: Colors.white,
-                                backgroundColor: Colors.cyan),
-                            icon: const Text("Continuar")
                           ),
-                        )
-                      ],
-                    ),
-                  );
-                }),
-              )
-            )
-          ),
+                          childrenPadding: const EdgeInsets.all(5),
+                          title: (index == 0)
+                              ? const Text('Detalle del Pedido')
+                              : (index == 1)
+                                  ? const Text('Datos de Cliente')
+                                  : const Text('Detalle de Pago'),
+                          children: [
+                            (index == 0)
+                                ? ItemsCart()
+                                : (index == 1)
+                                    ? ItemCliente()
+                                    : const Text(''),
+                            Container(
+                              alignment: Alignment.centerRight,
+                              child: ElevatedButton.icon(
+                                  label: const Icon(
+                                    Icons.arrow_forward,
+                                    size: 20,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (index == 0) {
+                                        open = 1;
+                                      } else if (index == 1) {
+                                        open = 2;
+                                      } else {
+                                        open = 0;
+                                      }
+                                    });
+                                    print(open);
+                                  },
+                                  style: TextButton.styleFrom(
+                                      primary: Colors.white,
+                                      backgroundColor: Colors.cyan),
+                                  icon: const Text("Continuar")),
+                            )
+                          ],
+                        ),
+                      );
+                    }),
+                  ))),
           Container(
             color: Color.fromARGB(255, 233, 233, 233),
             padding: EdgeInsets.all(20),
             child: Row(
               children: [
-                Text("Total: ${f.format(_total)}",
+                /*Text("Total: ${f.format(_total)}",
                     style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(
                   width: 80,
-                ),
+                ),*/
                 Expanded(
                     child: TextButton.icon(
                   onPressed: () {
