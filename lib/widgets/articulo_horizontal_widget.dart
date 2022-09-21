@@ -60,23 +60,6 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
   String? _dropdownValue = '';
   int position = 0;
 
-  /*void customBottomSheet(BuildContext context) {
-    return DraggableScrollableSheet(){
-
-    }
-    /*SlideDialog.showSlideDialog(
-        context: context,
-        backgroundColor: Colors.white,
-        pillColor: Colors.cyan,
-        transitionDuration: const Duration(milliseconds: 200),
-        child: /*ListView(
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            children: [ArticuloSheet(listProd: widget.listProd)])*/
-            Column(
-          children: [ArticuloSheet(listProd: widget.listProd)],
-        ));*/
-  }*/
   void customBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -131,6 +114,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                         ArticuloSheet(
                                           listProd: widget.listProd,
                                           colorPrimary: widget.colorPrimary,
+                                          id_tmp:widget.id_tmp
                                         ),
                                       ],
                                     ))),
@@ -184,23 +168,10 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
     if (_do.contains(widget.listProd.precio_4) == false) {
       _do.add("${widget.listProd.precio_4}");
     }
-
-    /*_do.add("${widget.listProd.precio}");
-    _do.add("${widget.listProd.precio_2}");
-    _do.add("${widget.listProd.precio_3}");
-    _do.add("${widget.listProd.precio_4}");*/
-    /*_do = [
-      "${widget.listProd.precio}",
-      "${widget.listProd.precio_2}",
-      "${widget.listProd.precio_3}",
-      "${widget.listProd.precio_4}"
-    ];*/
-    /*_dropdownValue =
-        (widget.listProd.precio.isEmpty) ? "0.00" : widget.listProd.precio;*/
-    //_itemselect = precios_list[0];
     myController.text = _counterValue.toString();
     myController.selection = TextSelection.fromPosition(
         TextPosition(offset: myController.text.length));
+
     return Card(
       elevation: 5,
       margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -261,7 +232,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                       fontSize: 15),
                                 ),
                                 /*Text(
-                                  widget.listProd.descBreve,
+                                  widget.listProd.descBreve,0.00
                                   maxLines: 2,
                                   style: const TextStyle(
                                       fontSize: 15, color: Colors.black45),
@@ -347,7 +318,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                     children: [
                       ElevatedButton.icon(
                           icon: const Icon(
-                            Icons.add_shopping_cart_rounded,
+                            Icons.shopping_bag_outlined,
                             size: 20,
                             color: Colors.white,
                           ),
@@ -586,7 +557,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                 color: widget.colorPrimary,
                                 borderRadius: BorderRadius.circular(15)),
                             child: const Icon(
-                              Icons.add_shopping_cart,
+                              Icons.shopping_bag_outlined,
                               color: Colors.white,
                               size: 25,
                             ),

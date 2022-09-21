@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ArticuloSheet extends StatefulWidget {
-  ArticuloSheet({Key? key, required this.listProd, required this.colorPrimary})
+  ArticuloSheet({Key? key, required this.listProd, required this.colorPrimary, required this.id_tmp})
       : super(key: key);
   final Producto listProd;
   final Color colorPrimary;
+  final String id_tmp;
 
   @override
   State<ArticuloSheet> createState() => _ArticuloSheetState();
@@ -104,7 +105,7 @@ class _ArticuloSheetState extends State<ArticuloSheet> {
         ]),
         Container(
           height: 3,
-          margin: const EdgeInsets.symmetric(vertical: 15),
+          margin: const EdgeInsets.symmetric(vertical: 3),
           color: Color.fromARGB(255, 219, 225, 235),
         ),
         Container(
@@ -132,13 +133,17 @@ class _ArticuloSheetState extends State<ArticuloSheet> {
                   ),
                 ),
                 const SizedBox(
-                  height: 25,
+                  height: 15,
                 ),
                 (widget.listProd.modo_venta == '2')
-                    ? ModoVenta2()
-                    : ModoVenta1(
-                        colorPrimary: widget.colorPrimary,
-                      )
+                    ? ModoVenta2(
+                      colorPrimary: widget.colorPrimary,
+                      listProd: widget.listProd,
+                      id_tmp: widget.id_tmp
+                    )
+                    : SingleChildScrollView(
+                      child: ModoVenta1(id_tmp: widget.id_tmp,listProd: widget.listProd,colorPrimary: widget.colorPrimary,),
+                    )
               ],
             ))
       ]),
