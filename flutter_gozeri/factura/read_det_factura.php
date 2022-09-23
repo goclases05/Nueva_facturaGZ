@@ -20,10 +20,10 @@ if($total_fact==0){
     foreach($row_fact as $key){
 
         $matriz_fac=array();
-        $matriz_fac[$o]['ID_TMP_ITEM']="{$key['ID_TMP']}";
-        $matriz_fac[$o]['CANTIDAD']="{$key['CANTIDAD']}";
-        $matriz_fac[$o]['PRECIO']="{$key['PRECIO']}";
-        $matriz_fac[$o]['TIPO_PRECIO']="{$key['TIPO_PRECIO']}";
+        $matriz_fac['ID_TMP_ITEM']="{$key['ID_TMP']}";
+        $matriz_fac['CANTIDAD']="{$key['CANTIDAD']}";
+        $matriz_fac['PRECIO']="{$key['PRECIO']}";
+        $matriz_fac['TIPO_PRECIO']="{$key['TIPO_PRECIO']}";
 
         $query = $conexion->query("SELECT (SELECT CONTENIDO FROM tblempresas_prefe WHERE tblempresas_prefe.ID_EMPRESA = tblproductos.ID_EMPRESA AND ID_PREFERENCIA = 70) AS EDIT_PRECIO, (SELECT CONTENIDO FROM tblempresas_prefe WHERE tblempresas_prefe.ID_EMPRESA = tblproductos.ID_EMPRESA AND ID_PREFERENCIA = 96) AS FACTURAR, tblproductos_pre.UNIDAD_MEDIDA, tblproductos.ID_PROD, tblproductos.PRODUCTO,tblproductos.CODIGO, tblproductos.DESC_BREVE, tblproductos.DESC_COMP, tblproductos.PRECIO, tblproductos.PRECIO_2, tblproductos.PRECIO_3, tblproductos.PRECIO_4, (tblproductos_inv.ENTRADAS-tblproductos_inv.SALIDAS) AS STOCK, FOTO, URL FROM bgzeri_empresa.tblproductos_fotos INNER JOIN bgzeri_empresa.tblproductos USING (ID_PROD) INNER JOIN bgzeri_empresa.tblproductos_inv USING (ID_PROD) INNER JOIN bgzeri_empresa.tblcategorias ON tblcategorias.ID_CATEG=tblproductos.ID_CATEG INNER JOIN bgzeri_empresa.tblcategorias AS tblcategorias2 ON tblcategorias2.ID_CATEG=tblcategorias.ID_PADRE INNER JOIN bgzeri_empresa.tblcategorias AS tblcategorias3 ON tblcategorias3.ID_CATEG=tblcategorias2.ID_PADRE LEFT JOIN bgzeri_empresa.tblproductos_pre ON tblproductos_pre.ID_PROD = tblproductos.ID_PROD WHERE TIPO = 1 AND tblcategorias.ID_EMPRESA = '$id_empresa' AND tblproductos.ID_PROD='$key[ID_PROD]' GROUP BY ID_PROD");
         $query->execute();

@@ -274,10 +274,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ViewTabsScreen(
-                                        colorPrimary: ColPrimary,
-                                        id_tmp: factuProv[0],
-                                        clave: factuProv[1])),
+                                  builder: (context) => ViewTabsScreen(
+                                      colorPrimary: ColPrimary,
+                                      id_tmp: factuProv[0],
+                                      clave: factuProv[1]),
+                                ),
                               );
                             }
                           }

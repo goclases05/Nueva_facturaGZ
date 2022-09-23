@@ -518,6 +518,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.9"
+  textfield_search:
+    dependency: "direct main"
+    description:
+      name: textfield_search
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.10.0"
   tutorial_coach_mark:
     dependency: "direct main"
     description:

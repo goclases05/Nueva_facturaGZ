@@ -45,7 +45,7 @@ class ItemsSearch extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     // TODO: implement buildResults
-    return Text('buildResults');
+    return buildSuggestions(context);
   }
 
   @override

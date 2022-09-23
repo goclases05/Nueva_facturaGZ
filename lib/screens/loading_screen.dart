@@ -1,7 +1,8 @@
 import "package:flutter/material.dart";
 
 class LoadingScreen extends StatelessWidget {
-  const LoadingScreen({Key? key}) : super(key: key);
+  LoadingScreen({Key? key, required this.colorPrimary}) : super(key: key);
+  Color colorPrimary;
 
   @override
   Widget build(BuildContext context) {
@@ -9,35 +10,31 @@ class LoadingScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
+        backgroundColor: colorPrimary,
         foregroundColor: Colors.white,
-        title:Image.asset(
+        title: Image.asset(
           'assets/gozeri_blanco2.png',
-           width: size.width * 0.25,
+          width: size.width * 0.25,
         ),
-        actions:[
+        actions: [
           CircleAvatar(
-            backgroundColor: Colors.cyan[300],
+            backgroundColor: Colors.white54,
             child: IconButton(
-              onPressed: () {
-                
-              },
-              icon:const Icon(
+              onPressed: () {},
+              icon: const Icon(
                 Icons.search,
                 color: Colors.white,
               ),
             ),
           ),
-          
           const SizedBox(
             width: 15,
           ),
           CircleAvatar(
-            backgroundColor: Colors.cyan[300],
+            backgroundColor: Colors.white54,
             child: IconButton(
-              onPressed: () {
-                
-              },
-              icon:const Icon(
+              onPressed: () {},
+              icon: const Icon(
                 Icons.receipt_long,
                 color: Colors.white,
               ),
@@ -48,9 +45,9 @@ class LoadingScreen extends StatelessWidget {
           ),
         ],
       ),
-      body:const Center(
+      body: Center(
         child: CircularProgressIndicator(
-          color: Colors.cyan,
+          color: colorPrimary,
         ),
       ),
     );

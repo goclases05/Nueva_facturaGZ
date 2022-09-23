@@ -51,7 +51,7 @@ dependencies:
   image: ^3.2.0
   tutorial_coach_mark: ^1.2.4
   flutter_rating_bar: ^4.0.1 #estrellas rating articulos
-  
+  textfield_search: ^0.10.0 #buscador de clientes
 
 dev_dependencies:
   flutter_test:

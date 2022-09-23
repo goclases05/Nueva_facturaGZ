@@ -22,28 +22,26 @@ import 'package:intl/intl.dart';
 class PrintScreen extends StatefulWidget {
   String id_tmp;
   Color colorPrimary;
-  PrintScreen({Key? key, required this.id_tmp, required this.colorPrimary}) : super(key: key);
+  PrintScreen({Key? key, required this.id_tmp, required this.colorPrimary})
+      : super(key: key);
 
   @override
   State<PrintScreen> createState() => _PrintScreenState();
 }
 
 class _PrintScreenState extends State<PrintScreen> {
-
   final List<Map<String, dynamic>> data = [
     {'title': 'uurururu', 'price': 15, 'qty': 2},
     {'title': 'wewerdd', 'price': 2, 'qty': 20},
     {'title': 'www  wer ewr ', 'price': 150, 'qty': 22},
     {'title': 'eerere ', 'price': 5, 'qty': 442},
   ];
-  Color colorPrimary = Colors.cyan;
 
   final f = NumberFormat("\$###,###.00", "en_US");
   int open = 0;
 
   @override
   Widget build(BuildContext context) {
-    
     int _total = 0;
     /*_total = data
         .map((e) => e['price'] * e['qty'])
@@ -53,7 +51,7 @@ class _PrintScreenState extends State<PrintScreen> {
       appBar: AppBar(
           elevation: 0,
           foregroundColor: Colors.white,
-          backgroundColor: colorPrimary,
+          backgroundColor: widget.colorPrimary,
           title:
               const Text('Facturación', style: TextStyle(color: Colors.white))),
       body: Column(
@@ -75,8 +73,7 @@ class _PrintScreenState extends State<PrintScreen> {
                           key: Key(index.toString()),
                           initiallyExpanded: open == index,
                           leading: CircleAvatar(
-                            backgroundColor:
-                                const Color.fromARGB(255, 0, 131, 143),
+                            backgroundColor: widget.colorPrimary,
                             child: Text(
                               '${index + 1}',
                               style: const TextStyle(
@@ -91,9 +88,13 @@ class _PrintScreenState extends State<PrintScreen> {
                                   : const Text('Detalle de Pago'),
                           children: [
                             (index == 0)
-                                ? ItemsCart(id_tmp: widget.id_tmp,colorPrimary: widget.colorPrimary,)
+                                ? ItemsCart(
+                                    id_tmp: widget.id_tmp,
+                                    colorPrimary: widget.colorPrimary,
+                                  )
                                 : (index == 1)
-                                    ? ItemCliente()
+                                    ? ItemCliente(
+                                        colorPrimary: widget.colorPrimary)
                                     : const Text(''),
                             Container(
                               alignment: Alignment.centerRight,
@@ -117,18 +118,14 @@ class _PrintScreenState extends State<PrintScreen> {
                                   },
                                   style: TextButton.styleFrom(
                                       primary: Colors.white,
-                                      backgroundColor: Colors.cyan),
+                                      backgroundColor: widget.colorPrimary),
                                   icon: const Text("Continuar")),
                             )
                           ],
                         ),
                       );
-                    }
-                  ),
-                )
-            
-            )
-          ),
+                    }),
+                  ))),
           Container(
             color: Color.fromARGB(255, 233, 233, 233),
             padding: EdgeInsets.all(20),
