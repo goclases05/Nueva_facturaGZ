@@ -1,6 +1,3 @@
-import 'dart:ffi';
-
-import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/print/print_page.dart';
 import 'package:factura_gozeri/widgets/item_dataCliente.dart';
 import 'package:factura_gozeri/widgets/items_cart.dart';
@@ -24,13 +21,15 @@ import 'package:intl/intl.dart';
 
 class PrintScreen extends StatefulWidget {
   String id_tmp;
-  PrintScreen({Key? key, required this.id_tmp}) : super(key: key);
+  Color colorPrimary;
+  PrintScreen({Key? key, required this.id_tmp, required this.colorPrimary}) : super(key: key);
 
   @override
   State<PrintScreen> createState() => _PrintScreenState();
 }
 
 class _PrintScreenState extends State<PrintScreen> {
+
   final List<Map<String, dynamic>> data = [
     {'title': 'uurururu', 'price': 15, 'qty': 2},
     {'title': 'wewerdd', 'price': 2, 'qty': 20},
@@ -44,6 +43,7 @@ class _PrintScreenState extends State<PrintScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
     int _total = 0;
     /*_total = data
         .map((e) => e['price'] * e['qty'])
@@ -91,7 +91,7 @@ class _PrintScreenState extends State<PrintScreen> {
                                   : const Text('Detalle de Pago'),
                           children: [
                             (index == 0)
-                                ? ItemsCart()
+                                ? ItemsCart(id_tmp: widget.id_tmp,colorPrimary: widget.colorPrimary,)
                                 : (index == 1)
                                     ? ItemCliente()
                                     : const Text(''),
@@ -123,8 +123,12 @@ class _PrintScreenState extends State<PrintScreen> {
                           ],
                         ),
                       );
-                    }),
-                  ))),
+                    }
+                  ),
+                )
+            
+            )
+          ),
           Container(
             color: Color.fromARGB(255, 233, 233, 233),
             padding: EdgeInsets.all(20),

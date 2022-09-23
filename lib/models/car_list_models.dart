@@ -1,98 +1,91 @@
-// To parse this JSON data, do
-//
-//     final dataProductos = dataProductosFromMap(jsonString);
 import 'dart:convert';
 
-List<DataProductos> dataProductosFromMap(String str) =>
-    List<DataProductos>.from(
-        json.decode(str).map((x) => DataProductos.fromMap(x)));
+List<ClassListCart> classListCartFromJson(String str) => List<ClassListCart>.from(json.decode(str).map((x) => ClassListCart.fromJson(x)));
 
-String dataProductosToMap(List<DataProductos> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toMap())));
+String classListCartToJson(List<ClassListCart> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class DataProductos {
-  DataProductos({
-    required this.dataFact,
-    required this.productos,
-  });
+class ClassListCart {
+    ClassListCart({
+        required this.dataFact,
+        required this.productos,
+    });
 
-  dynamic dataFact;
-  List<Producto> productos;
+    DataFact dataFact;
+    List<Producto> productos;
 
-  factory DataProductos.fromMap(Map<String, dynamic> json) => DataProductos(
-        dataFact: json["data_fact"],
-        productos: List<Producto>.from(
-            json["productos"].map((x) => Producto.fromMap(x))),
-      );
+    factory ClassListCart.fromJson(Map<String, dynamic> json) => ClassListCart(
+        dataFact: DataFact.fromJson(json["data_fact"]),
+        productos: List<Producto>.from(json["productos"].map((x) => Producto.fromJson(x))),
+    );
 
-  Map<String, dynamic> toMap() => {
-        "data_fact": dataFact,
-        "productos": List<dynamic>.from(productos.map((x) => x.toMap())),
-      };
+    Map<String, dynamic> toJson() => {
+        "data_fact": dataFact.toJson(),
+        "productos": List<dynamic>.from(productos.map((x) => x.toJson())),
+    };
 }
 
-class DataFactElement {
-  DataFactElement({
-    required this.idTmpItem,
-    required this.cantidad,
-    required this.precio,
-    required this.tipoPrecio,
-  });
+class DataFact {
+    DataFact({
+        required this.idTmpItem,
+        required this.cantidad,
+        required this.precio,
+        required this.tipoPrecio,
+    });
 
-  String idTmpItem;
-  String cantidad;
-  String precio;
-  String tipoPrecio;
+    String idTmpItem;
+    String cantidad;
+    String precio;
+    String tipoPrecio;
 
-  factory DataFactElement.fromMap(Map<String, dynamic> json) => DataFactElement(
+    factory DataFact.fromJson(Map<String, dynamic> json) => DataFact(
         idTmpItem: json["ID_TMP_ITEM"],
         cantidad: json["CANTIDAD"],
         precio: json["PRECIO"],
         tipoPrecio: json["TIPO_PRECIO"],
-      );
+    );
 
-  Map<String, dynamic> toMap() => {
+    Map<String, dynamic> toJson() => {
         "ID_TMP_ITEM": idTmpItem,
         "CANTIDAD": cantidad,
         "PRECIO": precio,
         "TIPO_PRECIO": tipoPrecio,
-      };
+    };
 }
 
 class Producto {
-  Producto({
-    required this.idProd,
-    required this.producto,
-    required this.codigo,
-    required this.descBreve,
-    required this.descComp,
-    required this.modoVenta,
-    required this.facturar,
-    required this.precio,
-    required this.precio2,
-    required this.precio3,
-    required this.precio4,
-    required this.stock,
-    required this.foto,
-    required this.url,
-  });
+    Producto({
+        required this.idProd,
+        required this.producto,
+        required this.codigo,
+        required this.descBreve,
+        required this.descComp,
+        required this.modoVenta,
+        required this.facturar,
+        required this.precio,
+        required this.precio2,
+        required this.precio3,
+        required this.precio4,
+        required this.stock,
+        required this.foto,
+        required this.url,
+    });
 
-  String idProd;
-  String producto;
-  String codigo;
-  String descBreve;
-  String descComp;
-  String modoVenta;
-  String facturar;
-  String precio;
-  String precio2;
-  String precio3;
-  String precio4;
-  String stock;
-  String foto;
-  String url;
+    String idProd;
+    String producto;
+    String codigo;
+    String descBreve;
+    String descComp;
+    String modoVenta;
+    String facturar;
+    String precio;
+    String precio2;
+    String precio3;
+    String precio4;
+    String stock;
+    String foto;
+    String url;
 
-  factory Producto.fromMap(Map<String, dynamic> json) => Producto(
+    factory Producto.fromJson(Map<String, dynamic> json) => Producto(
         idProd: json["ID_PROD"],
         producto: json["PRODUCTO"],
         codigo: json["CODIGO"],
@@ -107,9 +100,9 @@ class Producto {
         stock: json["STOCK"],
         foto: json["FOTO"],
         url: json["URL"],
-      );
+    );
 
-  Map<String, dynamic> toMap() => {
+    Map<String, dynamic> toJson() => {
         "ID_PROD": idProd,
         "PRODUCTO": producto,
         "CODIGO": codigo,
@@ -124,5 +117,5 @@ class Producto {
         "STOCK": stock,
         "FOTO": foto,
         "URL": url,
-      };
+    };
 }

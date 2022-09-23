@@ -1,4 +1,5 @@
 import 'package:factura_gozeri/print/print_print.dart';
+import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/search/items_search.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,10 +9,11 @@ import 'package:factura_gozeri/screens/screens.dart';
 import 'package:factura_gozeri/services/services.dart';
 
 class ViewTabsScreen extends StatefulWidget {
-  const ViewTabsScreen({Key? key, required this.id_tmp, required this.clave})
+  ViewTabsScreen({Key? key, required this.id_tmp, required this.clave, required this.colorPrimary})
       : super(key: key);
   final id_tmp;
   final clave;
+  Color colorPrimary;
   @override
   State<ViewTabsScreen> createState() => _ViewTabsScreen();
 }
@@ -35,7 +37,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
     List<String> data = [];
     List<String> data_id = [];
     int initPosition = 0;
-    Color ColPrimary = Colors.cyan;
+    Color ColPrimary = widget.colorPrimary;
 
     if (departamentoService.isLoading) return const LoadingScreen();
 
@@ -99,12 +101,16 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                     style: TextStyle(color: Colors.white),
                   ),
                   child: IconButton(
-                    onPressed: () {
+                    onPressed: () async{
+                      final _facturacion =Provider.of<Facturacion>(context, listen: false);
+                      _facturacion.list_cart(widget.id_tmp);
+
+                      // ignore: use_build_context_synchronously
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (_) => PrintScreen(
-                                    id_tmp: widget.id_tmp,
+                                    id_tmp: widget.id_tmp,colorPrimary: widget.colorPrimary,
                                   )));
                     },
                     icon: const Icon(
@@ -267,6 +273,7 @@ AppBar appBarra(size, context, id_tmp, ColPrimary) {
                     MaterialPageRoute(
                         builder: (_) => PrintScreen(
                               id_tmp: id_tmp,
+                              colorPrimary:ColPrimary ,
                             )));
               },
               icon: const Icon(

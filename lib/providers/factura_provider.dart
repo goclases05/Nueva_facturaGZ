@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/models/car_list_models.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +7,8 @@ import 'package:http/http.dart' as http;
 class Facturacion extends ChangeNotifier {
   final String _baseUrl = "app.gozeri.com";
   bool tmp_creada = false;
-  bool list_load = false;
+  bool list_load = true;
+  late List<ClassListCart> list_det=[];
 
   Future<dynamic> new_tmpFactura() async {
     tmp_creada = false;
@@ -40,7 +40,7 @@ class Facturacion extends ChangeNotifier {
   }
 
   Future<dynamic> list_cart(String id) async {
-    list_load = false;
+    list_load = true;
     notifyListeners();
 
     final empresa = Preferencias.data_empresa;
@@ -52,9 +52,27 @@ class Facturacion extends ChangeNotifier {
         "https://${_baseUrl}/flutter_gozeri/factura/read_det_factura.php?id_tmp=${id}&id_empresa=${empresa}");
 
     final resp = await http.get(uri);
+    int count=json.decode(resp.body).length;
 
-    final result = DataProductos.fromMap(json.decode(resp.body));
-
-    return result.productos[0].codigo;
+    //final result =ClassListCart.fromJson(json.decode(resp.body));
+    list_det.clear();
+    print(json.decode(resp.body)[1]);
+    var result;
+    //final result =ClassListCart.fromJson(json.decode(resp.body));
+    for(int i=0;i<count;i++){
+      result =ClassListCart.fromJson(json.decode(resp.body)[i]);
+      /*list_det.addAll(result);*/
+      list_det.add(result);
+      print(result);
+    }
+    
+    //final result = DataProductos.fromMap(json.decode(resp.body));
+    
+    
+    
+    list_load=false;
+    notifyListeners();
+    print(result);
+    return result;
   }
 }

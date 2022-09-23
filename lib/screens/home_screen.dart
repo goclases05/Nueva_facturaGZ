@@ -275,6 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => ViewTabsScreen(
+                                        colorPrimary: ColPrimary,
                                         id_tmp: factuProv[0],
                                         clave: factuProv[1])),
                               );
