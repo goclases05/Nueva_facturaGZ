@@ -8,7 +8,7 @@ class Facturacion extends ChangeNotifier {
   final String _baseUrl = "app.gozeri.com";
   bool tmp_creada = false;
   bool list_load = true;
-  late List<ClassListCart> list_det=[];
+  late List<ClassListCart> list_det = [];
 
   Future<dynamic> new_tmpFactura() async {
     tmp_creada = false;
@@ -52,27 +52,53 @@ class Facturacion extends ChangeNotifier {
         "https://${_baseUrl}/flutter_gozeri/factura/read_det_factura.php?id_tmp=${id}&id_empresa=${empresa}");
 
     final resp = await http.get(uri);
-    int count=json.decode(resp.body).length;
+    int count = json.decode(resp.body).length;
 
     //final result =ClassListCart.fromJson(json.decode(resp.body));
     list_det.clear();
     print(json.decode(resp.body)[1]);
     var result;
     //final result =ClassListCart.fromJson(json.decode(resp.body));
-    for(int i=0;i<count;i++){
-      result =ClassListCart.fromJson(json.decode(resp.body)[i]);
+    for (int i = 0; i < count; i++) {
+      result = ClassListCart.fromJson(json.decode(resp.body)[i]);
       /*list_det.addAll(result);*/
       list_det.add(result);
       print(result);
     }
-    
+
     //final result = DataProductos.fromMap(json.decode(resp.body));
-    
-    
-    
-    list_load=false;
+
+    list_load = false;
     notifyListeners();
     print(result);
+    return result;
+  }
+
+  Future<dynamic> get_Sat(String id, String nit) async {
+    final empresa = Preferencias.data_empresa;
+    final id_usuario = Preferencias.data_id;
+
+    print(
+        "https://${_baseUrl}/flutter_gozeri/factura/read_det_factura.php?id_tmp=${id}&id_empresa=${empresa}");
+    final Uri uri = Uri.parse(
+        "https://${_baseUrl}/flutter_gozeri/factura/read_det_factura.php?id_tmp=${id}&id_empresa=${empresa}");
+
+    final resp = await http.get(uri);
+    int count = json.decode(resp.body).length;
+
+    list_det.clear();
+    print(json.decode(resp.body)[1]);
+    var result;
+    //final result =ClassListCart.fromJson(json.decode(resp.body));
+    for (int i = 0; i < count; i++) {
+      result = ClassListCart.fromJson(json.decode(resp.body)[i]);
+      /*list_det.addAll(result);*/
+      list_det.add(result);
+      print(result);
+    }
+
+    list_load = false;
+    notifyListeners();
     return result;
   }
 }

@@ -60,6 +60,7 @@ class _ItemCliente extends State<ItemCliente> {
 
   @override
   Widget build(BuildContext context) {
+    cliente = cliente.replaceAll("(${nit_cliente})", "");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -148,91 +149,69 @@ class _ItemCliente extends State<ItemCliente> {
             )
           ],
         ),
-        const SizedBox(height: 5),
+        const SizedBox(height: 10),
+        Text(
+          'Cliente',
+          style: TextStyle(
+              fontSize: 18,
+              color: widget.colorPrimary,
+              fontWeight: FontWeight.bold),
+        ),
         (searchC.text.length == 0)
-            ? Text('')
-            : Container(
-                width: MediaQuery.of(context).size.width * 1,
-                margin: EdgeInsets.symmetric(vertical: 10),
-                padding: EdgeInsets.all(10),
+            ? Container(
+                margin: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Color.fromARGB(255, 231, 245, 248)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text('Cliente:',
-                            style: TextStyle(
-                                color: widget.colorPrimary,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold)),
-                        Expanded(
-                            child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    searchC.text = '';
-                                    cliente = '';
-                                    id_cliente = '';
-                                    nit_cliente = '';
-                                  });
-                                },
-                                icon: Icon(
-                                  Icons.close,
-                                  color: widget.colorPrimary,
-                                )),
-                          ],
-                        ))
-                      ],
+                    border: Border.all(color: Colors.black26, width: 1)),
+                child: const ListTile(
+                    title: Text(
+                      'Sin Cliente',
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10),
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Expanded(
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                const Text('Nombre',
-                                    style: TextStyle(
-                                        color:
-                                            Color.fromARGB(255, 168, 184, 192),
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18)),
-                                Text(cliente)
-                              ])),
-                          Expanded(
-                              child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              const Text('NIT',
-                                  style: TextStyle(
-                                      color: Color.fromARGB(255, 168, 184, 192),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18)),
-                              Text(nit_cliente)
-                            ],
-                          ))
-                        ],
+                    leading: CircleAvatar(
+                      backgroundColor: Color.fromARGB(255, 221, 221, 221),
+                      child: Icon(
+                        Icons.warning,
+                        size: 25,
+                        color: Colors.white,
                       ),
+                    )),
+              )
+            : Container(
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black26, width: 1)),
+                child: ListTile(
+                  title: Text(
+                    '${cliente}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(
+                    'NIT: ${nit_cliente}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  leading: const CircleAvatar(
+                    backgroundColor: Color.fromARGB(255, 221, 221, 221),
+                    child: Icon(
+                      Icons.person,
+                      size: 40,
+                      color: Colors.white,
                     ),
-                  ],
+                  ),
+                  trailing: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          searchC.text = '';
+                          cliente = '';
+                          id_cliente = '';
+                          nit_cliente = '';
+                        });
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        color: widget.colorPrimary,
+                      )),
                 ),
-              ),
+              )
         /*Container(
           width: MediaQuery.of(context).size.width * 0.9,
           child: const TextField(

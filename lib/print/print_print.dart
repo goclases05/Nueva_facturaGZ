@@ -43,9 +43,6 @@ class _PrintScreenState extends State<PrintScreen> {
   @override
   Widget build(BuildContext context) {
     int _total = 0;
-    /*_total = data
-        .map((e) => e['price'] * e['qty'])
-        .reduce((value, element) => value + element);*/
 
     return Scaffold(
       appBar: AppBar(
