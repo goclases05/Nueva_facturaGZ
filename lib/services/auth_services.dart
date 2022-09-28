@@ -39,6 +39,7 @@ class AuthService extends ChangeNotifier {
       Preferencias.data_id = decodeResp['message']['ID_USUARIO'];
       Preferencias.data_empresa = decodeResp['message']['ID_EMPRESA'];
       Preferencias.moneda = decodeResp['message']['MONEDA'];
+      Preferencias.tipo = decodeResp['message']['TIPO_USUARIO'];
 
       return null;
     } else {

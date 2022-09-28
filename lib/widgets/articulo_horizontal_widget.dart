@@ -172,9 +172,9 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
         TextPosition(offset: myController.text.length));
 
     return Card(
-      elevation: 5,
+      elevation: 2,
       margin: const EdgeInsets.symmetric(horizontal: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       child: Column(
         children: [
           Stack(children: [
@@ -213,11 +213,11 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                       image: NetworkImage(widget.listProd.url +
                                           widget.listProd.foto),
                                       width: MediaQuery.of(context).size.width *
-                                          0.3),
+                                          0.25),
                             )),
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(8),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [

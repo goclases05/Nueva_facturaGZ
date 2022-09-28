@@ -2,13 +2,15 @@ import 'dart:convert';
 
 import 'package:factura_gozeri/global/preferencias_global.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
+import 'package:factura_gozeri/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:textfield_search/textfield_search.dart';
 import 'package:http/http.dart' as http;
 
 class ItemCliente extends StatefulWidget {
-  ItemCliente({Key? key, required this.colorPrimary, required this.tmp}) : super(key: key);
+  ItemCliente({Key? key, required this.colorPrimary, required this.tmp})
+      : super(key: key);
   Color colorPrimary;
   String tmp;
 
@@ -25,11 +27,12 @@ class _ItemCliente extends State<ItemCliente> {
 
     final empresa = Preferencias.data_empresa;
     final id_usuario = Preferencias.data_id;
+    final tipo = Preferencias.tipo;
 
     print(
-        "https://${_baseUrl}/flutter_gozeri/factura/clientes_factura.php?empresa=${empresa}&idusuario=${id_usuario}&clientes=${_inputText}");
+        "https://${_baseUrl}/flutter_gozeri/factura/clientes_factura.php?empresa=${empresa}&idusuario=${id_usuario}&clientes=${_inputText}&tipo=${tipo}");
     final Uri uri = Uri.parse(
-        "https://${_baseUrl}/flutter_gozeri/factura/clientes_factura.php?empresa=${empresa}&idusuario=${id_usuario}&clientes=${_inputText}");
+        "https://${_baseUrl}/flutter_gozeri/factura/clientes_factura.php?empresa=${empresa}&idusuario=${id_usuario}&clientes=${_inputText}&tipo=${tipo}");
 
     final resp = await http.get(uri);
     int count = json.decode(resp.body).length;
@@ -43,6 +46,56 @@ class _ItemCliente extends State<ItemCliente> {
   }
 
   TextEditingController searchC = TextEditingController();
+
+  void customBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: Container(
+            color: Color.fromRGBO(0, 0, 0, 0.001),
+            child: GestureDetector(
+              onTap: () {},
+              child: DraggableScrollableSheet(
+                initialChildSize: 0.7,
+                minChildSize: 0.2,
+                maxChildSize: 1,
+                builder: (_, controller) {
+                  return Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(25.0),
+                        topRight: const Radius.circular(25.0),
+                      ),
+                    ),
+                    child: Column(
+                      /*crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,*/
+                      children: [
+                        Icon(
+                          Icons.remove,
+                          color: Colors.grey[600],
+                          size: 30,
+                        ),
+                        CreateClienteWidget(
+                          colorPrimary: widget.colorPrimary,
+                        ),
+                      ],
+                    ),
+                  );
+                  //return ArticuloSheet(listProd: widget.listProd);
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -60,14 +113,11 @@ class _ItemCliente extends State<ItemCliente> {
 
   @override
   Widget build(BuildContext context) {
-  var FacturaProvider = Provider.of<Facturacion>(context, listen: false);
-    /*String cliente=FacturaProvider.cliente;
-    String nit_cliente=FacturaProvider.nit_cliente;*/
-    //String id_cliente=FacturaProvider.id_cliente;
+    var FacturaProvider = Provider.of<Facturacion>(context, listen: false);
 
-  String cliente = FacturaProvider.cliente.replaceAll("(${FacturaProvider.nit_cliente})", "");
+    String cliente = FacturaProvider.cliente
+        .replaceAll("(${FacturaProvider.nit_cliente})", "");
 
-   
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -79,35 +129,29 @@ class _ItemCliente extends State<ItemCliente> {
           children: [
             Container(
                 width: MediaQuery.of(context).size.width * 0.6,
-                child: /*const TextField(
-                  decoration: InputDecoration(
-                      label: Text('NIT, usuario, nombre, correo'),
-                      icon: Icon(
-                        Icons.person,
-                        color: Color.fromARGB(255, 15, 96, 106),
-                      ),
-                      border: OutlineInputBorder())),*/
-                    TextFieldSearch(
-                        decoration: const InputDecoration(
-                            label: Text('NIT, usuario, nombre, correo'),
-                            border: OutlineInputBorder()),
-                        label: 'NIT, usuario, nombre, correo',
-                        controller: searchC,
-                        minStringLength: 1,
-                        future: () async {
-                          return await fetchData();
-                        },
-                        getSelectedValue: (value) async{
-                          searchC.text = value.label;
-                          if (searchC.text.length > 0) {
-                              await FacturaProvider.read_cliente('remove', value.id, widget.tmp);
-                          } else {
-                            /*cliente = '';
-                            id_cliente = '';
-                            nit_cliente = '';*/
-                          }
-                          setState(() {}); // this prints the selected option which could be an object
-                        })),
+                child: TextFieldSearch(
+                    decoration: const InputDecoration(
+                        label: Text('NIT, usuario, nombre, correo'),
+                        border: OutlineInputBorder()),
+                    label: 'NIT, usuario, nombre, correo',
+                    controller: searchC,
+                    minStringLength: 1,
+                    future: () async {
+                      return await fetchData();
+                    },
+                    getSelectedValue: (value) async {
+                      searchC.text = value.label;
+                      if (searchC.text.length > 0) {
+                        await FacturaProvider.read_cliente(
+                            'remove', value.id, widget.tmp);
+                      } else {
+                        /*cliente = '';
+                      id_cliente = '';
+                      nit_cliente = '';*/
+                      }
+                      setState(
+                          () {}); // this prints the selected option which could be an object
+                    })),
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
@@ -120,7 +164,7 @@ class _ItemCliente extends State<ItemCliente> {
                 //color: Color.fromARGB(255, 65, 185, 214),
                 alignment: Alignment.center,
                 child: IconButton(
-                    onPressed: () async{
+                    onPressed: () async {
                       const snackBar = SnackBar(
                         padding: EdgeInsets.all(20),
                         content: Text(
@@ -131,7 +175,7 @@ class _ItemCliente extends State<ItemCliente> {
                       );
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       await FacturaProvider.get_Sat(widget.tmp, searchC.text);
-                      if(FacturaProvider.cambio_c!='0'){
+                      if (FacturaProvider.cambio_c != '0') {
                         SnackBar snackBar = SnackBar(
                           padding: EdgeInsets.all(20),
                           content: Text(
@@ -141,7 +185,7 @@ class _ItemCliente extends State<ItemCliente> {
                           backgroundColor: Color.fromARGB(255, 210, 92, 83),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      }else{
+                      } else {
                         const snackBar = SnackBar(
                           padding: EdgeInsets.all(20),
                           content: Text(
@@ -153,9 +197,7 @@ class _ItemCliente extends State<ItemCliente> {
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
                       FocusScope.of(context).requestFocus(FocusNode());
-                      setState(() {
-                        
-                      });
+                      setState(() {});
                     },
                     icon: const Icon(
                       Icons.search,
@@ -179,7 +221,9 @@ class _ItemCliente extends State<ItemCliente> {
                 padding: const EdgeInsets.symmetric(vertical: 3.6),
                 alignment: Alignment.center,
                 child: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      customBottomSheet(context);
+                    },
                     icon: const Icon(
                       Icons.add,
                       color: Colors.white,
@@ -197,7 +241,7 @@ class _ItemCliente extends State<ItemCliente> {
               color: widget.colorPrimary,
               fontWeight: FontWeight.bold),
         ),
-        (FacturaProvider.id=='')
+        (FacturaProvider.id == '')
             ? Container(
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
@@ -238,12 +282,13 @@ class _ItemCliente extends State<ItemCliente> {
                     ),
                   ),
                   trailing: IconButton(
-                      onPressed: () async{
+                      onPressed: () async {
                         searchC.text = '';
-                          /*FacturaProvider.cliente='';
+                        /*FacturaProvider.cliente='';
                           FacturaProvider.nit_cliente='';
                           FacturaProvider.id_cliente='';*/
-                        await FacturaProvider.read_cliente('remove', '0', widget.tmp);
+                        await FacturaProvider.read_cliente(
+                            'remove', '0', widget.tmp);
                         setState(() {});
                       },
                       icon: Icon(

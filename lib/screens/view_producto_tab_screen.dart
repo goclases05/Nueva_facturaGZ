@@ -130,7 +130,7 @@ class _viewproductotab extends State<ViewProductoTab> {
                         producto.precio_4,
                       ];
                       return Padding(
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(5),
                           child: ArticleHorizontal(
                             listProd: producto,
                             id_tmp: widget.id_tmp,

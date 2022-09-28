@@ -13,6 +13,7 @@ class Preferencias {
   static String _data_id = '';
   static String _data_empresa = '';
   static String _moneda = '';
+  static String _tipo = '';
 
   static Future init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -25,6 +26,15 @@ class Preferencias {
   static set apellido(String apellido) {
     _apellido = apellido;
     _prefs.setString('APELLIDO', apellido);
+  }
+
+  static String get tipo {
+    return _prefs.getString('TIPO') ?? _tipo;
+  }
+
+  static set tipo(String tipo) {
+    _tipo = tipo;
+    _prefs.setString('TIPO', tipo);
   }
 
   static String get moneda {
