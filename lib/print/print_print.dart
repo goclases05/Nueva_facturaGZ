@@ -91,7 +91,7 @@ class _PrintScreenState extends State<PrintScreen> {
                                   )
                                 : (index == 1)
                                     ? ItemCliente(
-                                        colorPrimary: widget.colorPrimary)
+                                        colorPrimary: widget.colorPrimary, tmp: widget.id_tmp)
                                     : const Text(''),
                             Container(
                               alignment: Alignment.centerRight,

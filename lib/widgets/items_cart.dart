@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/models/producto_x_departamento_models.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
+import 'package:factura_gozeri/screens/screens.dart';
 import 'package:factura_gozeri/widgets/articulo_sheet_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -122,6 +123,34 @@ class _ItemsCart extends State<ItemsCart> {
               color: Colors.cyan,
             ),
       ));
+    if(ListDet.contenido==false){
+      // ignore: curly_braces_in_flow_control_structures
+      return Container(
+        alignment: Alignment.center,
+        margin: EdgeInsets.symmetric(vertical: 15),
+        child: ElevatedButton.icon(
+            label: const Icon(
+              Icons.add,
+              size: 20,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ViewTabsScreen(
+                      colorPrimary: widget.colorPrimary,
+                      id_tmp: widget.id_tmp,
+                      clave: '2321'),
+                ),
+              );
+            },
+            style: TextButton.styleFrom(
+                primary: Colors.white,
+                backgroundColor: Colors.green),
+            icon: const Text("Agregar Articulos")),
+      );
+    }
 
       return ListView.builder(
         physics: const NeverScrollableScrollPhysics(),

@@ -1,13 +1,16 @@
 import 'dart:convert';
 
 import 'package:factura_gozeri/global/preferencias_global.dart';
+import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:textfield_search/textfield_search.dart';
 import 'package:http/http.dart' as http;
 
 class ItemCliente extends StatefulWidget {
-  ItemCliente({Key? key, required this.colorPrimary}) : super(key: key);
+  ItemCliente({Key? key, required this.colorPrimary, required this.tmp}) : super(key: key);
   Color colorPrimary;
+  String tmp;
 
   @override
   State<ItemCliente> createState() => _ItemCliente();
@@ -40,9 +43,6 @@ class _ItemCliente extends State<ItemCliente> {
   }
 
   TextEditingController searchC = TextEditingController();
-  String cliente = '';
-  String nit_cliente = '';
-  String id_cliente = '';
 
   @override
   void initState() {
@@ -60,7 +60,14 @@ class _ItemCliente extends State<ItemCliente> {
 
   @override
   Widget build(BuildContext context) {
-    cliente = cliente.replaceAll("(${nit_cliente})", "");
+  var FacturaProvider = Provider.of<Facturacion>(context, listen: false);
+    /*String cliente=FacturaProvider.cliente;
+    String nit_cliente=FacturaProvider.nit_cliente;*/
+    //String id_cliente=FacturaProvider.id_cliente;
+
+  String cliente = FacturaProvider.cliente.replaceAll("(${FacturaProvider.nit_cliente})", "");
+
+   
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -90,19 +97,16 @@ class _ItemCliente extends State<ItemCliente> {
                         future: () async {
                           return await fetchData();
                         },
-                        getSelectedValue: (value) {
+                        getSelectedValue: (value) async{
                           searchC.text = value.label;
-                          setState(() {
-                            if (searchC.text.length > 0) {
-                              cliente = value.label;
-                              id_cliente = value.id;
-                              nit_cliente = value.nit;
-                            } else {
-                              cliente = '';
-                              id_cliente = '';
-                              nit_cliente = '';
-                            }
-                          }); // this prints the selected option which could be an object
+                          if (searchC.text.length > 0) {
+                              await FacturaProvider.read_cliente('remove', value.id, widget.tmp);
+                          } else {
+                            /*cliente = '';
+                            id_cliente = '';
+                            nit_cliente = '';*/
+                          }
+                          setState(() {}); // this prints the selected option which could be an object
                         })),
             Expanded(
               child: Container(
@@ -116,7 +120,43 @@ class _ItemCliente extends State<ItemCliente> {
                 //color: Color.fromARGB(255, 65, 185, 214),
                 alignment: Alignment.center,
                 child: IconButton(
-                    onPressed: () {},
+                    onPressed: () async{
+                      const snackBar = SnackBar(
+                        padding: EdgeInsets.all(20),
+                        content: Text(
+                          'Buscando NIT en SAT ...',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        backgroundColor: Color.fromARGB(255, 19, 126, 164),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      await FacturaProvider.get_Sat(widget.tmp, searchC.text);
+                      if(FacturaProvider.cambio_c!='0'){
+                        SnackBar snackBar = SnackBar(
+                          padding: EdgeInsets.all(20),
+                          content: Text(
+                            FacturaProvider.cambio_c,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Color.fromARGB(255, 210, 92, 83),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }else{
+                        const snackBar = SnackBar(
+                          padding: EdgeInsets.all(20),
+                          content: Text(
+                            'Cliente Agregado',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Color.fromARGB(255, 93, 202, 164),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      setState(() {
+                        
+                      });
+                    },
                     icon: const Icon(
                       Icons.search,
                       color: Colors.white,
@@ -157,7 +197,7 @@ class _ItemCliente extends State<ItemCliente> {
               color: widget.colorPrimary,
               fontWeight: FontWeight.bold),
         ),
-        (searchC.text.length == 0)
+        (FacturaProvider.id=='')
             ? Container(
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
@@ -186,7 +226,7 @@ class _ItemCliente extends State<ItemCliente> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
-                    'NIT: ${nit_cliente}',
+                    'NIT: ${FacturaProvider.nit_cliente}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   leading: const CircleAvatar(
@@ -198,13 +238,13 @@ class _ItemCliente extends State<ItemCliente> {
                     ),
                   ),
                   trailing: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          searchC.text = '';
-                          cliente = '';
-                          id_cliente = '';
-                          nit_cliente = '';
-                        });
+                      onPressed: () async{
+                        searchC.text = '';
+                          /*FacturaProvider.cliente='';
+                          FacturaProvider.nit_cliente='';
+                          FacturaProvider.id_cliente='';*/
+                        await FacturaProvider.read_cliente('remove', '0', widget.tmp);
+                        setState(() {});
                       },
                       icon: Icon(
                         Icons.close,
