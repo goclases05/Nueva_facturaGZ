@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String data_empresa = Preferencias.data_empresa;
     String nombre_empresa = Preferencias.nombre_empresa;
 
-    Color ColPrimary = Colors.cyan;
+    Color ColPrimary = Colors.blueGrey;
     //Color ColPrimary =Color.fromARGB(int.parse('251'), int.parse('251'), int.parse('251'), 1);
 
     return Scaffold(
@@ -252,50 +252,52 @@ class _HomeScreenState extends State<HomeScreen> {
                               Provider.of<Facturacion>(context, listen: false);
 
                           if (index == 0) {
-                            final factuProv = await _facturacion.new_tmpFactura();
+                            final factuProv =
+                                await _facturacion.new_tmpFactura();
                             print('factura no: ${factuProv[0]}');
                             print('clave : ${factuProv[1]}');
-                              _depa.isLoading = true;
-                              _cart.cantidad = 0;
-                              _depa.LoadDepa();
+                            _depa.isLoading = true;
+                            _cart.cantidad = 0;
+                            _depa.LoadDepa();
 
-                              _facturacion.new_tmpFactura();
+                            _facturacion.new_tmpFactura();
 
-                              if (_facturacion.tmp_creada == '') {
-                                var snackBar = SnackBar(
-                                  /// need to set following properties for best effect of awesome_snackbar_content
-                                  duration: const Duration(seconds: 1),
-                                  elevation: 0,
-                                  behavior: SnackBarBehavior.floating,
-                                  backgroundColor: Colors.transparent,
-                                  content: AwesomeSnackbarContent(
-                                    title: 'Error!',
-                                    message:
-                                        'Fallo al crear la factura temporal.',
+                            if (_facturacion.tmp_creada == '') {
+                              var snackBar = SnackBar(
+                                /// need to set following properties for best effect of awesome_snackbar_content
+                                duration: const Duration(seconds: 1),
+                                elevation: 0,
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.transparent,
+                                content: AwesomeSnackbarContent(
+                                  title: 'Error!',
+                                  message:
+                                      'Fallo al crear la factura temporal.',
 
-                                    /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-                                    contentType: ContentType.failure,
-                                  ),
-                                );
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
-                              } else {
-                                // ignore: use_build_context_synchronously
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ViewTabsScreen(
-                                        colorPrimary: ColPrimary,
-                                        id_tmp: factuProv[0],
-                                        clave: factuProv[1]),
-                                  ),
-                                );
-                              }
-                          }else if(index==1){
+                                  /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                  contentType: ContentType.failure,
+                                ),
+                              );
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
+                            } else {
+                              // ignore: use_build_context_synchronously
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ViewTabsScreen(
+                                      colorPrimary: ColPrimary,
+                                      id_tmp: factuProv[0],
+                                      clave: factuProv[1]),
+                                ),
+                              );
+                            }
+                          } else if (index == 1) {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => TabsFacturacion(colorPrimary: ColPrimary),
+                                builder: (context) =>
+                                    TabsFacturacion(colorPrimary: ColPrimary),
                               ),
                             );
                           }

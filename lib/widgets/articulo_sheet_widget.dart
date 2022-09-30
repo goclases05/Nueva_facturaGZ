@@ -22,7 +22,7 @@ class _ArticuloSheetState extends State<ArticuloSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(children: [
         Chip(
           label: Text(widget.listProd.codigo),

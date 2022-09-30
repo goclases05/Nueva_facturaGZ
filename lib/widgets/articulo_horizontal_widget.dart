@@ -109,14 +109,10 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                           ),*/
                                 SingleChildScrollView(
                                     controller: controller,
-                                    child: Column(
-                                      children: [
-                                        ArticuloSheet(
-                                            listProd: widget.listProd,
-                                            colorPrimary: widget.colorPrimary,
-                                            id_tmp: widget.id_tmp),
-                                      ],
-                                    ))),
+                                    child: ArticuloSheet(
+                                        listProd: widget.listProd,
+                                        colorPrimary: widget.colorPrimary,
+                                        id_tmp: widget.id_tmp))),
                       ],
                     ),
                   );

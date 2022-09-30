@@ -14,10 +14,9 @@ class Print extends StatefulWidget {
 }
 
 class _PrintState extends State<Print> {
-
   PrinterBluetoothManager _printerManager = PrinterBluetoothManager();
   List<PrinterBluetooth> _devices = [];
-  String _devicesMsg="";
+  String _devicesMsg = "";
   BluetoothManager bluetoothManager = BluetoothManager.instance;
 
   @override
@@ -53,7 +52,7 @@ class _PrintState extends State<Print> {
               itemCount: _devices.length,
               itemBuilder: (c, i) {
                 return ListTile(
-                  leading: Icon(Icons.print),
+                  leading: const Icon(Icons.print),
                   title: Text("${_devices[i].name}"),
                   subtitle: Text("${_devices[i].address}"),
                   onTap: () {
@@ -83,8 +82,8 @@ class _PrintState extends State<Print> {
         content: Text(result.msg),
       ),
     );
-
   }
+
   Future<List<int>> testTicket() async {
     // Using default profile
     final profile = await CapabilityProfile.load();
@@ -100,8 +99,10 @@ class _PrintState extends State<Print> {
     bytes += generator.text('Reverse text', styles: PosStyles(reverse: true));
     bytes += generator.text('Underlined text',
         styles: PosStyles(underline: true), linesAfter: 1);
-    bytes += generator.text('Align left', styles: PosStyles(align: PosAlign.left));
-    bytes += generator.text('Align center', styles: PosStyles(align: PosAlign.center));
+    bytes +=
+        generator.text('Align left', styles: PosStyles(align: PosAlign.left));
+    bytes += generator.text('Align center',
+        styles: PosStyles(align: PosAlign.center));
     bytes += generator.text('Align right',
         styles: PosStyles(align: PosAlign.right), linesAfter: 1);
 
@@ -115,10 +116,10 @@ class _PrintState extends State<Print> {
     bytes += generator.cut();
     return bytes;
   }
+
   @override
   void dispose() {
     _printerManager.stopScan();
     super.dispose();
   }
-
 }
