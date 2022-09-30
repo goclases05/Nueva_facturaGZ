@@ -18,7 +18,7 @@ class LoadingScreen extends StatelessWidget {
         ),
         actions: [
           CircleAvatar(
-            backgroundColor: Colors.white54,
+            backgroundColor: Colors.white38,
             child: IconButton(
               onPressed: () {},
               icon: const Icon(
@@ -31,7 +31,7 @@ class LoadingScreen extends StatelessWidget {
             width: 15,
           ),
           CircleAvatar(
-            backgroundColor: Colors.white54,
+            backgroundColor: Colors.white38,
             child: IconButton(
               onPressed: () {},
               icon: const Icon(

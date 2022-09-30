@@ -88,6 +88,7 @@ class _viewproductotab extends State<ViewProductoTab> {
           body: SmartRefresher(
             physics: const BouncingScrollPhysics(),
             header: WaterDropMaterialHeader(
+              distance: 30,
               color: Colors.white,
               backgroundColor: widget.colPrimary,
             ),

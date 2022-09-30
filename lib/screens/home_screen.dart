@@ -114,6 +114,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           itemBuilder: (BuildContext context) =>
                               <PopupMenuEntry>[
                                 const PopupMenuItem(
+                                  value: "settings",
+                                  child: ListTile(
+                                    title: Text("Ajustes"),
+                                    trailing: Icon(
+                                      Icons.settings,
+                                    ),
+                                  ),
+                                ),
+                                const PopupMenuItem(
                                   value: "exit",
                                   child: ListTile(
                                     title: Text("Cerrar Sesión"),
@@ -121,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Icons.logout,
                                     ),
                                   ),
-                                ),
+                                )
                               ])),
                   const SizedBox(
                     width: 20,
@@ -241,46 +250,54 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () async {
                           final _facturacion =
                               Provider.of<Facturacion>(context, listen: false);
-                          final factuProv = await _facturacion.new_tmpFactura();
-                          print('factura no: ${factuProv[0]}');
-                          print('clave : ${factuProv[1]}');
+
                           if (index == 0) {
-                            _depa.isLoading = true;
-                            _cart.cantidad = 0;
-                            _depa.LoadDepa();
+                            final factuProv = await _facturacion.new_tmpFactura();
+                            print('factura no: ${factuProv[0]}');
+                            print('clave : ${factuProv[1]}');
+                              _depa.isLoading = true;
+                              _cart.cantidad = 0;
+                              _depa.LoadDepa();
 
-                            _facturacion.new_tmpFactura();
+                              _facturacion.new_tmpFactura();
 
-                            if (_facturacion.tmp_creada == '') {
-                              var snackBar = SnackBar(
-                                /// need to set following properties for best effect of awesome_snackbar_content
-                                duration: const Duration(seconds: 1),
-                                elevation: 0,
-                                behavior: SnackBarBehavior.floating,
-                                backgroundColor: Colors.transparent,
-                                content: AwesomeSnackbarContent(
-                                  title: 'Error!',
-                                  message:
-                                      'Fallo al crear la factura temporal.',
+                              if (_facturacion.tmp_creada == '') {
+                                var snackBar = SnackBar(
+                                  /// need to set following properties for best effect of awesome_snackbar_content
+                                  duration: const Duration(seconds: 1),
+                                  elevation: 0,
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: Colors.transparent,
+                                  content: AwesomeSnackbarContent(
+                                    title: 'Error!',
+                                    message:
+                                        'Fallo al crear la factura temporal.',
 
-                                  /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-                                  contentType: ContentType.failure,
-                                ),
-                              );
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(snackBar);
-                            } else {
-                              // ignore: use_build_context_synchronously
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ViewTabsScreen(
-                                      colorPrimary: ColPrimary,
-                                      id_tmp: factuProv[0],
-                                      clave: factuProv[1]),
-                                ),
-                              );
-                            }
+                                    /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                    contentType: ContentType.failure,
+                                  ),
+                                );
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                              } else {
+                                // ignore: use_build_context_synchronously
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ViewTabsScreen(
+                                        colorPrimary: ColPrimary,
+                                        id_tmp: factuProv[0],
+                                        clave: factuProv[1]),
+                                  ),
+                                );
+                              }
+                          }else if(index==1){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TabsFacturacion(colorPrimary: ColPrimary),
+                              ),
+                            );
                           }
                         },
                         child: Card(
