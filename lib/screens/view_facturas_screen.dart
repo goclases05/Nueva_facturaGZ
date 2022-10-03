@@ -2,7 +2,11 @@ import 'dart:convert';
 
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/models/data_facturas_models.dart';
+import 'package:factura_gozeri/print/print_print.dart';
+import 'package:factura_gozeri/providers/factura_provider.dart';
+import 'package:factura_gozeri/screens/screens.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh_plus/pull_to_refresh_plus.dart';
 
 import 'package:http/http.dart' as http;
@@ -19,7 +23,7 @@ class ViewFacturas extends StatefulWidget {
 
 class _ViewFacturasState extends State<ViewFacturas> {
   List<DataFacturas> list_tmp = [];
-  List<String> list_emi = [];
+  List<DataFacturas> list_emi = [];
   int i = 10;
   final RefreshController refreshController =
       RefreshController(initialRefresh: true);
@@ -27,23 +31,41 @@ class _ViewFacturasState extends State<ViewFacturas> {
   Future<bool> getCursosData({bool isRefresh = false}) async {
     // Read all values
     final empresa = Preferencias.data_empresa;
+    /*if(i==10){
+      list_emi.clear();
+      list_emi.clear();
+    }*/
     print(
-        "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}");
+        "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}");
+        "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}");
 
     final resp = await http.get(uri);
-    final o = json.decode(resp.body).lenght;
+    final o = json.decode(resp.body);
     print('la e: ');
-    print(o.toString());
-    for (int e = 0; e < o; e++) {
-      var lfac = DataFacturas.fromJson(json.decode(resp.body)[e]);
-      list_tmp.add(lfac);
+    print(o.length);
+    if(o.length==0){
+        
+    }else{
+      for (int e = 0; e < o.length; e++) {
+        var lfac = DataFacturas.fromJson(json.decode(resp.body)[e]);
+        
+        if(widget.accion=='Emitidas'){
+          print('entro final');
+          list_emi.add(lfac);
+          print('salio final');
+        }else if(widget.accion=='Pendientes'){
+          print('entro tmp');
+          list_tmp.add(lfac);
+          print('salio tmp');
+        }
+      }
+
+      //final search = ProductosDepartamento.fromJson(resp.body);
+
+      i = i + 10;
+
     }
-
-    //final search = ProductosDepartamento.fromJson(resp.body);
-
-    i = i + 10;
     setState(() {});
     return true;
   }
@@ -78,7 +100,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                   refreshController.loadFailed();
                 }
               },
-              child: (widget.accion == 'pendiente')
+              child: (widget.accion == 'Pendientes')
                   ? (list_tmp.length > 0)
                       ? ListView.separated(
                           scrollDirection: Axis.vertical,
@@ -96,17 +118,34 @@ class _ViewFacturasState extends State<ViewFacturas> {
                               leading: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(5),
-                                    decoration: BoxDecoration(
-                                        //color: Theme.of(context).primaryColor,
-                                        color: widget.colorPrimary,
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: const Icon(
-                                      Icons.receipt_long,
-                                      color: Colors.white,
-                                      size: 25,
+                                  GestureDetector(
+                                    onTap: ()async{
+                                      final _facturacion =
+                                          Provider.of<Facturacion>(context, listen: false);
+                                      await _facturacion.list_cart(list_tmp[index].idFactTmp);
+                                      await _facturacion.read_cliente('read', '0', list_tmp[index].idFactTmp);
+
+                                      // ignore: use_build_context_synchronously
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) => PrintScreen(
+                                                    id_tmp: list_tmp[index].idFactTmp,
+                                                    colorPrimary: widget.colorPrimary,
+                                        )));
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                          //color: Theme.of(context).primaryColor,
+                                          color: widget.colorPrimary,
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: const Icon(
+                                        Icons.receipt_long,
+                                        color: Colors.white,
+                                        size: 25,
+                                      ),
                                     ),
                                   ),
                                   Container(
@@ -133,9 +172,9 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                     fontWeight: FontWeight.bold,
                                     color: Color.fromARGB(167, 0, 0, 0)),
                               ),
-                              subtitle: const Text(
-                                '06/10/2022  8:55',
-                                style: TextStyle(
+                              subtitle: Text(
+                                '${list_tmp[index].fecha}',
+                                style:const  TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black38),
@@ -143,8 +182,8 @@ class _ViewFacturasState extends State<ViewFacturas> {
                               onTap: () {},
                             );
                           })
-                      : const Center(child: Text('Sin data'))
-                  : (widget.accion == 'emitidas')
+                      : Center(child: Text('Sin data'))
+                  : (widget.accion == 'Emitidas')
                       ? (list_emi.length > 0)
                           ? ListView.separated(
                               scrollDirection: Axis.vertical,
@@ -162,17 +201,25 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                   leading: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(5),
-                                        decoration: BoxDecoration(
-                                            //color: Theme.of(context).primaryColor,
-                                            color: widget.colorPrimary,
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        child: const Icon(
-                                          Icons.visibility,
-                                          color: Colors.white,
-                                          size: 25,
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (_) =>ViewTicket()));
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(5),
+                                          decoration: BoxDecoration(
+                                              //color: Theme.of(context).primaryColor,
+                                              color: widget.colorPrimary,
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          child: const Icon(
+                                            Icons.visibility,
+                                            color: Colors.white,
+                                            size: 25,
+                                          ),
                                         ),
                                       ),
                                       Container(
@@ -192,26 +239,27 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                     ],
                                   ),
                                   title: Text(
-                                    'No ${index}: ${list_emi[index]}',
+                                    'No ${list_emi[index].no}: ${list_emi[index].nombre} ${list_emi[index].apellidos}',
                                     style: const TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold,
                                         color: Color.fromARGB(167, 0, 0, 0)),
                                   ),
-                                  subtitle: const Text(
-                                    '06/10/2022  8:55',
-                                    style: TextStyle(
+                                  subtitle: Text(
+                                    '${list_emi[index].fecha}',
+                                    style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black38),
                                   ),
                                   onTap: () {},
-                                  trailing: const Chip(
-                                      padding: EdgeInsets.all(1),
-                                      backgroundColor:
-                                          Color.fromARGB(255, 189, 209, 123),
-                                      label: Text(
-                                        'Pagada',
+                                  trailing: Chip(
+                                      padding:const EdgeInsets.all(1),
+                                      backgroundColor:(list_emi[index].estado=='1')?
+                                          Color.fromARGB(255, 189, 209, 123):
+                                          Color.fromARGB(255, 232, 116, 107),
+                                      label: Text((list_emi[index].estado=='1')?
+                                        'Pagada':'Anulada',
                                         style: TextStyle(
                                             fontSize: 10, color: Colors.white),
                                       )),

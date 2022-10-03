@@ -13,6 +13,9 @@ class DataFacturas {
     required this.nombre,
     required this.apellidos,
     required this.nit,
+    required this.no,
+    required this.fecha,
+    required this.estado
   });
 
   String idFactTmp;
@@ -20,6 +23,9 @@ class DataFacturas {
   String nombre;
   String apellidos;
   String nit;
+  String no;
+  String fecha;
+  String estado;
 
   factory DataFacturas.fromJson(Map<String, dynamic> json) => DataFacturas(
         idFactTmp: json["ID_FACT_TMP"],
@@ -27,6 +33,9 @@ class DataFacturas {
         nombre: json["NOMBRE"],
         apellidos: json["APELLIDOS"],
         nit: json["NIT"],
+        no: json["NO"],
+        fecha: json["FECHA"],
+        estado: json["ESTADO"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -35,5 +44,8 @@ class DataFacturas {
         "NOMBRE": nombre,
         "APELLIDOS": apellidos,
         "NIT": nit,
+        "NO": no,
+        "FECHA": fecha,
+        "ESTADO": estado,
       };
 }

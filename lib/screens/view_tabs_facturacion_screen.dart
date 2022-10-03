@@ -24,11 +24,11 @@ class TabsFacturacion extends StatelessWidget {
     _views = [
       ViewFacturas(
         colorPrimary: colorPrimary,
-        accion: 'emitidas',
+        accion: 'Emitidas',
       ),
       ViewFacturas(
         colorPrimary: colorPrimary,
-        accion: 'pendiente',
+        accion: 'Pendientes',
       )
     ];
 

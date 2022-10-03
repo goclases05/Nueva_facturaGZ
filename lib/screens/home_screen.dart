@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String data_empresa = Preferencias.data_empresa;
     String nombre_empresa = Preferencias.nombre_empresa;
 
-    Color ColPrimary = Colors.blueGrey;
+    Color ColPrimary = Colors.pink;
     //Color ColPrimary =Color.fromARGB(int.parse('251'), int.parse('251'), int.parse('251'), 1);
 
     return Scaffold(
