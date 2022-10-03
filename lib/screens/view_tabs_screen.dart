@@ -111,7 +111,8 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                       final _facturacion =
                           Provider.of<Facturacion>(context, listen: false);
                       await _facturacion.list_cart(widget.id_tmp);
-                      await _facturacion.read_cliente('read', '0', widget.id_tmp);
+                      await _facturacion.read_cliente(
+                          'read', '0', widget.id_tmp);
 
                       // ignore: use_build_context_synchronously
                       Navigator.push(

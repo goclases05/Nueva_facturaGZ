@@ -1,5 +1,8 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/screens/screens.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class TabsFacturacion extends StatelessWidget {
   TabsFacturacion({Key? key, required this.colorPrimary}) : super(key: key);
@@ -101,7 +104,44 @@ class TabsFacturacion extends StatelessWidget {
         bottom: 30,
         right: 30,
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () async {
+            final _facturacion =
+                Provider.of<Facturacion>(context, listen: false);
+            final factuProv = await _facturacion.new_tmpFactura();
+            print('factura no: ${factuProv[0]}');
+            print('clave : ${factuProv[1]}');
+
+            _facturacion.new_tmpFactura();
+
+            if (_facturacion.tmp_creada == '') {
+              var snackBar = SnackBar(
+                /// need to set following properties for best effect of awesome_snackbar_content
+                duration: const Duration(seconds: 1),
+                elevation: 0,
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.transparent,
+                content: AwesomeSnackbarContent(
+                  title: 'Error!',
+                  message: 'Fallo al crear la factura temporal.',
+
+                  /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                  contentType: ContentType.failure,
+                ),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            } else {
+              // ignore: use_build_context_synchronously
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ViewTabsScreen(
+                      colorPrimary: colorPrimary,
+                      id_tmp: factuProv[0],
+                      clave: factuProv[1]),
+                ),
+              );
+            }
+          },
           elevation: 50.0,
           backgroundColor: this.colorPrimary,
           child: const Icon(

@@ -24,37 +24,41 @@ class ViewFacturas extends StatefulWidget {
 class _ViewFacturasState extends State<ViewFacturas> {
   List<DataFacturas> list_tmp = [];
   List<DataFacturas> list_emi = [];
-  int i = 10;
+  int i = 0;
   final RefreshController refreshController =
       RefreshController(initialRefresh: true);
 
   Future<bool> getCursosData({bool isRefresh = false}) async {
     // Read all values
     final empresa = Preferencias.data_empresa;
+    final id_usuario = Preferencias.data_id;
     /*if(i==10){
       list_emi.clear();
       list_emi.clear();
     }*/
+    if (isRefresh == true) {
+      i = 0;
+      list_emi.clear();
+    }
     print(
-        "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}");
+        "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}");
+        "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}");
 
     final resp = await http.get(uri);
     final o = json.decode(resp.body);
     print('la e: ');
     print(o.length);
-    if(o.length==0){
-        
-    }else{
+    if (o.length == 0) {
+    } else {
       for (int e = 0; e < o.length; e++) {
         var lfac = DataFacturas.fromJson(json.decode(resp.body)[e]);
-        
-        if(widget.accion=='Emitidas'){
+
+        if (widget.accion == 'Emitidas') {
           print('entro final');
           list_emi.add(lfac);
           print('salio final');
-        }else if(widget.accion=='Pendientes'){
+        } else if (widget.accion == 'Pendientes') {
           print('entro tmp');
           list_tmp.add(lfac);
           print('salio tmp');
@@ -64,7 +68,6 @@ class _ViewFacturasState extends State<ViewFacturas> {
       //final search = ProductosDepartamento.fromJson(resp.body);
 
       i = i + 10;
-
     }
     setState(() {});
     return true;
@@ -119,20 +122,25 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   GestureDetector(
-                                    onTap: ()async{
+                                    onTap: () async {
                                       final _facturacion =
-                                          Provider.of<Facturacion>(context, listen: false);
-                                      await _facturacion.list_cart(list_tmp[index].idFactTmp);
-                                      await _facturacion.read_cliente('read', '0', list_tmp[index].idFactTmp);
+                                          Provider.of<Facturacion>(context,
+                                              listen: false);
+                                      await _facturacion
+                                          .list_cart(list_tmp[index].idFactTmp);
+                                      await _facturacion.read_cliente('read',
+                                          '0', list_tmp[index].idFactTmp);
 
                                       // ignore: use_build_context_synchronously
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                               builder: (_) => PrintScreen(
-                                                    id_tmp: list_tmp[index].idFactTmp,
-                                                    colorPrimary: widget.colorPrimary,
-                                        )));
+                                                    id_tmp: list_tmp[index]
+                                                        .idFactTmp,
+                                                    colorPrimary:
+                                                        widget.colorPrimary,
+                                                  )));
                                     },
                                     child: Container(
                                       padding: const EdgeInsets.all(5),
@@ -174,7 +182,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                               ),
                               subtitle: Text(
                                 '${list_tmp[index].fecha}',
-                                style:const  TextStyle(
+                                style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black38),
@@ -204,9 +212,11 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                       GestureDetector(
                                         onTap: () {
                                           Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (_) =>ViewTicket()));
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (_) => ViewTicket(
+                                                      colorPrimary: widget
+                                                          .colorPrimary)));
                                         },
                                         child: Container(
                                           padding: const EdgeInsets.all(5),
@@ -254,13 +264,17 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                   ),
                                   onTap: () {},
                                   trailing: Chip(
-                                      padding:const EdgeInsets.all(1),
-                                      backgroundColor:(list_emi[index].estado=='1')?
-                                          Color.fromARGB(255, 189, 209, 123):
-                                          Color.fromARGB(255, 232, 116, 107),
-                                      label: Text((list_emi[index].estado=='1')?
-                                        'Pagada':'Anulada',
-                                        style: TextStyle(
+                                      padding: const EdgeInsets.all(1),
+                                      backgroundColor: (list_emi[index]
+                                                  .estado ==
+                                              '2')
+                                          ? Color.fromARGB(255, 189, 209, 123)
+                                          : Color.fromARGB(255, 232, 116, 107),
+                                      label: Text(
+                                        (list_emi[index].estado == '2')
+                                            ? 'Pagada'
+                                            : 'Anulada',
+                                        style: const TextStyle(
                                             fontSize: 10, color: Colors.white),
                                       )),
                                 );
