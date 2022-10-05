@@ -17,7 +17,9 @@ class Preferencias {
   static String _data_empresa = '';
   static String _moneda = '';
   static String _tipo = '';
-  static String _positionColor='0';
+  static String _positionColor = '0';
+  static String _sucursal = '';
+  static String _serie = '';
 
   static Future init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -32,6 +34,24 @@ class Preferencias {
     _prefs.setString('APELLIDO', apellido);
   }
 
+  static String get sucursal {
+    return _prefs.getString('ID_SUCURSAL') ?? _sucursal;
+  }
+
+  static set sucursal(String sucursal) {
+    _sucursal = sucursal;
+    _prefs.setString('ID_SUCURSAL', sucursal);
+  }
+
+  static String get serie {
+    return _prefs.getString('SERIE') ?? _serie;
+  }
+
+  static set serie(String serie) {
+    _serie = serie;
+    _prefs.setString('SERIE', serie);
+  }
+
   static String get pcolor {
     return _prefs.getString('POSITION') ?? _positionColor;
   }
@@ -40,8 +60,6 @@ class Preferencias {
     _positionColor = pcolor;
     _prefs.setString('POSITION', pcolor);
   }
-
-  
 
   static String get tipo {
     return _prefs.getString('TIPO') ?? _tipo;

@@ -1,8 +1,11 @@
+import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/print/print_page.dart';
+import 'package:factura_gozeri/services/auth_services.dart';
 import 'package:factura_gozeri/widgets/item_dataCliente.dart';
 import 'package:factura_gozeri/widgets/items_cart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 //import 'package:intl/intl.dart';
 
 /*ListView.builder(
@@ -39,10 +42,29 @@ class _PrintScreenState extends State<PrintScreen> {
 
   final f = NumberFormat("\$###,###.00", "en_US");
   int open = 0;
+  String initialSerie = (Preferencias.serie == '') ? '0' : Preferencias.serie;
 
   @override
   Widget build(BuildContext context) {
     int _total = 0;
+    List<DropdownMenuItem<String>> menuItems = [];
+    final authService = Provider.of<AuthService>(context, listen: false);
+
+    menuItems.add(DropdownMenuItem(
+        child: Text(
+          'Selecciona una serie',
+          textAlign: TextAlign.center,
+        ),
+        value: '0'));
+
+    for (var i = 0; i < authService.list_serie.length; i++) {
+      menuItems.add(DropdownMenuItem(
+          child: Text(
+            authService.list_serie[i].nombre,
+            textAlign: TextAlign.center,
+          ),
+          value: authService.list_serie[i].idSerie));
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -53,6 +75,50 @@ class _PrintScreenState extends State<PrintScreen> {
               const Text('Facturación', style: TextStyle(color: Colors.white))),
       body: Column(
         children: [
+          Container(
+            padding: const EdgeInsets.only(left: 30, right: 10, top: 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  "Serie: ",
+                  style: TextStyle(
+                      color: widget.colorPrimary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+                Expanded(
+                  child: Card(
+                      child: Container(
+                    padding: EdgeInsets.only(left: 10),
+                    child: DropdownButton(
+                      itemHeight: null,
+                      value: initialSerie,
+                      isExpanded: true,
+                      dropdownColor: Color.fromARGB(255, 241, 238, 241),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          Preferencias.serie = initialSerie;
+                          initialSerie = newValue!;
+                        });
+                      },
+                      items: menuItems,
+                      elevation: 0,
+                      style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                      //icon: Icon(Icons.arrow_drop_down),
+                      iconDisabledColor: Colors.red,
+                      iconEnabledColor: widget.colorPrimary,
+                      underline: SizedBox(),
+                    ),
+                  )),
+                )
+              ],
+            ),
+          ),
           Expanded(
               child: Container(
                   color: Colors.white,
@@ -91,8 +157,11 @@ class _PrintScreenState extends State<PrintScreen> {
                                   )
                                 : (index == 1)
                                     ? ItemCliente(
-                                        colorPrimary: widget.colorPrimary, tmp: widget.id_tmp)
-                                    : const Text(''),
+                                        colorPrimary: widget.colorPrimary,
+                                        tmp: widget.id_tmp)
+                                    : (index == 2)
+                                        ? const Text('')
+                                        : const Text(''),
                             Container(
                               alignment: Alignment.centerRight,
                               child: ElevatedButton.icon(

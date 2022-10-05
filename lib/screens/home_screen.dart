@@ -23,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   GlobalKey keyButton = GlobalKey();
   GlobalKey keyFacturar = GlobalKey();
   GlobalKey keyHistorial = GlobalKey();
+  GlobalKey keysucursal = GlobalKey();
 
   //Iniciando o estado.
   @override
@@ -31,7 +32,14 @@ class _HomeScreenState extends State<HomeScreen> {
     Future.delayed(Duration.zero, showTutorial);
     super.initState();
   }
-  
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  String selectedValue = "${Preferencias.sucursal}";
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +60,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
     Color ColPrimary = settings.colorPrimary;
     //Color ColPrimary =Color.fromARGB(int.parse('251'), int.parse('251'), int.parse('251'), 1);
+
+    List<DropdownMenuItem<String>> menuItems = [];
+    for (var i = 0; i < authService.list_sucu.length; i++) {
+      menuItems.add(DropdownMenuItem(
+          child: Center(
+            child: Text(
+              authService.list_sucu[i].nombre,
+              textAlign: TextAlign.center,
+            ),
+          ),
+          value: authService.list_sucu[i].idSucursal));
+      ;
+    }
 
     return Scaffold(
         body: Container(
@@ -112,12 +133,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               authService.logout();
                               Navigator.pushReplacementNamed(
                                   context, 'checking');
-                            }else if(value=='settings'){
+                            } else if (value == 'settings') {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      const SettingsScreen(),
+                                  builder: (context) => const SettingsScreen(),
                                 ),
                               );
                             }
@@ -201,36 +221,36 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     direction: Axis.horizontal,
                     children: [
-                      /*Image.network(
-                        '${foto_empresa}',
-                        width: size.width * 0.1,
+                      Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white),
+                            borderRadius: BorderRadius.circular(30),
+                            color: Colors.white),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 0, horizontal: 10),
+                        child: DropdownButton(
+                          key: keysucursal,
+                          itemHeight: null,
+                          value: selectedValue,
+                          dropdownColor: Colors.white,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedValue = newValue!;
+                              Preferencias.sucursal = selectedValue;
+                            });
+                          },
+                          items: menuItems,
+                          elevation: 0,
+                          style: TextStyle(
+                              color: ColPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold),
+                          //icon: Icon(Icons.arrow_drop_down),
+                          iconDisabledColor: Colors.red,
+                          iconEnabledColor: settings.colorPrimary,
+                          underline: SizedBox(),
+                        ),
                       ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        "${nombre_empresa}",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18.0,
-                            color: Colors.white54),
-                        textAlign: TextAlign.center,
-                      ),*/
-                      Chip(
-                          //backgroundColor: Color.fromARGB(124, 0, 187, 212),
-                          backgroundColor: Colors.white,
-                          /*avatar: Image.network(
-                        '${foto_empresa}',
-                        width: size.width * 0.1,
-                      ),*/
-                          label: Text(
-                            "${nombre_empresa}",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0,
-                                color: ColPrimary),
-                            textAlign: TextAlign.center,
-                          ))
                     ],
                   ),
                 ),
@@ -417,6 +437,62 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(
                       height: 20,
                     )
+                  ],
+                ),
+              );
+            },
+          )
+        ],
+        shape: ShapeLightFocus.RRect,
+        radius: 5,
+      ),
+    );
+
+    targets.add(
+      TargetFocus(
+        identify: "Target 5",
+        keyTarget: keysucursal,
+        color: Colors.black54,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) {
+              return Container(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const Text(
+                      "Sucursal",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 20.0,
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10.0),
+                      child: Text(
+                        "Selecciona la sucursal con la que se realizaran las facturas",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    ElevatedButton.icon(
+                        icon: const Icon(
+                          Icons.chevron_left,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          controller.previous();
+                        },
+                        style: TextButton.styleFrom(
+                            primary: Colors.white,
+                            backgroundColor: Colors.cyan),
+                        label: const Text("Ver Anterior"))
                   ],
                 ),
               );

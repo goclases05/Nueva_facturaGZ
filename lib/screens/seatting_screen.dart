@@ -1,4 +1,6 @@
 import 'package:factura_gozeri/providers/seattings_provider.dart';
+import 'package:factura_gozeri/screens/checkouth_screen.dart';
+import 'package:factura_gozeri/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -12,7 +14,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreen extends State<SettingsScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -28,9 +29,15 @@ class _SettingsScreen extends State<SettingsScreen> {
     final settings = Provider.of<settingsProvider>(context, listen: false);
 
     return WillPopScope(
-      onWillPop: ()async{
-        Navigator.pushReplacementNamed(context, 'checking');
-        return true;
+      onWillPop: () async {
+        Navigator.of(context).pop();
+        Navigator.pushReplacement<void, void>(
+          context,
+          MaterialPageRoute<void>(
+            builder: (BuildContext context) => const HomeScreen(),
+          ),
+        ).then((value) => setState(() {}));
+        return false;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -41,47 +48,50 @@ class _SettingsScreen extends State<SettingsScreen> {
         ),
         body: ListView(
           scrollDirection: Axis.vertical,
-          shrinkWrap:true,
+          shrinkWrap: true,
           children: [
             ListTile(
               leading: CircleAvatar(
-                backgroundColor: settings.colorPrimary,
-                child: const Icon(Icons.filter_none,color: Colors.white,)
-              ),
-              title: Text('Serie Predeterminada: '),
-              onTap: (() {
-                
-              }),
+                  backgroundColor: settings.colorPrimary,
+                  child: const Icon(
+                    Icons.filter_none,
+                    color: Colors.white,
+                  )),
+              title: const Text('Serie Predeterminada '),
+              onTap: (() {}),
             ),
-            const Divider(
-              color:Colors.grey
-            ),
+            const Divider(color: Colors.grey),
             ExpansionTile(
               leading: CircleAvatar(
-                backgroundColor: settings.colorPrimary,
-                child: const Icon(Icons.palette,color: Colors.white,)
-              ),
-              title: Text('Serie Predeterminada: '),
-              children:[
-                 ListView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap:true,
-                  itemCount: settings.list_Color.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: settings.list_Color[index],
-                      ),
-                      onTap: (){
-                        settings.colorChange(index);
-                        setState(() {
-                          
-                        });
-                      },
-                    );
-                  },
-                )
+                  backgroundColor: settings.colorPrimary,
+                  child: const Icon(
+                    Icons.palette,
+                    color: Colors.white,
+                  )),
+              title: const Text('Colores de Ambiente '),
+              //backgroundColor: const Color.fromRGBO(246, 243, 244, 1),
+              children: [
+                GridView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: settings.list_Color.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 5),
+                    itemBuilder: ((context, index) {
+                      return GestureDetector(
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: CircleAvatar(
+                            backgroundColor: settings.list_Color[index],
+                          ),
+                        ),
+                        onTap: () {
+                          settings.colorChange(index);
+                          setState(() {});
+                        },
+                      );
+                    })),
               ],
             )
           ],
@@ -89,6 +99,4 @@ class _SettingsScreen extends State<SettingsScreen> {
       ),
     );
   }
-
-    
 }

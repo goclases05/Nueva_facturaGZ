@@ -1,20 +1,20 @@
+import 'dart:convert';
+
 import 'package:factura_gozeri/global/globals.dart';
+import 'package:factura_gozeri/models/sucursales_models.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class settingsProvider extends ChangeNotifier {
   final String _baseUrl = "app.gozeri.com";
-  
-  List<Color> list_Color=[
+  bool load_sucursal = true;
+
+  List<Color> list_Color = [
     Colors.cyan,
     Colors.black,
-    Colors.white,
-    Colors.yellowAccent,
     Colors.amber,
     Colors.amberAccent,
-    Colors.yellow,
-    Colors.tealAccent,
     Colors.teal,
-    Colors.cyanAccent,
     Colors.redAccent,
     Colors.red,
     Colors.purpleAccent,
@@ -33,22 +33,18 @@ class settingsProvider extends ChangeNotifier {
     Colors.deepPurple,
     Colors.green,
     Colors.grey
-
   ];
-  Color colorPrimary=Colors.cyan;
+  Color colorPrimary = Colors.cyan;
 
   settingsProvider() {
     print(list_Color[int.parse(Preferencias.pcolor)]);
-    colorPrimary=list_Color[int.parse(Preferencias.pcolor)];
+    colorPrimary = list_Color[int.parse(Preferencias.pcolor)];
     notifyListeners();
   }
 
-
   Future colorChange(int position) async {
-    colorPrimary=list_Color[position];
-    Preferencias.pcolor='${position}';
+    colorPrimary = list_Color[position];
+    Preferencias.pcolor = '${position}';
     return notifyListeners();
   }
-
-
 }

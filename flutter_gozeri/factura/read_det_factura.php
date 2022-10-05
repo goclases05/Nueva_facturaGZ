@@ -8,11 +8,7 @@ include('../conex.php');
 $query_fact=$conexion->query("SELECT * FROM bgzeri_empresa.tblfacturas_det_tmp WHERE ID_FACT_TMP='$id_tmp'");
 $total_fact = $query_fact->rowCount();
 if($total_fact==0){
-    echo '
-        {
-            "error": "factura no existente."
-        }
-    ';
+    echo '0';
 }else{
     $padre=array();
     $row_fact=$query_fact->fetchAll();

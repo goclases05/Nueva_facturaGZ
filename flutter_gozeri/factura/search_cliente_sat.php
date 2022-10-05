@@ -55,13 +55,14 @@ $nit = addslashes(str_replace("-", "", $SAT));
 			$new_insert = $conexion->query("INSERT INTO bgzeri_empresa.tblclientes (ID_USUARIO, ID_VENDEDOR, ID_EMPRESA, ID_FASE, TIPO_CLIENTE) VALUES ('$new_id', '$idusuario', '$empresa', (SELECT ID_FASE FROM bgzeri_empresa.tblclientes_fases WHERE ID_PRED = 1 AND ID_EMPRESA = '$empresa'), '1')");
 
 			//echo $new_id;
-            echo "{                
-                'cliente':'".$new_id."'
-            }";
+			$data=array();
+			$data['cliente']=$new_id;
+			$data['error']='0';
+            echo json_encode($data);
 		}else{
-			echo "{                
-                'error':'NIT no encontrado'
-            }";
+			$data=array();
+			$data['error']="NIT no encontrado";
+            echo json_encode($data);
 		}
 	}
 

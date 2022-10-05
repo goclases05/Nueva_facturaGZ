@@ -62,19 +62,22 @@ class CheckOuthScreen extends StatelessWidget {
                   Future.microtask(() {
                     //Future.delayed(Duration(seconds: 5));
                     Navigator.pushReplacement(
-                        context,
-                        PageRouteBuilder(
-                            pageBuilder: (_, __, ___) => LoginScreen(),
-                            transitionDuration: Duration(seconds: 0)));
+                            context,
+                            PageRouteBuilder(
+                                pageBuilder: (_, __, ___) => LoginScreen(),
+                                transitionDuration: Duration(seconds: 0)))
+                        .then((value) => Navigator.of(context).pop());
                   });
                 } else {
                   Future.microtask(() {
                     //Future.delayed(Duration(seconds: 5));
+
                     Navigator.pushReplacement(
-                        context,
-                        PageRouteBuilder(
-                            pageBuilder: (_, __, ___) => HomeScreen(),
-                            transitionDuration: Duration(seconds: 0)));
+                            context,
+                            PageRouteBuilder(
+                                pageBuilder: (_, __, ___) => HomeScreen(),
+                                transitionDuration: Duration(seconds: 0)))
+                        .then((value) => Navigator.of(context).pop());
                   });
                 }
               });
