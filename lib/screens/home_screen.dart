@@ -2,6 +2,7 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
+import 'package:factura_gozeri/providers/seattings_provider.dart';
 import 'package:factura_gozeri/screens/screens.dart';
 import 'package:factura_gozeri/services/services.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Future.delayed(Duration.zero, showTutorial);
     super.initState();
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
     String data_id = Preferencias.data_id;
     String data_empresa = Preferencias.data_empresa;
     String nombre_empresa = Preferencias.nombre_empresa;
+    final settings = Provider.of<settingsProvider>(context, listen: false);
 
-    Color ColPrimary = Colors.blueGrey;
+    Color ColPrimary = settings.colorPrimary;
     //Color ColPrimary =Color.fromARGB(int.parse('251'), int.parse('251'), int.parse('251'), 1);
 
     return Scaffold(
@@ -109,6 +112,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               authService.logout();
                               Navigator.pushReplacementNamed(
                                   context, 'checking');
+                            }else if(value=='settings'){
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const SettingsScreen(),
+                                ),
+                              );
                             }
                           },
                           itemBuilder: (BuildContext context) =>

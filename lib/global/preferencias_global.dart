@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Preferencias {
@@ -14,6 +17,7 @@ class Preferencias {
   static String _data_empresa = '';
   static String _moneda = '';
   static String _tipo = '';
+  static String _positionColor='0';
 
   static Future init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -27,6 +31,17 @@ class Preferencias {
     _apellido = apellido;
     _prefs.setString('APELLIDO', apellido);
   }
+
+  static String get pcolor {
+    return _prefs.getString('POSITION') ?? _positionColor;
+  }
+
+  static set pcolor(String pcolor) {
+    _positionColor = pcolor;
+    _prefs.setString('POSITION', pcolor);
+  }
+
+  
 
   static String get tipo {
     return _prefs.getString('TIPO') ?? _tipo;

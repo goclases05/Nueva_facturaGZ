@@ -7,3 +7,4 @@ export 'view_producto_tab_screen.dart';
 export 'view_tabs_facturacion_screen.dart';
 export 'view_facturas_screen.dart';
 export 'view_ticket_desing_screen.dart';
+export 'seatting_screen.dart';

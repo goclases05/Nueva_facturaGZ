@@ -216,7 +216,8 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                               MaterialPageRoute(
                                                   builder: (_) => ViewTicket(
                                                       colorPrimary: widget
-                                                          .colorPrimary)));
+                                                          .colorPrimary,
+                                                      estado: list_emi[index].estado)));
                                         },
                                         child: Container(
                                           padding: const EdgeInsets.all(5),
@@ -268,8 +269,8 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                       backgroundColor: (list_emi[index]
                                                   .estado ==
                                               '2')
-                                          ? Color.fromARGB(255, 189, 209, 123)
-                                          : Color.fromARGB(255, 232, 116, 107),
+                                          ? const Color.fromARGB(255, 169, 189, 105)
+                                          : const Color.fromARGB(255, 232, 116, 107),
                                       label: Text(
                                         (list_emi[index].estado == '2')
                                             ? 'Pagada'
