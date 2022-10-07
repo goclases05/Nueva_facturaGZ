@@ -19,3 +19,24 @@ class SeriesData {
         "NOMBRE": nombre,
       };
 }
+
+class MetodosPago {
+  MetodosPago({
+    required this.idMetodo,
+    required this.nombre,
+  });
+
+  String idMetodo;
+  String nombre;
+
+  factory MetodosPago.fromJson(Map<String, dynamic> json) => MetodosPago(
+        idMetodo: json["ID_PAGO_PRED"],
+        nombre: json["FORMA"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "ID_PAGO_PRED": idMetodo,
+        "FORMA": nombre,
+      };
+}
+

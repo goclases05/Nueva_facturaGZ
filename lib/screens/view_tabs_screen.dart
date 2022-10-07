@@ -113,6 +113,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                       await _facturacion.list_cart(widget.id_tmp);
                       await _facturacion.read_cliente(
                           'read', '0', widget.id_tmp);
+                      await _facturacion.serie(widget.id_tmp, 'read', '');
 
                       // ignore: use_build_context_synchronously
                       Navigator.push(
@@ -121,6 +122,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                               builder: (_) => PrintScreen(
                                     id_tmp: widget.id_tmp,
                                     colorPrimary: widget.colorPrimary,
+                                    serie: _facturacion.initialSerie,
                                   )));
                     },
                     icon: const Icon(

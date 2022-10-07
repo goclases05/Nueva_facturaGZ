@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:factura_gozeri/global/globals.dart';
+import 'package:factura_gozeri/models/bancos_models.dart';
 import 'package:factura_gozeri/models/car_list_models.dart';
+import 'package:factura_gozeri/models/series_models.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -8,10 +10,21 @@ class Facturacion extends ChangeNotifier {
   final String _baseUrl = "app.gozeri.com";
   bool tmp_creada = false;
 
+  //serie
+  String initialSerie='0';
+
   //lista de la carta
   bool contenido=false;
   bool list_load = true;
   late List<ClassListCart> list_det = [];
+
+
+  bool loadMetodo=true;
+  List<MetodosPago> list_metodoPago=[];
+
+  //bancos
+  bool loadBancos=true;
+  List<BancosData>list_Bancos=[];
 
   //variables para cliente
   String cliente='';
@@ -19,6 +32,102 @@ class Facturacion extends ChangeNotifier {
   String id_cliente='';
   String id='';
   String cambio_c='0';
+
+  Facturacion(){
+
+    metodoPago();
+  }
+
+  Future serie(String tmp,String accion,String serie) async {
+    if(accion=='read'){
+      initialSerie='0';
+      notifyListeners();
+      print(
+          "https://app.gozeri.com/flutter_gozeri/factura/serie_tmp.php?tmp=${tmp}&accion=read");
+      final Uri uri = Uri.parse(
+          "https://app.gozeri.com/flutter_gozeri/factura/serie_tmp.php?tmp=${tmp}&accion=read");
+
+      final resp = await http.get(uri);
+      if(resp.body=='0'){
+        initialSerie=(Preferencias.serie == '') ? '0' : Preferencias.serie;
+        notifyListeners();
+        return this.serie(tmp, 'add', initialSerie);
+      }else{
+        initialSerie=resp.body;
+        return notifyListeners();
+      }
+      
+    }else if(accion=='add'){
+
+        print(
+          "https://app.gozeri.com/flutter_gozeri/factura/serie_tmp.php?tmp=${tmp}&accion=add&serie=${serie}");
+        final Uri uri = Uri.parse(
+            "https://app.gozeri.com/flutter_gozeri/factura/serie_tmp.php?tmp=${tmp}&accion=add&serie=${serie}");
+
+        final resp = await http.get(uri);
+        if(resp.body=='1'){
+          initialSerie=serie;
+          notifyListeners();
+        }
+        notifyListeners();
+        return resp.body;
+
+
+    }
+    
+  }
+
+  Future metodoPago() async {
+    final sucursal = Preferencias.sucursal;
+    loadMetodo=true;
+    notifyListeners();
+    print(
+        "https://app.gozeri.com/flutter_gozeri/metodoPago.php");
+    final Uri uri = Uri.parse(
+        "https://app.gozeri.com/flutter_gozeri/metodoPago.php");
+
+    final resp = await http.get(uri);
+    var js = json.decode(resp.body);
+    final len = js.length;
+    //final sucursales_http = sucursalesDataFromJson(resp.body);
+    list_metodoPago.clear();
+    var result;
+    for (int o = 0; o < len; o++) {
+      result = MetodosPago.fromJson(js[o]);
+      /*list_det.addAll(result);*/
+      print(list_metodoPago);
+      list_metodoPago.add(result);
+    }
+    loadMetodo=false;
+    return notifyListeners();
+  }
+
+  Future bancos() async {
+    final empresa = Preferencias.data_empresa;
+    loadBancos=true;
+    notifyListeners();
+    print(
+        "https://app.gozeri.com/flutter_gozeri/factura/bancos.php?empresa=${empresa}");
+    final Uri uri = Uri.parse(
+        "https://app.gozeri.com/flutter_gozeri/factura/bancos.php?empresa=${empresa}");
+
+    final resp = await http.get(uri);
+
+    var js = json.decode(resp.body);
+    final len = js.length;
+    //final sucursales_http = sucursalesDataFromJson(resp.body);
+    list_Bancos.clear();
+    var result;
+    for (int o = 0; o < len; o++) {
+      result = BancosData.fromJson(js[o]);
+
+      /*list_det.addAll(result);*/
+      print(result);
+      list_Bancos.add(result);
+    }
+    loadBancos=false;
+    return notifyListeners();
+  }
 
 
   Future<dynamic> new_tmpFactura() async {
@@ -146,4 +255,6 @@ class Facturacion extends ChangeNotifier {
       return notifyListeners();
     }
   }
+
+  
 }

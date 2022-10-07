@@ -177,16 +177,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 100.0,
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
+                            color: Colors.white,
                             border:
                                 Border.all(color: Colors.white60, width: 2.0)),
                         child: (foto_usuario == '' ||
                                 foto_usuario ==
                                     'https://imagenes.gozeri.com/ImagenesGozeri/siluetas_perfil.gif')
                             ? const CircleAvatar(
+                                backgroundColor: Colors.white,
                                 backgroundImage:
                                     AssetImage('assets/perfil_user.png'),
                               )
                             : CircleAvatar(
+                              backgroundColor: Colors.white,
                                 backgroundImage: NetworkImage(foto_usuario),
                               )),
                   ],

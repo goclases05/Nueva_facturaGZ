@@ -131,6 +131,8 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                       await _facturacion.read_cliente('read',
                                           '0', list_tmp[index].idFactTmp);
 
+                                      await _facturacion.serie(list_tmp[index].idFactTmp, 'read', '');
+
                                       // ignore: use_build_context_synchronously
                                       Navigator.push(
                                           context,
@@ -140,6 +142,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                         .idFactTmp,
                                                     colorPrimary:
                                                         widget.colorPrimary,
+                                                    serie: _facturacion.initialSerie,
                                                   )));
                                     },
                                     child: Container(

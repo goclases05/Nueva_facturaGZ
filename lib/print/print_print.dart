@@ -1,8 +1,10 @@
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/print/print_page.dart';
+import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/services/auth_services.dart';
 import 'package:factura_gozeri/widgets/item_dataCliente.dart';
 import 'package:factura_gozeri/widgets/items_cart.dart';
+import 'package:factura_gozeri/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -25,8 +27,10 @@ import 'package:provider/provider.dart';
 class PrintScreen extends StatefulWidget {
   String id_tmp;
   Color colorPrimary;
-  PrintScreen({Key? key, required this.id_tmp, required this.colorPrimary})
+  String serie;
+  PrintScreen({Key? key, required this.id_tmp, required this.colorPrimary, required this.serie})
       : super(key: key);
+
 
   @override
   State<PrintScreen> createState() => _PrintScreenState();
@@ -42,13 +46,13 @@ class _PrintScreenState extends State<PrintScreen> {
 
   final f = NumberFormat("\$###,###.00", "en_US");
   int open = 0;
-  String initialSerie = (Preferencias.serie == '') ? '0' : Preferencias.serie;
 
   @override
   Widget build(BuildContext context) {
     int _total = 0;
     List<DropdownMenuItem<String>> menuItems = [];
     final authService = Provider.of<AuthService>(context, listen: false);
+    final facturaService = Provider.of<Facturacion>(context, listen: false);
 
     menuItems.add(DropdownMenuItem(
         child: Text(
@@ -94,13 +98,26 @@ class _PrintScreenState extends State<PrintScreen> {
                     padding: EdgeInsets.only(left: 10),
                     child: DropdownButton(
                       itemHeight: null,
-                      value: initialSerie,
+                      value: facturaService.initialSerie,
                       isExpanded: true,
                       dropdownColor: Color.fromARGB(255, 241, 238, 241),
-                      onChanged: (String? newValue) {
+                      onChanged: (String? newValue) async{
+                        var cambio=await facturaService.serie(widget.id_tmp, 'add', newValue!);
+                          if(cambio!='1'){
+                            Preferencias.serie = newValue!;
+                            SnackBar snackBar = SnackBar(
+                              padding: EdgeInsets.all(20),
+                              content: Text(
+                                '${cambio}',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              backgroundColor: Color.fromARGB(255, 224, 96, 113),
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          }
+
                         setState(() {
-                          Preferencias.serie = initialSerie;
-                          initialSerie = newValue!;
+                          
                         });
                       },
                       items: menuItems,
@@ -160,11 +177,11 @@ class _PrintScreenState extends State<PrintScreen> {
                                         colorPrimary: widget.colorPrimary,
                                         tmp: widget.id_tmp)
                                     : (index == 2)
-                                        ? const Text('')
+                                        ? RegistroMetodoPago(colorPrimary: widget.colorPrimary, id_tmp: widget.id_tmp)
                                         : const Text(''),
                             Container(
                               alignment: Alignment.centerRight,
-                              child: ElevatedButton.icon(
+                              child: (index==2)?const Text(''):ElevatedButton.icon(
                                   label: const Icon(
                                     Icons.arrow_forward,
                                     size: 20,
@@ -177,7 +194,7 @@ class _PrintScreenState extends State<PrintScreen> {
                                       } else if (index == 1) {
                                         open = 2;
                                       } else {
-                                        open = 0;
+                                        //open = 0;
                                       }
                                     });
                                     print(open);
