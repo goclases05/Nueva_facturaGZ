@@ -6,14 +6,14 @@ import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
 import 'dart:io' show Platform;
 import 'package:image/image.dart';
 
-class Print extends StatefulWidget {
-  final List<Map<String, dynamic>> data;
-  Print(this.data);
+class PrintSC extends StatefulWidget {
+  String id_tmp;
+  PrintSC({Key? key, required this.id_tmp}) : super(key: key);
   @override
   _PrintState createState() => _PrintState();
 }
 
-class _PrintState extends State<Print> {
+class _PrintState extends State<PrintSC> {
   PrinterBluetoothManager _printerManager = PrinterBluetoothManager();
   List<PrinterBluetooth> _devices = [];
   String _devicesMsg = "";
@@ -44,7 +44,11 @@ class _PrintState extends State<Print> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Print'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        foregroundColor: Colors.cyan,
+        title: Text('Impresoras',
+            style: TextStyle(fontSize: 25, color: Colors.blueGrey[300])),
       ),
       body: _devices.isEmpty
           ? Center(child: Text(_devicesMsg ?? ''))

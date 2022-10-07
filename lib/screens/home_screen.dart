@@ -189,9 +189,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     AssetImage('assets/perfil_user.png'),
                               )
                             : CircleAvatar(
-                              backgroundColor: Colors.white,
-                                backgroundImage: NetworkImage(foto_usuario),
-                              )),
+                                backgroundColor: Colors.white,
+                                backgroundImage: NetworkImage(foto_usuario))),
                   ],
                 ),
                 const SizedBox(

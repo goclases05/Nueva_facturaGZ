@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/print/print_page.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
+import 'package:factura_gozeri/screens/view_tabs_facturacion_screen.dart';
 import 'package:factura_gozeri/services/auth_services.dart';
 import 'package:factura_gozeri/widgets/item_dataCliente.dart';
 import 'package:factura_gozeri/widgets/items_cart.dart';
@@ -28,9 +31,12 @@ class PrintScreen extends StatefulWidget {
   String id_tmp;
   Color colorPrimary;
   String serie;
-  PrintScreen({Key? key, required this.id_tmp, required this.colorPrimary, required this.serie})
+  PrintScreen(
+      {Key? key,
+      required this.id_tmp,
+      required this.colorPrimary,
+      required this.serie})
       : super(key: key);
-
 
   @override
   State<PrintScreen> createState() => _PrintScreenState();
@@ -101,24 +107,23 @@ class _PrintScreenState extends State<PrintScreen> {
                       value: facturaService.initialSerie,
                       isExpanded: true,
                       dropdownColor: Color.fromARGB(255, 241, 238, 241),
-                      onChanged: (String? newValue) async{
-                        var cambio=await facturaService.serie(widget.id_tmp, 'add', newValue!);
-                          if(cambio!='1'){
-                            Preferencias.serie = newValue!;
-                            SnackBar snackBar = SnackBar(
-                              padding: EdgeInsets.all(20),
-                              content: Text(
-                                '${cambio}',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              backgroundColor: Color.fromARGB(255, 224, 96, 113),
-                            );
-                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                          }
+                      onChanged: (String? newValue) async {
+                        var cambio = await facturaService.serie(
+                            widget.id_tmp, 'add', newValue!);
+                        if (cambio != '1') {
+                          Preferencias.serie = newValue!;
+                          SnackBar snackBar = SnackBar(
+                            padding: EdgeInsets.all(20),
+                            content: Text(
+                              '${cambio}',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Color.fromARGB(255, 224, 96, 113),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
 
-                        setState(() {
-                          
-                        });
+                        setState(() {});
                       },
                       items: menuItems,
                       elevation: 0,
@@ -144,8 +149,86 @@ class _PrintScreenState extends State<PrintScreen> {
                     physics: const BouncingScrollPhysics(),
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
-                    itemCount: 3,
+                    itemCount: 4,
                     itemBuilder: ((context, index) {
+                      if (index == 3) {
+                        return Consumer<Facturacion>(
+                            builder: (context, fact, child) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 15),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                    width: 2,
+                                    style: BorderStyle.solid,
+                                    color: Color.fromARGB(255, 199, 193, 197)),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Column(children: [
+                              (fact.loadTransaccion)
+                                  ? Container(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.2,
+                                      padding: const EdgeInsets.all(0),
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.cyan,
+                                        ),
+                                      ))
+                                  : ListView.builder(
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      scrollDirection: Axis.vertical,
+                                      shrinkWrap: true,
+                                      itemCount: fact.list_transaccion.length,
+                                      itemBuilder: (context, index) {
+                                        return ListTile(
+                                          title: Text(fact
+                                              .list_transaccion[index].forma),
+                                          trailing: Text(Preferencias.moneda +
+                                              fact.list_transaccion[index]
+                                                  .abono),
+                                        );
+                                      },
+                                    ),
+                              ListTile(
+                                title: const Text(
+                                  'Total: ',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                trailing: Text(
+                                  Preferencias.moneda + fact.total_fac,
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              ListTile(
+                                title: Text(
+                                  (double.parse(fact.saldo) < 0)
+                                      ? 'Vuelto: '
+                                      : 'Saldo: ',
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                trailing: Text(
+                                  (double.parse(fact.saldo) < 0)
+                                      ? '${Preferencias.moneda}${double.parse(fact.saldo) * (-1)}'
+                                      : Preferencias.moneda + fact.saldo,
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              )
+                            ]),
+                          );
+                        });
+                      }
                       return Card(
                         elevation: 3,
                         margin: const EdgeInsets.all(10),
@@ -177,32 +260,36 @@ class _PrintScreenState extends State<PrintScreen> {
                                         colorPrimary: widget.colorPrimary,
                                         tmp: widget.id_tmp)
                                     : (index == 2)
-                                        ? RegistroMetodoPago(colorPrimary: widget.colorPrimary, id_tmp: widget.id_tmp)
+                                        ? RegistroMetodoPago(
+                                            colorPrimary: widget.colorPrimary,
+                                            id_tmp: widget.id_tmp)
                                         : const Text(''),
                             Container(
                               alignment: Alignment.centerRight,
-                              child: (index==2)?const Text(''):ElevatedButton.icon(
-                                  label: const Icon(
-                                    Icons.arrow_forward,
-                                    size: 20,
-                                    color: Colors.white,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      if (index == 0) {
-                                        open = 1;
-                                      } else if (index == 1) {
-                                        open = 2;
-                                      } else {
-                                        //open = 0;
-                                      }
-                                    });
-                                    print(open);
-                                  },
-                                  style: TextButton.styleFrom(
-                                      primary: Colors.white,
-                                      backgroundColor: widget.colorPrimary),
-                                  icon: const Text("Continuar")),
+                              child: (index == 2)
+                                  ? const Text('')
+                                  : ElevatedButton.icon(
+                                      label: const Icon(
+                                        Icons.arrow_forward,
+                                        size: 20,
+                                        color: Colors.white,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          if (index == 0) {
+                                            open = 1;
+                                          } else if (index == 1) {
+                                            open = 2;
+                                          } else {
+                                            //open = 0;
+                                          }
+                                        });
+                                        print(open);
+                                      },
+                                      style: TextButton.styleFrom(
+                                          primary: Colors.white,
+                                          backgroundColor: widget.colorPrimary),
+                                      icon: const Text("Continuar")),
                             )
                           ],
                         ),
@@ -221,9 +308,38 @@ class _PrintScreenState extends State<PrintScreen> {
                 ),*/
                 Expanded(
                     child: TextButton.icon(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => Print(data)));
+                  onPressed: () async {
+                    var facturar = await facturaService.facturar(widget.id_tmp);
+                    var js = json.decode(facturar);
+                    if (js['MENSAJE'] == 'OK') {
+                      SnackBar snackBar = const SnackBar(
+                        padding: EdgeInsets.all(20),
+                        content: Text(
+                          'Facturacion Completada',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        backgroundColor: Colors.green,
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      // ignore: use_build_context_synchronously
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => TabsFacturacion(
+                                  colorPrimary: widget.colorPrimary)));
+                    } else {
+                      SnackBar snackBar = SnackBar(
+                        padding: const EdgeInsets.all(20),
+                        content: Text(
+                          '${facturar}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        backgroundColor:
+                            const Color.fromARGB(255, 224, 96, 113),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      print(facturar);
+                    }
                   },
                   icon: const Icon(Icons.print),
                   label: const Text('Facturar'),

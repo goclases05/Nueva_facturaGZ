@@ -10,10 +10,14 @@ include('../conex.php');
 $salect=$conexion->query("SELECT ID_USUARIO FROM tblusuarios WHERE ID_EMPRESA='$empresa' AND ID_USUARIO='$id_usuario'");
 $salect->execute();
 $total_rows = $salect->rowCount();
-
 $select_cliente = $conexion->query("SELECT ID_USUARIO FROM tblusuarios WHERE ID_EMPRESA = '$empresa' AND NOMBRE = 'Consumidor Final'");
 $cliente = $select_cliente->fetch(PDO::FETCH_ASSOC);
-$CF = $cliente["ID_USUARIO"];
+if(isset($cliente["ID_USUARIO"])){
+    $CF = $cliente["ID_USUARIO"];
+}else{
+    $CF=0;
+}
+
 $select_cliente->closeCursor();
 if (empty($CF)) {
     $CF = 0;

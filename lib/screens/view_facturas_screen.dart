@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/models/data_facturas_models.dart';
+import 'package:factura_gozeri/print/print_page.dart';
 import 'package:factura_gozeri/print/print_print.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/screens/screens.dart';
@@ -131,8 +132,12 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                       await _facturacion.read_cliente('read',
                                           '0', list_tmp[index].idFactTmp);
 
-                                      await _facturacion.serie(list_tmp[index].idFactTmp, 'read', '');
-
+                                      await _facturacion.serie(
+                                          list_tmp[index].idFactTmp,
+                                          'read',
+                                          '');
+                                      await _facturacion.transacciones(
+                                          list_tmp[index].idFactTmp);
                                       // ignore: use_build_context_synchronously
                                       Navigator.push(
                                           context,
@@ -142,7 +147,8 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                         .idFactTmp,
                                                     colorPrimary:
                                                         widget.colorPrimary,
-                                                    serie: _facturacion.initialSerie,
+                                                    serie: _facturacion
+                                                        .initialSerie,
                                                   )));
                                     },
                                     child: Container(
@@ -218,9 +224,10 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (_) => ViewTicket(
-                                                      colorPrimary: widget
-                                                          .colorPrimary,
-                                                      estado: list_emi[index].estado)));
+                                                      colorPrimary:
+                                                          widget.colorPrimary,
+                                                      estado: list_emi[index]
+                                                          .estado)));
                                         },
                                         child: Container(
                                           padding: const EdgeInsets.all(5),
@@ -236,18 +243,33 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                           ),
                                         ),
                                       ),
-                                      Container(
-                                        margin: const EdgeInsets.only(left: 2),
-                                        padding: const EdgeInsets.all(5),
-                                        decoration: BoxDecoration(
-                                            //color: Theme.of(context).primaryColor,
-                                            color: Colors.lightBlue,
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        child: const Icon(
-                                          Icons.print,
-                                          color: Colors.white,
-                                          size: 25,
+                                      GestureDetector(
+                                        onTap: () {
+                                          print('print ' +
+                                              list_emi[index].idFactTmp);
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => PrintSC(
+                                                  id_tmp:
+                                                      list_emi[index].idFactTmp,
+                                                ),
+                                              ));
+                                        },
+                                        child: Container(
+                                          margin:
+                                              const EdgeInsets.only(left: 2),
+                                          padding: const EdgeInsets.all(5),
+                                          decoration: BoxDecoration(
+                                              //color: Theme.of(context).primaryColor,
+                                              color: Colors.lightBlue,
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          child: const Icon(
+                                            Icons.print,
+                                            color: Colors.white,
+                                            size: 25,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -269,11 +291,12 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                   onTap: () {},
                                   trailing: Chip(
                                       padding: const EdgeInsets.all(1),
-                                      backgroundColor: (list_emi[index]
-                                                  .estado ==
-                                              '2')
-                                          ? const Color.fromARGB(255, 169, 189, 105)
-                                          : const Color.fromARGB(255, 232, 116, 107),
+                                      backgroundColor:
+                                          (list_emi[index].estado == '2')
+                                              ? const Color.fromARGB(255, 169,
+                                                  189, 105)
+                                              : const Color.fromARGB(
+                                                  255, 232, 116, 107),
                                       label: Text(
                                         (list_emi[index].estado == '2')
                                             ? 'Pagada'

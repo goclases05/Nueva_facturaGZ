@@ -114,6 +114,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                       await _facturacion.read_cliente(
                           'read', '0', widget.id_tmp);
                       await _facturacion.serie(widget.id_tmp, 'read', '');
+                      await _facturacion.transacciones(widget.id_tmp);
 
                       // ignore: use_build_context_synchronously
                       Navigator.push(
