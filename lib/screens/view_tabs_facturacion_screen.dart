@@ -1,6 +1,8 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/screens/screens.dart';
+import 'package:factura_gozeri/services/departamentos_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,7 +13,7 @@ class TabsFacturacion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    Color colorSecundario=const Color.fromRGBO(242, 242, 247, 1);
+    Color colorSecundario = const Color.fromRGBO(242, 242, 247, 1);
 
     List<Tab> _tabs = [];
     List<Widget> _views = [];
@@ -48,7 +50,7 @@ class TabsFacturacion extends StatelessWidget {
                 indicatorColor: colorPrimary,
                 unselectedLabelColor: Color.fromARGB(255, 206, 198, 198),
                 isScrollable: false,
-                labelStyle:const TextStyle(
+                labelStyle: const TextStyle(
                   fontSize: 18,
                 ),
                 tabs: _tabs,
@@ -67,9 +69,15 @@ class TabsFacturacion extends StatelessWidget {
           onPressed: () async {
             final _facturacion =
                 Provider.of<Facturacion>(context, listen: false);
+            final _depa =
+                Provider.of<DepartamentoService>(context, listen: false);
+            final _cart = Provider.of<Cart>(context, listen: false);
             final factuProv = await _facturacion.new_tmpFactura();
             print('factura no: ${factuProv[0]}');
             print('clave : ${factuProv[1]}');
+            _depa.isLoading = true;
+            _cart.cantidad = 0;
+            _depa.LoadDepa();
 
             _facturacion.new_tmpFactura();
 
@@ -102,15 +110,15 @@ class TabsFacturacion extends StatelessWidget {
               );
             }
           },
-          icon:const Icon(
+          icon: const Icon(
             Icons.add,
             color: Colors.white,
           ),
-          label:const Text(
+          label: const Text(
             'NUEVA FACTURA',
             style: TextStyle(color: Colors.white),
           ),
-        ), 
+        ),
       )
     ]);
   }

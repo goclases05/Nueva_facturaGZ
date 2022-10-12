@@ -42,7 +42,7 @@ class Transacciones {
   Map<String, dynamic> toJson() => {
         "ID_TRANS": idTrans,
         "NO_TRANSACCION": noTransaccion,
-        "DOCU": docu,
+        "DOCU": docu == null ? '' : docu,
         "ABONO": abono,
         "FORMA": forma,
         "CUENTA": cuenta == null ? '' : cuenta,

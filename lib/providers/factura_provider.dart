@@ -206,9 +206,9 @@ class Facturacion extends ChangeNotifier {
     final id_usuario = Preferencias.data_id;
 
     print(
-        "https://${_baseUrl}/flutter_gozeri/factura/new_tmp_factura.php?empresa=${empresa}&id_usuario=${id_usuario}");
+        "https://${_baseUrl}/flutter_gozeri/factura/new_tmp_factura.php?empresa=${empresa}&id_usuario=${id_usuario}&sucu=${Preferencias.sucursal}");
     final Uri uri = Uri.parse(
-        "https://${_baseUrl}/flutter_gozeri/factura/new_tmp_factura.php?empresa=${empresa}&id_usuario=${id_usuario}");
+        "https://${_baseUrl}/flutter_gozeri/factura/new_tmp_factura.php?empresa=${empresa}&id_usuario=${id_usuario}&sucu=${Preferencias.sucursal}");
 
     final resp = await http.get(uri);
 

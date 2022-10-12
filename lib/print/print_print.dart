@@ -67,8 +67,9 @@ class _PrintScreenState extends State<PrintScreen> {
           textAlign: TextAlign.center,
         ),
         value: '0'));
-
+    print('valor de drop ' + facturaService.initialSerie);
     for (var i = 0; i < authService.list_serie.length; i++) {
+      print('item ' + authService.list_serie[i].idSerie);
       menuItems.add(DropdownMenuItem(
           child: Text(
             authService.list_serie[i].nombre,
@@ -82,7 +83,8 @@ class _PrintScreenState extends State<PrintScreen> {
           elevation: 0,
           foregroundColor: widget.colorPrimary,
           backgroundColor: widget.colorPrimary.withOpacity(0.2),
-          title: Text('Facturación', style: TextStyle(color: widget.colorPrimary))),
+          title: Text('Facturación',
+              style: TextStyle(color: widget.colorPrimary))),
       body: Column(
         children: [
           Container(
@@ -104,7 +106,7 @@ class _PrintScreenState extends State<PrintScreen> {
                     padding: EdgeInsets.only(left: 10),
                     child: DropdownButton(
                       itemHeight: null,
-                      value: facturaService.initialSerie,
+                      value: '0', //facturaService.initialSerie,
                       isExpanded: true,
                       dropdownColor: Color.fromARGB(255, 241, 238, 241),
                       onChanged: (String? newValue) async {

@@ -43,9 +43,9 @@ class _ViewFacturasState extends State<ViewFacturas> {
       list_emi.clear();
     }
     print(
-        "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}");
+        "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}");
+        "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
 
     final resp = await http.get(uri);
     final o = json.decode(resp.body);
@@ -220,20 +220,41 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       GestureDetector(
-                                        onTap: () {
-                                          final printProvider = Provider.of<PrintProvider>(context, listen: false);
-                                          printProvider.dataFac(list_emi[index]
-                                                          .idFactTmp);
+                                        onTap: () async {
+                                          final printProvider =
+                                              Provider.of<PrintProvider>(
+                                                  context,
+                                                  listen: false);
+                                          await printProvider.dataFac(
+                                              list_emi[index].idFactTmp);
+
+                                          final _facturacion =
+                                              Provider.of<Facturacion>(context,
+                                                  listen: false);
+                                          await _facturacion.list_cart(
+                                              list_emi[index].idFactTmp);
+                                          await _facturacion.read_cliente(
+                                              'read',
+                                              '0',
+                                              list_emi[index].idFactTmp);
+                                          await _facturacion.serie(
+                                              list_emi[index].idFactTmp,
+                                              'read',
+                                              '');
+                                          await _facturacion.transacciones(
+                                              list_emi[index].idFactTmp);
+                                          // ignore: use_build_context_synchronously
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (_) => ViewTicket(
-                                                      colorPrimary:
-                                                          widget.colorPrimary,
-                                                      estado: list_emi[index]
-                                                          .estado,
-                                                      factura: list_emi[index]
-                                                          .idFactTmp,)));
+                                                        colorPrimary:
+                                                            widget.colorPrimary,
+                                                        estado: list_emi[index]
+                                                            .estado,
+                                                        factura: list_emi[index]
+                                                            .idFactTmp,
+                                                      )));
                                         },
                                         child: Container(
                                           padding: const EdgeInsets.all(5),
