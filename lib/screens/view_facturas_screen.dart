@@ -5,6 +5,7 @@ import 'package:factura_gozeri/models/data_facturas_models.dart';
 import 'package:factura_gozeri/print/print_page.dart';
 import 'package:factura_gozeri/print/print_print.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
+import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -220,6 +221,9 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                     children: [
                                       GestureDetector(
                                         onTap: () {
+                                          final printProvider = Provider.of<PrintProvider>(context, listen: false);
+                                          printProvider.dataFac(list_emi[index]
+                                                          .idFactTmp);
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
@@ -227,7 +231,9 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                       colorPrimary:
                                                           widget.colorPrimary,
                                                       estado: list_emi[index]
-                                                          .estado)));
+                                                          .estado,
+                                                      factura: list_emi[index]
+                                                          .idFactTmp,)));
                                         },
                                         child: Container(
                                           padding: const EdgeInsets.all(5),

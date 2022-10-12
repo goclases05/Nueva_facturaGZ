@@ -97,6 +97,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   ])),*/
                   color: ColPrimary //Color.fromARGB(255, 203, 209, 218)
                   )),
+          Container(
+            margin: EdgeInsets.only(top: size.height * 0.50),
+            decoration: const BoxDecoration(
+                color: Color.fromARGB(210, 255, 255, 255),
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20))),
+          ),
           Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
@@ -256,119 +264,109 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: size.height * 0.50),
-            decoration: const BoxDecoration(
-                color: Color.fromARGB(210, 255, 255, 255),
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20))),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: size.height * 0.33),
-            decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20))),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: GridView.builder(
-                  itemCount: 2,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2),
-                  itemBuilder: (context, index) => GestureDetector(
-                        onTap: () async {
-                          final _facturacion =
-                              Provider.of<Facturacion>(context, listen: false);
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: 2,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2),
+                    itemBuilder: (context, index) => GestureDetector(
+                          onTap: () async {
+                            final _facturacion =
+                                Provider.of<Facturacion>(context, listen: false);
 
-                          if (index == 0) {
-                            final factuProv =
-                                await _facturacion.new_tmpFactura();
-                            print('factura no: ${factuProv[0]}');
-                            print('clave : ${factuProv[1]}');
-                            _depa.isLoading = true;
-                            _cart.cantidad = 0;
-                            _depa.LoadDepa();
+                            if (index == 0) {
+                              final factuProv =
+                                  await _facturacion.new_tmpFactura();
+                              print('factura no: ${factuProv[0]}');
+                              print('clave : ${factuProv[1]}');
+                              _depa.isLoading = true;
+                              _cart.cantidad = 0;
+                              _depa.LoadDepa();
 
-                            _facturacion.new_tmpFactura();
+                              _facturacion.new_tmpFactura();
 
-                            if (_facturacion.tmp_creada == '') {
-                              var snackBar = SnackBar(
-                                /// need to set following properties for best effect of awesome_snackbar_content
-                                duration: const Duration(seconds: 1),
-                                elevation: 0,
-                                behavior: SnackBarBehavior.floating,
-                                backgroundColor: Colors.transparent,
-                                content: AwesomeSnackbarContent(
-                                  title: 'Error!',
-                                  message:
-                                      'Fallo al crear la factura temporal.',
+                              if (_facturacion.tmp_creada == '') {
+                                var snackBar = SnackBar(
+                                  /// need to set following properties for best effect of awesome_snackbar_content
+                                  duration: const Duration(seconds: 1),
+                                  elevation: 0,
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: Colors.transparent,
+                                  content: AwesomeSnackbarContent(
+                                    title: 'Error!',
+                                    message:
+                                        'Fallo al crear la factura temporal.',
 
-                                  /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-                                  contentType: ContentType.failure,
-                                ),
-                              );
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(snackBar);
-                            } else {
-                              // ignore: use_build_context_synchronously
+                                    /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                    contentType: ContentType.failure,
+                                  ),
+                                );
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                              } else {
+                                // ignore: use_build_context_synchronously
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ViewTabsScreen(
+                                        colorPrimary: ColPrimary,
+                                        id_tmp: factuProv[0],
+                                        clave: factuProv[1]),
+                                  ),
+                                );
+                              }
+                            } else if (index == 1) {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ViewTabsScreen(
-                                      colorPrimary: ColPrimary,
-                                      id_tmp: factuProv[0],
-                                      clave: factuProv[1]),
+                                  builder: (context) =>
+                                      TabsFacturacion(colorPrimary: ColPrimary),
                                 ),
                               );
                             }
-                          } else if (index == 1) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    TabsFacturacion(colorPrimary: ColPrimary),
-                              ),
-                            );
-                          }
-                        },
-                        child: Card(
-                          key: (index == 0) ? keyFacturar : keyHistorial,
-                          shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                          child: Container(
-                            color: Colors.white,
-                            margin: const EdgeInsets.all(4.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Image.asset((index == 0)
-                                    ? 'assets/add_factura_2.png'
-                                    : (index == 1)
-                                        ? 'assets/fhistorial_2.png'
-                                        : 'gozeri_blanco.png'),
-                                Text(
-                                  (index == 0)
-                                      ? 'Facturar'
+                          },
+                          child: Card(
+                            key: (index == 0) ? keyFacturar : keyHistorial,
+                            shape: const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15))),
+                            child: Container(
+                              color: Colors.white,
+                              margin: const EdgeInsets.all(4.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Image.asset((index == 0)
+                                      ? 'assets/add_factura_22.png'
                                       : (index == 1)
-                                          ? "Historial F."
-                                          : '',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: ColPrimary,
-                                      fontSize: 18.0),
-                                )
-                              ],
+                                          ? 'assets/fhistorial_22.png'
+                                          : 'gozeri_blanco.png'),
+                                  Text(
+                                    (index == 0)
+                                        ? 'Facturar'
+                                        : (index == 1)
+                                            ? "Historial F."
+                                            : '',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: ColPrimary,
+                                        fontSize: 18.0),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      )),
+                        )
+                      ),
+                  ),
+              ],
             ),
-          )
+          ),
+          
         ],
       ),
     ));

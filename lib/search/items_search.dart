@@ -1,6 +1,7 @@
 import 'package:factura_gozeri/global/preferencias_global.dart';
 import 'package:factura_gozeri/models/producto_x_departamento_models.dart';
 import 'package:factura_gozeri/providers/items_provider.dart';
+import 'package:factura_gozeri/providers/seattings_provider.dart';
 import 'package:factura_gozeri/widgets/articulo_horizontal_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -51,12 +52,13 @@ class ItemsSearch extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     // TODO: implement buildSuggestions
+    final settings = Provider.of<settingsProvider>(context, listen: false);
     if (query.isEmpty) {
       return Container(
-        child: const Center(
+        child: Center(
           child: Icon(
             Icons.search,
-            color: Colors.cyan,
+            color: settings.colorPrimary,
             size: 130,
           ),
         ),
@@ -90,7 +92,7 @@ class ItemsSearch extends SearchDelegate {
         
       }
     );*/
-    Color colorPrimary = Colors.cyan;
+    Color colorPrimary = settings.colorPrimary;
     return StreamBuilder(
         stream: itm.suggestionsStrem,
         builder: (_, AsyncSnapshot<List<Producto>> snapshot) {

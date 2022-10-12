@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/print/print_page.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
+import 'package:factura_gozeri/screens/escritorio_screen.dart';
 import 'package:factura_gozeri/screens/view_tabs_facturacion_screen.dart';
 import 'package:factura_gozeri/services/auth_services.dart';
 import 'package:factura_gozeri/widgets/item_dataCliente.dart';
@@ -79,10 +80,9 @@ class _PrintScreenState extends State<PrintScreen> {
     return Scaffold(
       appBar: AppBar(
           elevation: 0,
-          foregroundColor: Colors.white,
-          backgroundColor: widget.colorPrimary,
-          title:
-              const Text('Facturación', style: TextStyle(color: Colors.white))),
+          foregroundColor: widget.colorPrimary,
+          backgroundColor: widget.colorPrimary.withOpacity(0.2),
+          title: Text('Facturación', style: TextStyle(color: widget.colorPrimary))),
       body: Column(
         children: [
           Container(
@@ -210,7 +210,7 @@ class _PrintScreenState extends State<PrintScreen> {
                               ListTile(
                                 title: Text(
                                   (double.parse(fact.saldo) < 0)
-                                      ? 'Vuelto: '
+                                      ? 'Cambio: '
                                       : 'Saldo: ',
                                   style: const TextStyle(
                                       fontSize: 18,
@@ -325,8 +325,7 @@ class _PrintScreenState extends State<PrintScreen> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => TabsFacturacion(
-                                  colorPrimary: widget.colorPrimary)));
+                              builder: (_) => const EscritorioScreen()));
                     } else {
                       SnackBar snackBar = SnackBar(
                         padding: const EdgeInsets.all(20),

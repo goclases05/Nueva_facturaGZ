@@ -10,20 +10,21 @@ class LoadingScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: colorPrimary,
-        foregroundColor: Colors.white,
+        backgroundColor: colorPrimary.withOpacity(0.1),
+        foregroundColor: colorPrimary,
         title: Image.asset(
+          color: colorPrimary.withOpacity(0.6),
           'assets/gozeri_blanco2.png',
           width: size.width * 0.25,
         ),
         actions: [
           CircleAvatar(
-            backgroundColor: Colors.white38,
+            backgroundColor: colorPrimary.withOpacity(0.1),
             child: IconButton(
               onPressed: () {},
-              icon: const Icon(
+              icon: Icon(
                 Icons.search,
-                color: Colors.white,
+                color: colorPrimary,
               ),
             ),
           ),
@@ -31,12 +32,12 @@ class LoadingScreen extends StatelessWidget {
             width: 15,
           ),
           CircleAvatar(
-            backgroundColor: Colors.white38,
+            backgroundColor: colorPrimary.withOpacity(0.1),
             child: IconButton(
               onPressed: () {},
-              icon: const Icon(
+              icon: Icon(
                 Icons.receipt_long,
-                color: Colors.white,
+                color: colorPrimary,
               ),
             ),
           ),

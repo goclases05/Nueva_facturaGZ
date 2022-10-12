@@ -1,5 +1,6 @@
 import 'package:factura_gozeri/providers/seattings_provider.dart';
 import 'package:factura_gozeri/screens/checkouth_screen.dart';
+import 'package:factura_gozeri/screens/escritorio_screen.dart';
 import 'package:factura_gozeri/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
@@ -34,7 +35,7 @@ class _SettingsScreen extends State<SettingsScreen> {
         Navigator.pushReplacement<void, void>(
           context,
           MaterialPageRoute<void>(
-            builder: (BuildContext context) => const HomeScreen(),
+            builder: (BuildContext context) => const EscritorioScreen(),
           ),
         ).then((value) => setState(() {}));
         return false;
@@ -42,8 +43,8 @@ class _SettingsScreen extends State<SettingsScreen> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          foregroundColor: Colors.white,
-          backgroundColor: settings.colorPrimary,
+          foregroundColor: settings.colorPrimary,
+          backgroundColor: settings.colorPrimary.withOpacity(0.1),
           title: const Text('Ajustes'),
         ),
         body: ListView(

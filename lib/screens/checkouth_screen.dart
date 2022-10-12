@@ -1,3 +1,5 @@
+import 'package:factura_gozeri/screens/escritorio_screen.dart';
+import 'package:factura_gozeri/screens/home2_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -75,7 +77,7 @@ class CheckOuthScreen extends StatelessWidget {
                     Navigator.pushReplacement(
                             context,
                             PageRouteBuilder(
-                                pageBuilder: (_, __, ___) => HomeScreen(),
+                                pageBuilder: (_, __, ___) => EscritorioScreen(),
                                 transitionDuration: Duration(seconds: 0)))
                         .then((value) => Navigator.of(context).pop());
                   });

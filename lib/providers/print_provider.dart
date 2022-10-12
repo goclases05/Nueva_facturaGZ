@@ -1,18 +1,38 @@
+import 'package:factura_gozeri/global/preferencias_global.dart';
+import 'package:factura_gozeri/models/view_factura_print.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class PrintProvider extends ChangeNotifier {
-  PrintProvider() {}
+  List<Encabezado> list=[];
+  bool loading=true;
 
-  Future dataFac() async {
-    print("https://app.gozeri.com/flutter_gozeri/metodoPago.php");
-    final Uri uri =
-        Uri.parse("https://app.gozeri.com/flutter_gozeri/metodoPago.php");
+  PrintProvider() {
 
+  }
+
+  Future dataFac(String factura) async {
+    list.clear();
+    loading=true;
+    notifyListeners();
+
+    final usuario = Preferencias.data_id;
+    final empresa = Preferencias.data_empresa;
+
+    print("https://app.gozeri.com/flutter_gozeri/factura/view_print.php?id=${factura}&empresa=${empresa}");
+    final Uri uri=Uri.parse("https://app.gozeri.com/flutter_gozeri/factura/view_print.php?id=${factura}&empresa=${empresa}");
+    
     final resp = await http.get(uri);
-    var js = json.decode(resp.body);
+    //print(resp.body);
 
+    final js=json.decode(resp.body);
+    print(js);
+    var result=Encabezado.fromJson(js['ENCABEZADO']);
+    
+    list.add(result);
+    
+    loading=false;
     return notifyListeners();
   }
 }

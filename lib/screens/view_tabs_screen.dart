@@ -70,11 +70,12 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
       length: _tabs.length,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: widget.colorPrimary,
-          foregroundColor: Colors.white,
+          backgroundColor: widget.colorPrimary.withOpacity(0.1),
+          foregroundColor: widget.colorPrimary,
           elevation: 0,
           title: Image.asset(
             'assets/gozeri_blanco2.png',
+            color: widget.colorPrimary.withOpacity(0.6),
             width: size.width * 0.25,
           ),
           actions: [
@@ -82,15 +83,15 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
               width: 15,
             ),
             CircleAvatar(
-              backgroundColor: Colors.white38,
+              backgroundColor: widget.colorPrimary.withOpacity(0.2),
               child: IconButton(
                 onPressed: () {
                   ItemsSearch.id_tmp = widget.id_tmp;
                   showSearch(context: context, delegate: ItemsSearch());
                 },
-                icon: const Icon(
+                icon: Icon(
                   Icons.search,
-                  color: Colors.white,
+                  color: widget.colorPrimary,
                 ),
               ),
             ),
@@ -98,7 +99,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
               width: 15,
             ),
             CircleAvatar(
-              backgroundColor: Colors.white38,
+              backgroundColor: widget.colorPrimary.withOpacity(0.2),
               child: Consumer<Cart>(builder: (context, cart, child) {
                 return Badge(
                   showBadge: (cart.count == 0) ? false : true,
@@ -126,9 +127,9 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                                     serie: _facturacion.initialSerie,
                                   )));
                     },
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.receipt_long,
-                      color: Colors.white,
+                      color: widget.colorPrimary,
                     ),
                   ),
                 );
@@ -143,8 +144,9 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
             ),
           ],
           bottom: TabBar(
-            labelColor: Colors.white,
-            unselectedLabelColor: Color.fromARGB(255, 219, 219, 219),
+            labelColor: widget.colorPrimary,
+            indicatorColor: widget.colorPrimary,
+            unselectedLabelColor: const Color.fromARGB(255, 200, 194, 194),
             isScrollable: true,
             tabs: _tabs,
           ),

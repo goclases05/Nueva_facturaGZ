@@ -11,6 +11,7 @@ class TabsFacturacion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    Color colorSecundario=const Color.fromRGBO(242, 242, 247, 1);
 
     List<Tab> _tabs = [];
     List<Widget> _views = [];
@@ -40,59 +41,16 @@ class TabsFacturacion extends StatelessWidget {
         length: _tabs.length,
         child: Scaffold(
             appBar: AppBar(
-              foregroundColor: Colors.white,
-              title: Text('Historial de Facturas'),
-              backgroundColor: this.colorPrimary,
+              backgroundColor: colorPrimary.withOpacity(0.1),
               elevation: 0,
-              actions: [
-                /*CircleAvatar(
-                    backgroundColor: Colors.white38,
-                    child: IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.print),
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),*/
-                CircleAvatar(
-                    backgroundColor: Colors.white38,
-                    child: PopupMenuButton(
-                        icon: const Icon(
-                          Icons.more_vert,
-                          color: Colors.white,
-                        ),
-                        // Callback that sets the selected popup menu item.
-                        onSelected: (value) {},
-                        itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                              const PopupMenuItem(
-                                value: "Escritorio",
-                                child: ListTile(
-                                  title: Text("Menu Principal"),
-                                  trailing: Icon(
-                                    Icons.home,
-                                  ),
-                                ),
-                              ),
-                              const PopupMenuItem(
-                                value: "settings",
-                                child: ListTile(
-                                  title: Text("Ajustes"),
-                                  trailing: Icon(
-                                    Icons.settings,
-                                  ),
-                                ),
-                              )
-                            ])),
-                const SizedBox(
-                  width: 20,
-                ),
-              ],
-              bottom: TabBar(
-                labelColor: Colors.white,
-                unselectedLabelColor: Color.fromARGB(255, 219, 219, 219),
+              title: TabBar(
+                labelColor: colorPrimary,
+                indicatorColor: colorPrimary,
+                unselectedLabelColor: Color.fromARGB(255, 206, 198, 198),
                 isScrollable: false,
+                labelStyle:const TextStyle(
+                  fontSize: 18,
+                ),
                 tabs: _tabs,
               ),
             ),
@@ -103,7 +61,9 @@ class TabsFacturacion extends StatelessWidget {
       Positioned(
         bottom: 30,
         right: 30,
-        child: FloatingActionButton(
+        child: FloatingActionButton.extended(
+          backgroundColor: colorPrimary,
+          elevation: 5,
           onPressed: () async {
             final _facturacion =
                 Provider.of<Facturacion>(context, listen: false);
@@ -142,13 +102,15 @@ class TabsFacturacion extends StatelessWidget {
               );
             }
           },
-          elevation: 50.0,
-          backgroundColor: this.colorPrimary,
-          child: const Icon(
+          icon:const Icon(
             Icons.add,
             color: Colors.white,
           ),
-        ),
+          label:const Text(
+            'NUEVA FACTURA',
+            style: TextStyle(color: Colors.white),
+          ),
+        ), 
       )
     ]);
   }
