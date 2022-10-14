@@ -20,10 +20,10 @@ class TabsFacturacion extends StatelessWidget {
 
     _tabs = const [
       Tab(
-        text: 'Emitidas',
+        text: '  Emitidas  ',
       ),
       Tab(
-        text: 'Pendientes',
+        text: '  Pendientes  ',
       )
     ];
 
@@ -43,11 +43,12 @@ class TabsFacturacion extends StatelessWidget {
         length: _tabs.length,
         child: Scaffold(
             appBar: AppBar(
-              backgroundColor: colorPrimary.withOpacity(0.1),
-              elevation: 0,
+              backgroundColor: Colors.white,
+              elevation: 2,
               title: TabBar(
                 labelColor: colorPrimary,
                 indicatorColor: colorPrimary,
+                //indicatorSize: TabBarIndicatorSize.label,
                 unselectedLabelColor: Color.fromARGB(255, 206, 198, 198),
                 isScrollable: false,
                 labelStyle: const TextStyle(

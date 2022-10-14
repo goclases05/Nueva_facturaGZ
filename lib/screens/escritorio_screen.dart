@@ -35,14 +35,14 @@ class _EscritorioScreenState extends State<EscritorioScreen> {
             foregroundColor: colorPrimary,
             title: Image.asset(
               'assets/gozeri_blanco2.png',
-              color: colorPrimary.withOpacity(0.6),
+              color: colorPrimary,
               width: size.width * 0.25,
             ),
-            backgroundColor: colorPrimary.withOpacity(0.1),
+            backgroundColor: Colors.white,
             elevation: 0,
             actions: [
               CircleAvatar(
-                backgroundColor: colorPrimary.withOpacity(0.2),
+                backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
                 child: IconButton(
                   onPressed: () {},
                   icon: Icon(Icons.print),
@@ -53,7 +53,7 @@ class _EscritorioScreenState extends State<EscritorioScreen> {
                 width: 10,
               ),
               CircleAvatar(
-                  backgroundColor: colorPrimary.withOpacity(0.2),
+                  backgroundColor:const Color.fromRGBO(242, 242, 247, 1),
                   child: PopupMenuButton(
                       icon: Icon(
                         Icons.more_vert,

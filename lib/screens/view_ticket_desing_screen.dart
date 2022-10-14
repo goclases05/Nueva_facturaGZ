@@ -16,9 +16,9 @@ class ViewTicket extends StatelessWidget {
     return Scaffold(
         backgroundColor: Color.fromRGBO(246, 243, 244, 1),
         appBar: AppBar(
-            backgroundColor: colorPrimary.withOpacity(0.1),
+            backgroundColor: Colors.white,
             foregroundColor: colorPrimary,
-            elevation: 0,
+            elevation: 2,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -36,7 +36,7 @@ class ViewTicket extends StatelessWidget {
             ),
             actions: [
               CircleAvatar(
-                backgroundColor: colorPrimary.withOpacity(0.2),
+                backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
                 child: IconButton(
                   onPressed: () {},
                   icon: Icon(Icons.print),

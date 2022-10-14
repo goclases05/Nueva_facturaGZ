@@ -22,15 +22,17 @@ class CheckOuthScreen extends StatelessWidget {
               gradient: LinearGradient(
                   begin: Alignment.topRight,
                   end: Alignment.bottomRight,
-                  colors: [Colors.cyan, Colors.cyan])),
+                  colors: [Colors.white,  Colors.white])),
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
+                SizedBox(height: 20,),
                 Column(
                   children: [
                     Image.asset(
                       "assets/gozeri_factura2.png",
+                      color: Colors.cyan.withOpacity(0.4),
                       width: 250.0,
                       height: 250.0,
                     ),
@@ -38,16 +40,17 @@ class CheckOuthScreen extends StatelessWidget {
                       "Sistema de Facturación",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          color: Colors.white,
+                          color: Color.fromARGB(255, 13, 205, 230),
                           fontWeight: FontWeight.bold,
                           fontSize: 25.0),
                     ),
                   ],
                 ),
-                const CircularProgressIndicator(
+                /*const CircularProgressIndicator(
                   color: Colors.white,
                   backgroundColor: Color.fromARGB(255, 178, 235, 242),
-                )
+                )*/
+                Image.asset("assets/out_preloader_image.gif",width: MediaQuery.of(context).size.width*0.4,)
               ]),
         ),
         Center(

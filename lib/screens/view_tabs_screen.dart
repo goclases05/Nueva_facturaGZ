@@ -70,12 +70,12 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
       length: _tabs.length,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: widget.colorPrimary.withOpacity(0.1),
+          backgroundColor: Colors.white,
           foregroundColor: widget.colorPrimary,
-          elevation: 0,
+          elevation: 2,
           title: Image.asset(
             'assets/gozeri_blanco2.png',
-            color: widget.colorPrimary.withOpacity(0.6),
+            color: widget.colorPrimary,
             width: size.width * 0.25,
           ),
           actions: [
@@ -83,7 +83,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
               width: 15,
             ),
             CircleAvatar(
-              backgroundColor: widget.colorPrimary.withOpacity(0.2),
+              backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
               child: IconButton(
                 onPressed: () {
                   ItemsSearch.id_tmp = widget.id_tmp;
@@ -99,7 +99,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
               width: 15,
             ),
             CircleAvatar(
-              backgroundColor: widget.colorPrimary.withOpacity(0.2),
+              backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
               child: Consumer<Cart>(builder: (context, cart, child) {
                 return Badge(
                   showBadge: (cart.count == 0) ? false : true,

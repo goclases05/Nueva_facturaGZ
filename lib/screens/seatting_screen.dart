@@ -42,9 +42,9 @@ class _SettingsScreen extends State<SettingsScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          elevation: 0,
+          elevation: 2,
           foregroundColor: settings.colorPrimary,
-          backgroundColor: settings.colorPrimary.withOpacity(0.1),
+          backgroundColor: Colors.white,
           title: const Text('Ajustes'),
         ),
         body: ListView(

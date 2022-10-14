@@ -80,9 +80,9 @@ class _PrintScreenState extends State<PrintScreen> {
 
     return Scaffold(
       appBar: AppBar(
-          elevation: 0,
+          elevation: 2,
           foregroundColor: widget.colorPrimary,
-          backgroundColor: widget.colorPrimary.withOpacity(0.2),
+          backgroundColor: Colors.white,
           title: Text('Facturación',
               style: TextStyle(color: widget.colorPrimary))),
       body: Column(
