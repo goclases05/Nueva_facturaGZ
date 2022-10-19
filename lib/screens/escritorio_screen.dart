@@ -1,10 +1,8 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
-import 'package:badges/badges.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/seattings_provider.dart';
 import 'package:factura_gozeri/screens/screens.dart';
-import 'package:factura_gozeri/screens/view_tabs_facturacion_screen.dart';
 import 'package:factura_gozeri/services/auth_services.dart';
 import 'package:factura_gozeri/services/departamentos_services.dart';
 import 'package:factura_gozeri/widgets/drawer_header.dart';
@@ -53,7 +51,7 @@ class _EscritorioScreenState extends State<EscritorioScreen> {
                 width: 10,
               ),
               CircleAvatar(
-                  backgroundColor:const Color.fromRGBO(242, 242, 247, 1),
+                  backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
                   child: PopupMenuButton(
                       icon: Icon(
                         Icons.more_vert,

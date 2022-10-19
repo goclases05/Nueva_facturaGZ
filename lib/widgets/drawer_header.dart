@@ -1,4 +1,5 @@
 import 'package:factura_gozeri/global/preferencias_global.dart';
+import 'package:factura_gozeri/screens/escritorio_screen.dart';
 import 'package:factura_gozeri/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -151,8 +152,18 @@ class _HeaderDrawerState extends State<HeaderDrawer> {
                     dropdownColor: widget.colorPrimary,
                     onChanged: (String? newValue) async {
                       selectedValue = newValue!;
-                      Preferencias.sucursal = selectedValue;
+                      Preferencias.sucursal = await selectedValue;
                       setState(() {});
+                      // ignore: use_build_context_synchronously
+                      Navigator.of(context).pop();
+                      // ignore: use_build_context_synchronously
+                      Navigator.pushReplacement<void, void>(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (BuildContext context) =>
+                              const EscritorioScreen(),
+                        ),
+                      ).then((value) => setState(() {}));
                     },
                     items: menuItems,
                     elevation: 0,

@@ -5,7 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ViewTicket extends StatelessWidget {
-  ViewTicket({Key? key, required this.colorPrimary, required this.estado, required this.factura})
+  ViewTicket(
+      {Key? key,
+      required this.colorPrimary,
+      required this.estado,
+      required this.factura})
       : super(key: key);
   Color colorPrimary;
   String estado;
@@ -49,288 +53,305 @@ class ViewTicket extends StatelessWidget {
             ]),
         bottomSheet: sheetButton(context),
         body: Consumer<PrintProvider>(
-          builder: (context, printProvider, child){
-
-            
-
-            if(printProvider.loading) 
+          builder: (context, printProvider, child) {
+            if (printProvider.loading)
               return Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: colorPrimary,
-                )
-              ));
-            
-            List<Encabezado> encabezado=printProvider.list;
-            
-            int sede=0;
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  child: Center(
+                      child: CircularProgressIndicator(
+                    color: colorPrimary,
+                  )));
+
+            List<Encabezado> encabezado = printProvider.list;
+
+            int sede = 0;
             //0= empresa
             //1= sucursal
-            if((encabezado[0].fel=='0' && encabezado[0].felSucu=='1') || (encabezado[0].fel=='1' && encabezado[0].felSucu=='1')){
-              sede=1;
-            }else if(encabezado[0].fel=='1' && encabezado[0].felSucu=='0'){
-              sede=0;
+            if ((encabezado[0].fel == '0' && encabezado[0].felSucu == '1') ||
+                (encabezado[0].fel == '1' && encabezado[0].felSucu == '1')) {
+              sede = 1;
+            } else if (encabezado[0].fel == '1' &&
+                encabezado[0].felSucu == '0') {
+              sede = 0;
             }
 
-
             return SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            scrollDirection: Axis.vertical,
-            child: Column(children: [
-              Card(
-                margin: EdgeInsets.all(15),
-                elevation: 8,
-                color: Colors.white,
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                  width: MediaQuery.of(context).size.width * 1,
-                  child: Column(
-                    children: [
-                      (sede==1)?
-                      //sucursal
-                      FadeInImage(
-                          width: MediaQuery.of(context).size.width * 0.25,
-                          placeholder: AssetImage('assets/productos_gz.jpg'),
-                          image: NetworkImage(encabezado[0].rutaSucu+encabezado[0].foto)):
-                      //empresa
-                      FadeInImage(
-                          width: MediaQuery.of(context).size.width * 0.25,
-                          placeholder: AssetImage('assets/productos_gz.jpg'),
-                          image: NetworkImage(encabezado[0].rutaSucu+encabezado[0].foto)),
-                      
-                      const SizedBox(
-                        height: 10,
-                      ),
+              physics: const BouncingScrollPhysics(),
+              scrollDirection: Axis.vertical,
+              child: Column(children: [
+                Card(
+                  margin: EdgeInsets.all(15),
+                  elevation: 8,
+                  color: Colors.white,
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    width: MediaQuery.of(context).size.width * 1,
+                    child: Column(
+                      children: [
+                        (sede == 1)
+                            ?
+                            //sucursal
+                            FadeInImage(
+                                width: MediaQuery.of(context).size.width * 0.25,
+                                placeholder:
+                                    AssetImage('assets/productos_gz.jpg'),
+                                image: NetworkImage(encabezado[0].rutaSucu +
+                                    encabezado[0].foto))
+                            :
+                            //empresa
+                            FadeInImage(
+                                width: MediaQuery.of(context).size.width * 0.25,
+                                placeholder:
+                                    AssetImage('assets/productos_gz.jpg'),
+                                image: NetworkImage(encabezado[0].logoUrl +
+                                    encabezado[0].logoNom)),
 
-                      //Nombre de empresa
-                      (sede==1)?
-                      TitleText(
-                          encabezado[0].nombreEmpresaSucu, 18, TextAlign.center):
-                      TitleText(
-                          encabezado[0].nombreEmpresa, 18, TextAlign.center),
+                        const SizedBox(
+                          height: 10,
+                        ),
 
+                        //Nombre de empresa
+                        (sede == 1)
+                            ? TitleText(encabezado[0].nombreEmpresaSucu, 18,
+                                TextAlign.center)
+                            : TitleText(encabezado[0].nombreEmpresa, 18,
+                                TextAlign.center),
 
-                      //Direccion de empresa
-                      (sede==1)?
-                      SimpleText(encabezado[0].direccionSucu, 15, TextAlign.center):
-                      SimpleText(encabezado[0].direccion, 15, TextAlign.center),
+                        //Direccion de empresa
+                        (sede == 1)
+                            ? SimpleText(encabezado[0].direccionSucu, 15,
+                                TextAlign.center)
+                            : SimpleText(
+                                encabezado[0].direccion, 15, TextAlign.center),
 
+                        const SizedBox(
+                          height: 10,
+                        ),
 
-                      const SizedBox(
-                        height: 10,
-                      ),
+                        //NIT de la empresa
+                        (encabezado[0].nit_emisor != '')
+                            ? claveValor('NIT: ', encabezado[0].nit_emisor,
+                                MainAxisAlignment.center)
+                            : Container(),
 
-                      //NIT de la empresa
-                      //TODO: NIT DE LA SUCURSAL
-                      (sede==1)?
-                        (encabezado[0].nit!='')?
-                          claveValor('NIT: ', encabezado[0].nit, MainAxisAlignment.center):
-                          Container()
+                        //Telefono de la empresa
+                        (sede == 1)
+                            ? (encabezado[0].teleSucu != '')
+                                ? claveValor(
+                                    'Teléfono: ',
+                                    encabezado[0].teleSucu,
+                                    MainAxisAlignment.center)
+                                : Container()
+                            : (encabezado[0].telefono != '')
+                                ? claveValor(
+                                    'Teléfono: ',
+                                    encabezado[0].telefono,
+                                    MainAxisAlignment.center)
+                                : Container(),
 
-                      :(encabezado[0].nit!='')?
-                        claveValor(
-                          'NIT: ', encabezado[0].nit, MainAxisAlignment.center):
-                          Container(),
+                        const SizedBox(
+                          height: 10,
+                        ),
 
+                        //nombre comercial
+                        (sede == 1)
+                            ? (encabezado[0].nombre_comercial_sucu != '')
+                                ? SimpleText(
+                                    encabezado[0].nombre_comercial_sucu,
+                                    15,
+                                    TextAlign.center)
+                                : Container()
+                            : (encabezado[0].nombre_comercial_emp != '')
+                                ? SimpleText(encabezado[0].nombre_comercial_emp,
+                                    15, TextAlign.center)
+                                : Container(),
 
-                      //Telefono de la empresa
-                      (sede==1)?
-                        (encabezado[0].teleSucu!='')?
-                          claveValor('Teléfono: ', encabezado[0].teleSucu, MainAxisAlignment.center):
-                          Container()
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        //facturada
+                        if (encabezado[0].dte != '')
+                          TitleText(
+                              'Factura Electrónica Documento Tributario Electrónico',
+                              18,
+                              TextAlign.center),
 
-                      :(encabezado[0].telefono!='')?
-                        claveValor(
-                          'Teléfono: ', encabezado[0].telefono, MainAxisAlignment.center):
-                          Container(),
+                        //fecha
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Expanded(
+                                child: Text(
+                              encabezado[0].fecha_letras,
+                              style: const TextStyle(
+                                fontSize: 11,
+                              ),
+                            ))
+                          ],
+                        ),
 
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        //n autorizacion
+                        (encabezado[0].dte != '')
+                            ? Container(
+                                child: Column(
+                                children: [
+                                  TitleText('Número de Autorización:', 13,
+                                      TextAlign.center),
+                                  SimpleText(
+                                      encabezado[0].dte, 13, TextAlign.center),
+                                  claveValor('Serie: ', encabezado[0].serieDte,
+                                      MainAxisAlignment.center),
+                                  claveValor(
+                                      'Número de DTE: ',
+                                      encabezado[0].noDte,
+                                      MainAxisAlignment.center),
+                                ],
+                              ))
+                            : Container(),
 
-                      const SizedBox(
-                        height: 10,
-                      ),
-
-
-                      //nombre comercial
-                      //TODO:NOMBRE COMERCIAL
-                      SimpleText(encabezado[0].organizacion, 15,
-                          TextAlign.center),
-                      const SizedBox(
-                        height: 10,
-                      ),
-
-
-                      //facturada
-                      if(encabezado[0].dte!='')
-                      TitleText(
-                          'Factura Electrónica Documento Tributario Electrónico',
-                          18,
-                          TextAlign.center),
-
-
-                      //fecha
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      //TODO: FECHA EN LETRAS
-                      claveValor(
-                          '', encabezado[0].fecha, MainAxisAlignment.end),
-
-
-
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      //n autorizacion
-                      (encabezado[0].dte!='')?
-                        Container(
-                          child:Column(
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        //serie y no
+                        Row(
+                          children: [
+                            Expanded(
+                                child: claveValor(
+                                    'Serie: ',
+                                    encabezado[0].serie,
+                                    MainAxisAlignment.start)),
+                            Expanded(
+                                child: claveValor('No:  ', encabezado[0].no,
+                                    MainAxisAlignment.end))
+                          ],
+                        ),
+                        //vendedor
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Vendedor: ',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 15)),
+                            Expanded(
+                              child: Text(
+                                '${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
+                                style: TextStyle(fontSize: 15),
+                                maxLines: 3,
+                              ),
+                            ),
+                          ],
+                        ),
+                        //cliente
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Cliente: ',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 15)),
+                            Expanded(
+                              child: Text(
+                                '${encabezado[0].nombre} ${encabezado[0].apellidos}',
+                                style: const TextStyle(fontSize: 15),
+                                maxLines: 3,
+                              ),
+                            ),
+                          ],
+                        ),
+                        claveValor('NIT: ', encabezado[0].nit,
+                            MainAxisAlignment.start),
+                        //direccion
+                        if (encabezado[0].direccionCli != '')
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              TitleText('Número de Autorización:', 13, TextAlign.center),
-                              SimpleText(encabezado[0].dte, 13,
-                                  TextAlign.center),
-                              claveValor('Serie: ', encabezado[0].serieDte, MainAxisAlignment.center),
-                              claveValor('Número de DTE: ', encabezado[0].noDte,
-                                  MainAxisAlignment.center),
+                              const Text('Dirección: ',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15)),
+                              Expanded(
+                                child: Text(
+                                  encabezado[0].direccionCli,
+                                  style: const TextStyle(fontSize: 15),
+                                  maxLines: 3,
+                                ),
+                              ),
                             ],
-                          )
-                        ):
-                        Container(),
-
-                      
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      //serie y no
-                      Row(
-                        children: [
-                          Expanded(
-                              child: claveValor(
-                                  'Serie: ', encabezado[0].serie, MainAxisAlignment.start)),
-                          Expanded(
-                              child: claveValor(
-                                  'No:  ', encabezado[0].no, MainAxisAlignment.end))
-                        ],
-                      ),
-                      //vendedor
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Vendedor: ',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 15)),
-                          Expanded(
-                            child: Text(
-                              '${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
-                              style: TextStyle(fontSize: 15),
-                              maxLines: 3,
-                            ),
                           ),
-                        ],
-                      ),
-                      //cliente
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Cliente: ',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 15)),
-                          Expanded(
-                            child: Text(
-                              '${encabezado[0].nombre} ${encabezado[0].apellidos}',
-                              style: const TextStyle(fontSize: 15),
-                              maxLines: 3,
-                            ),
-                          ),
-                        ],
-                      ),
-                      //TODO: NIT DEL CLIENTE
-                      claveValor('NIT: ', encabezado[0].nit, MainAxisAlignment.start),
-                      //direccion
-                      if(encabezado[0].direccionCli!='')
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children:  [
-                          const Text('Dirección: ',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 15)),
-                          Expanded(
-                            child: Text(
-                              encabezado[0].direccionCli,
-                              style: const TextStyle(fontSize: 15),
-                              maxLines: 3,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
+                        const SizedBox(
+                          height: 20,
+                        ),
 
-                      //condicion de pago
-                      TitleText('Condiciones de pago:', 15, TextAlign.center),
+                        //condicion de pago
+                        TitleText('Condiciones de pago:', 15, TextAlign.center),
 
-                      claveValor(
-                          'Efectivo: ', 'Q200.00', MainAxisAlignment.center),
+                        claveValor(
+                            'Efectivo: ', 'Q200.00', MainAxisAlignment.center),
 
-                      
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      ListTile(
-                        title: TitleText('Descripción', 16, TextAlign.start),
-                        trailing: TitleText('Subtotal', 16, TextAlign.end),
-                      ),
-                      Listdata('Q'),
-                      //descuento
-                      Container(
-                          margin: EdgeInsets.only(right: 20),
-                          child: claveValor('Descuentos (-) :  ', 'Q2.00',
-                              MainAxisAlignment.end)),
-                      //total
-                      Container(
-                          margin: EdgeInsets.only(right: 20),
-                          child: claveValor(
-                              'Total :  ', 'Q200.00', MainAxisAlignment.end)),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      //total letra
-                      claveValor(
-                          'noventa con 00/100', '', MainAxisAlignment.start),
-                      //isr
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      SimpleText('Sujeto a pagos trimestrales ISR', 15,
-                          TextAlign.center),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      claveValor('Certificador: ', 'Megaprint, S.A.',
-                          MainAxisAlignment.start),
-                      claveValor('NIT: ', '50510231', MainAxisAlignment.start),
-                      claveValor('Fecha: ', '2022-10-04T11:30:32.465-06:00',
-                          MainAxisAlignment.start),
-                      //creditos xd
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      SimpleText('Factura realizada en www.gozeri.com', 15,
-                          TextAlign.center)
-                    ],
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        ListTile(
+                          title: TitleText('Descripción', 16, TextAlign.start),
+                          trailing: TitleText('Subtotal', 16, TextAlign.end),
+                        ),
+                        Listdata('Q'),
+                        //descuento
+                        Container(
+                            margin: EdgeInsets.only(right: 20),
+                            child: claveValor('Descuentos (-) :  ', 'Q2.00',
+                                MainAxisAlignment.end)),
+                        //total
+                        Container(
+                            margin: EdgeInsets.only(right: 20),
+                            child: claveValor(
+                                'Total :  ', 'Q200.00', MainAxisAlignment.end)),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        //total letra
+                        claveValor(
+                            'noventa con 00/100', '', MainAxisAlignment.start),
+                        //isr
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        SimpleText('Sujeto a pagos trimestrales ISR', 15,
+                            TextAlign.center),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        claveValor('Certificador: ', 'Megaprint, S.A.',
+                            MainAxisAlignment.start),
+                        claveValor(
+                            'NIT: ', '50510231', MainAxisAlignment.start),
+                        claveValor('Fecha: ', '2022-10-04T11:30:32.465-06:00',
+                            MainAxisAlignment.start),
+                        //creditos xd
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        SimpleText('Factura realizada en www.gozeri.com', 15,
+                            TextAlign.center)
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(
-                height: 100,
-              ),
-            ]),
-          );
+                const SizedBox(
+                  height: 100,
+                ),
+              ]),
+            );
           },
         ));
   }
