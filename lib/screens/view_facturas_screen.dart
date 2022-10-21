@@ -220,12 +220,14 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       GestureDetector(
-                                        onTap: () async {
+                                        onTap: () {
                                           final printProvider =
                                               Provider.of<PrintProvider>(
                                                   context,
                                                   listen: false);
-                                          await printProvider.dataFac(
+                                          printProvider.dataFac(
+                                              list_emi[index].idFactTmp);
+                                          /*await printProvider.dataFac(
                                               list_emi[index].idFactTmp);
 
                                           final _facturacion =
@@ -242,7 +244,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                               'read',
                                               '');
                                           await _facturacion.transacciones(
-                                              list_emi[index].idFactTmp);
+                                              list_emi[index].idFactTmp);*/
                                           // ignore: use_build_context_synchronously
                                           Navigator.push(
                                               context,

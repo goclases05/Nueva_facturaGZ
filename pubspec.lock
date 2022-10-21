@@ -43,13 +43,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.6"
-  carousel_slider:
-    dependency: "direct main"
-    description:
-      name: carousel_slider
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.1.1"
   characters:
     dependency: transitive
     description:
@@ -154,7 +147,7 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_bluetooth_basic:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: flutter_bluetooth_basic
       url: "https://pub.dartlang.org"
@@ -532,13 +525,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.10.0"
-  tutorial_coach_mark:
-    dependency: "direct main"
-    description:
-      name: tutorial_coach_mark
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.2.4"
   typed_data:
     dependency: transitive
     description:

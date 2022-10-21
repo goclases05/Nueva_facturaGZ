@@ -20,9 +20,29 @@ class Preferencias {
   static String _positionColor = '0';
   static String _sucursal = '';
   static String _serie = '';
+  static String _impresora = '';
+  static String _papel = '';
 
   static Future init() async {
     _prefs = await SharedPreferences.getInstance();
+  }
+
+  static String get impresora {
+    return _prefs.getString('IMPRESORA') ?? _impresora;
+  }
+
+  static set impresora(String impresora) {
+    _impresora = impresora;
+    _prefs.setString('IMPRESORA', impresora);
+  }
+
+  static String get papel {
+    return _prefs.getString('PAPEL') ?? _papel;
+  }
+
+  static set papel(String papel) {
+    _papel = papel;
+    _prefs.setString('PAPEL', papel);
   }
 
   static String get apellido {

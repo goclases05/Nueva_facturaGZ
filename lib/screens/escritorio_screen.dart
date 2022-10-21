@@ -1,4 +1,5 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:factura_gozeri/print/impresoras_print.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/seattings_provider.dart';
@@ -42,7 +43,13 @@ class _EscritorioScreenState extends State<EscritorioScreen> {
               CircleAvatar(
                 backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
                 child: IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ImpresorasPrint(id_tmp: ''),
+                        ));
+                  },
                   icon: Icon(Icons.print),
                   color: colorPrimary,
                 ),

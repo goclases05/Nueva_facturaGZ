@@ -68,8 +68,15 @@ class _PrintScreenState extends State<PrintScreen> {
         ),
         value: '0'));
     print('valor de drop ' + facturaService.initialSerie);
+
+    /* if (authService.list_serie.contains(facturaService.initialSerie)) {
+    } else {
+      facturaService.initialSerie = '0';
+    }*/
+
     for (var i = 0; i < authService.list_serie.length; i++) {
       print('item ' + authService.list_serie[i].idSerie);
+
       menuItems.add(DropdownMenuItem(
           child: Text(
             authService.list_serie[i].nombre,
@@ -106,14 +113,15 @@ class _PrintScreenState extends State<PrintScreen> {
                     padding: EdgeInsets.only(left: 10),
                     child: DropdownButton(
                       itemHeight: null,
-                      value: '0', //facturaService.initialSerie,
+                      value: facturaService
+                          .initialSerie, //facturaService.initialSerie,
                       isExpanded: true,
                       dropdownColor: Color.fromARGB(255, 241, 238, 241),
                       onChanged: (String? newValue) async {
                         var cambio = await facturaService.serie(
                             widget.id_tmp, 'add', newValue!);
                         if (cambio != '1') {
-                          Preferencias.serie = newValue!;
+                          //Preferencias.serie = newValue!;
                           SnackBar snackBar = SnackBar(
                             padding: EdgeInsets.all(20),
                             content: Text(
@@ -123,9 +131,10 @@ class _PrintScreenState extends State<PrintScreen> {
                             backgroundColor: Color.fromARGB(255, 224, 96, 113),
                           );
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        } else {
+                          facturaService.initialSerie = newValue;
+                          setState(() {});
                         }
-
-                        setState(() {});
                       },
                       items: menuItems,
                       elevation: 0,

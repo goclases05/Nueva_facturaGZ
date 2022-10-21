@@ -1,27 +1,30 @@
 import 'dart:convert';
 
-ViewPrintData viewPrintDataFromJson(String str) =>
-    ViewPrintData.fromJson(json.decode(str));
+ViewFacturaPrint viewFacturaPrintFromJson(String str) =>
+    ViewFacturaPrint.fromJson(json.decode(str));
 
-String viewPrintDataToJson(ViewPrintData data) => json.encode(data.toJson());
+String viewFacturaPrintToJson(ViewFacturaPrint data) =>
+    json.encode(data.toJson());
 
-class ViewPrintData {
-  ViewPrintData({
+class ViewFacturaPrint {
+  ViewFacturaPrint({
     required this.encabezado,
     required this.detalle,
   });
 
   Encabezado encabezado;
-  List<dynamic> detalle;
+  List<Detalle> detalle;
 
-  factory ViewPrintData.fromJson(Map<String, dynamic> json) => ViewPrintData(
+  factory ViewFacturaPrint.fromJson(Map<String, dynamic> json) =>
+      ViewFacturaPrint(
         encabezado: Encabezado.fromJson(json["ENCABEZADO"]),
-        detalle: List<dynamic>.from(json["DETALLE"].map((x) => x)),
+        detalle:
+            List<Detalle>.from(json["DETALLE"].map((x) => Detalle.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
         "ENCABEZADO": encabezado.toJson(),
-        "DETALLE": List<dynamic>.from(detalle.map((x) => x)),
+        "DETALLE": List<dynamic>.from(detalle.map((x) => x.toJson())),
       };
 }
 
@@ -263,5 +266,53 @@ class Encabezado {
         "NOMBRE_COMERCIAL_EMP": nombre_comercial_emp,
         "NOMBRE_COMERCIAL_SUCU": nombre_comercial_sucu,
         "NIT_EMISOR": nit_emisor,
+      };
+}
+
+class Detalle {
+  Detalle({
+    required this.contenido,
+    required this.idProd,
+    required this.codigo,
+    required this.descripcion,
+    required this.costo,
+    required this.idFact,
+    required this.producto,
+    required this.cantidad,
+    required this.precio,
+  });
+
+  dynamic contenido;
+  String idProd;
+  String codigo;
+  String descripcion;
+  String costo;
+  String idFact;
+  String producto;
+  String cantidad;
+  String precio;
+
+  factory Detalle.fromJson(Map<String, dynamic> json) => Detalle(
+        contenido: json["CONTENIDO"],
+        idProd: json["ID_PROD"],
+        codigo: json["CODIGO"],
+        descripcion: json["DESCRIPCION"],
+        costo: json["COSTO"],
+        idFact: json["ID_FACT"],
+        producto: json["PRODUCTO"],
+        cantidad: json["CANTIDAD"],
+        precio: json["PRECIO"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "CONTENIDO": contenido,
+        "ID_PROD": idProd,
+        "CODIGO": codigo,
+        "DESCRIPCION": descripcion,
+        "COSTO": costo,
+        "ID_FACT": idFact,
+        "PRODUCTO": producto,
+        "CANTIDAD": cantidad,
+        "PRECIO": precio,
       };
 }

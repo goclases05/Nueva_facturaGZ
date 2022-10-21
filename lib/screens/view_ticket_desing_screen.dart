@@ -54,7 +54,7 @@ class ViewTicket extends StatelessWidget {
         bottomSheet: sheetButton(context),
         body: Consumer<PrintProvider>(
           builder: (context, printProvider, child) {
-            if (printProvider.loading)
+            if (printProvider.loading) {
               return Container(
                   height: MediaQuery.of(context).size.height,
                   width: MediaQuery.of(context).size.width,
@@ -62,8 +62,17 @@ class ViewTicket extends StatelessWidget {
                       child: CircularProgressIndicator(
                     color: colorPrimary,
                   )));
+            }
 
             List<Encabezado> encabezado = printProvider.list;
+            List<Detalle> detalle = printProvider.list_detalle;
+
+            List<Widget> frases = [];
+            //frases del certificador
+            for (int i = 0; i < encabezado[0].frases.length; i++) {
+              frases.add(
+                  SimpleText(encabezado[0].frases[i], 13, TextAlign.center));
+            }
 
             int sede = 0;
             //0= empresa
@@ -181,18 +190,17 @@ class ViewTicket extends StatelessWidget {
                         const SizedBox(
                           height: 15,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Expanded(
-                                child: Text(
+                        Container(
+                          width: MediaQuery.of(context).size.width * 1,
+                          child: Expanded(
+                            child: Text(
                               encabezado[0].fecha_letras,
+                              textAlign: TextAlign.end,
                               style: const TextStyle(
                                 fontSize: 11,
                               ),
-                            ))
-                          ],
+                            ),
+                          ),
                         ),
 
                         const SizedBox(
@@ -296,7 +304,7 @@ class ViewTicket extends StatelessWidget {
                         TitleText('Condiciones de pago:', 15, TextAlign.center),
 
                         claveValor(
-                            'Efectivo: ', 'Q200.00', MainAxisAlignment.center),
+                            encabezado[0].forma, '', MainAxisAlignment.center),
 
                         const SizedBox(
                           height: 20,
@@ -305,38 +313,55 @@ class ViewTicket extends StatelessWidget {
                           title: TitleText('Descripción', 16, TextAlign.start),
                           trailing: TitleText('Subtotal', 16, TextAlign.end),
                         ),
-                        Listdata('Q'),
+                        Listdata(encabezado[0].contenido, detalle),
                         //descuento
                         Container(
                             margin: EdgeInsets.only(right: 20),
-                            child: claveValor('Descuentos (-) :  ', 'Q2.00',
+                            child: claveValor(
+                                'Descuentos (-) :  ',
+                                encabezado[0].contenido +
+                                    encabezado[0].descuento,
                                 MainAxisAlignment.end)),
                         //total
                         Container(
                             margin: EdgeInsets.only(right: 20),
                             child: claveValor(
-                                'Total :  ', 'Q200.00', MainAxisAlignment.end)),
+                                'Total :  ',
+                                encabezado[0].contenido + encabezado[0].total,
+                                MainAxisAlignment.end)),
                         const SizedBox(
                           height: 15,
                         ),
                         //total letra
-                        claveValor(
-                            'noventa con 00/100', '', MainAxisAlignment.start),
+                        claveValor(encabezado[0].totalLetas, '',
+                            MainAxisAlignment.start),
                         //isr
                         const SizedBox(
                           height: 15,
                         ),
-                        SimpleText('Sujeto a pagos trimestrales ISR', 15,
-                            TextAlign.center),
+                        Column(
+                          children: frases,
+                        ),
                         const SizedBox(
                           height: 15,
                         ),
-                        claveValor('Certificador: ', 'Megaprint, S.A.',
-                            MainAxisAlignment.start),
-                        claveValor(
-                            'NIT: ', '50510231', MainAxisAlignment.start),
-                        claveValor('Fecha: ', '2022-10-04T11:30:32.465-06:00',
-                            MainAxisAlignment.start),
+                        (encabezado[0].dte != '')
+                            ? Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  claveValor(
+                                      'Certificador: ',
+                                      encabezado[0].certificador,
+                                      MainAxisAlignment.start),
+                                  claveValor('NIT: ', encabezado[0].nitCert,
+                                      MainAxisAlignment.start),
+                                  claveValor('Fecha: ', encabezado[0].fechaCert,
+                                      MainAxisAlignment.start),
+                                ],
+                              )
+                            : Container(),
+
                         //creditos xd
                         const SizedBox(
                           height: 15,
@@ -378,13 +403,15 @@ class ViewTicket extends StatelessWidget {
     );
   }
 
-  ListView Listdata(String moneda) {
+  ListView Listdata(String moneda, List<Detalle> detalle) {
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
-      itemCount: 4,
+      itemCount: detalle.length,
       itemBuilder: (context, index) {
+        double tota = double.parse(detalle[index].cantidad) *
+            double.parse(detalle[index].precio);
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -394,8 +421,11 @@ class ViewTicket extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SimpleText('COJINETE 6206', 12, TextAlign.start),
-                  SimpleText('1 * ${moneda}50.00', 10, TextAlign.start),
+                  SimpleText(detalle[index].producto, 16, TextAlign.start),
+                  SimpleText(
+                      '${detalle[index].cantidad} * ${moneda}${detalle[index].precio}',
+                      12,
+                      TextAlign.start),
                   const SizedBox(
                     height: 10,
                   ),
@@ -404,7 +434,7 @@ class ViewTicket extends StatelessWidget {
             ),
             Container(
                 margin: const EdgeInsets.only(right: 20),
-                child: SimpleText('${moneda}50.00', 12, TextAlign.end))
+                child: SimpleText('${moneda}${tota}', 16, TextAlign.end))
           ],
         );
       },

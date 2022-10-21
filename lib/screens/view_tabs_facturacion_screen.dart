@@ -43,6 +43,7 @@ class TabsFacturacion extends StatelessWidget {
         length: _tabs.length,
         child: Scaffold(
             appBar: AppBar(
+              automaticallyImplyLeading: false,
               backgroundColor: Colors.white,
               elevation: 2,
               title: TabBar(

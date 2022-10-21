@@ -47,12 +47,13 @@ dependencies:
   intl: ^0.17.0
   esc_pos_bluetooth: ^0.4.1
   esc_pos_utils: ^1.1.0
-  flutter_bluetooth_basic: ^0.1.7
+  #esc_pos_utils_plus: ^2.0.1+6
+  #flutter_bluetooth_basic: ^0.1.7
   image: ^3.2.0
-  tutorial_coach_mark: ^1.2.4
+  #tutorial_coach_mark: ^1.2.4
   flutter_rating_bar: ^4.0.1 #estrellas rating articulos
   textfield_search: ^0.10.0 #buscador de clientes
-  carousel_slider: ^4.1.1 #slider
+  #carousel_slider: ^4.1.1 #slider
 
 dev_dependencies:
   flutter_test:
