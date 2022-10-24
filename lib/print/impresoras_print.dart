@@ -1,3 +1,4 @@
+import 'package:factura_gozeri/global/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
@@ -75,10 +76,23 @@ class _ImpresorasPrint extends State<ImpresorasPrint> {
               itemBuilder: (c, i) {
                 return ListTile(
                   leading: Switch(
-                      value: isSwitched,
+                      value: (Preferencias.mac == '')
+                          ? false
+                          : (Preferencias.mac == _devices[i].address)
+                              ? true
+                              : false,
                       onChanged: (value) {
                         print(' el valor ' + value.toString());
-                        isSwitched = value;
+
+                        if (value) {
+                          Preferencias.impresora = _devices[i];
+                          Preferencias.mac = _devices[i].address.toString();
+                        } else {
+                          Preferencias.impresora = {};
+                          Preferencias.mac = '';
+                        }
+                        /*print(
+                            'mac ' + Preferencias.impresora.address.toString());*/
                         setState(() {});
                       }),
                   title: Text("${_devices[i].name}"),
@@ -88,6 +102,7 @@ class _ImpresorasPrint extends State<ImpresorasPrint> {
                     children: [
                       GestureDetector(
                         onTap: () {
+                          _printerManager.stopScan();
                           _startPrint(_devices[i]);
                         },
                         child: Container(
@@ -115,6 +130,7 @@ class _ImpresorasPrint extends State<ImpresorasPrint> {
 
   void initPrinter() {
     _printerManager.startScan(Duration(seconds: 2));
+    //_printerManager.stopScan();
     _printerManager.scanResults.listen((val) {
       if (!mounted) return;
       setState(() => _devices = val);
@@ -142,15 +158,22 @@ class _ImpresorasPrint extends State<ImpresorasPrint> {
     final generatorr = Generator(PaperSize.mm58, profile);
     List<int> bytess = [];
 
-    /*bytess += generator.text('Impresión Factura',
+    /*bytess += generatorr.text('Impresión Factura',
         styles: const PosStyles(
             codeTable: 'CP1252',
             align: PosAlign.center,
             bold: true,
             width: PosTextSize.size2));*/
+    bytess += generatorr.text('Impresión Termica',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
     bytess += generatorr.text('Esta es una prueba:' + msg + ' ' + id_device,
         styles: const PosStyles(
-            align: PosAlign.left,
+            align: PosAlign.center,
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
 

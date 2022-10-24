@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
+import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/print/print_page.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
@@ -12,6 +14,7 @@ import 'package:factura_gozeri/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:intl/intl.dart';
 
 /*ListView.builder(
@@ -44,6 +47,7 @@ class PrintScreen extends StatefulWidget {
 }
 
 class _PrintScreenState extends State<PrintScreen> {
+  PrinterBluetoothManager _printerManager = PrinterBluetoothManager();
   final List<Map<String, dynamic>> data = [
     {'title': 'uurururu', 'price': 15, 'qty': 2},
     {'title': 'wewerdd', 'price': 2, 'qty': 20},
@@ -320,10 +324,18 @@ class _PrintScreenState extends State<PrintScreen> {
                 Expanded(
                     child: TextButton.icon(
                   onPressed: () async {
-                    var facturar = await facturaService.facturar(widget.id_tmp);
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    //final dynamic din = await Preferencias.impresora as dynamic;
+                    PrinterBluetooth device = await (prefs
+                        .getString('IMPRESORA') as PrinterBluetooth);
+
+                    print('device: ${Preferencias.impresora}');
+                    await _startPrint(device);
+                    /*var facturar = await facturaService.facturar(widget.id_tmp);
                     var js = json.decode(facturar);
                     if (js['MENSAJE'] == 'OK') {
-                      SnackBar snackBar = const SnackBar(
+                      /*SnackBar snackBar = const SnackBar(
                         padding: EdgeInsets.all(20),
                         content: Text(
                           'Facturacion Completada',
@@ -331,7 +343,9 @@ class _PrintScreenState extends State<PrintScreen> {
                         ),
                         backgroundColor: Colors.green,
                       );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+
+
                       // ignore: use_build_context_synchronously
                       Navigator.push(
                           context,
@@ -349,7 +363,7 @@ class _PrintScreenState extends State<PrintScreen> {
                       );
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       print(facturar);
-                    }
+                    }*/
                   },
                   icon: const Icon(Icons.print),
                   label: const Text('Facturar'),
@@ -364,5 +378,84 @@ class _PrintScreenState extends State<PrintScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _startPrint(PrinterBluetooth printer) async {
+    _printerManager.selectPrinter(printer);
+    showDialog(
+      context: context,
+      builder: (_) => const AlertDialog(
+        backgroundColor: Color.fromARGB(255, 115, 160, 236),
+        content: Text(
+          'Imprimiendo...',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+    final result = await _printerManager.printTicket(
+        await testTicket(printer.name.toString(), printer.address.toString()));
+    Navigator.of(context, rootNavigator: true).pop(result);
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: (result.msg == 'Success')
+            ? Color.fromARGB(255, 109, 224, 186)
+            : Color.fromARGB(255, 201, 124, 124),
+        content: Text(
+          (result.msg == 'Success') ? 'Listo..' : result.msg,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  Future<List<int>> testTicket(String msg, String id_device) async {
+    // Using default profile
+    final profile = await CapabilityProfile.load();
+    final generatorr = Generator(PaperSize.mm58, profile);
+    List<int> bytess = [];
+
+    /*bytess += generatorr.text('Impresión Factura',
+        styles: const PosStyles(
+            codeTable: 'CP1252',
+            align: PosAlign.center,
+            bold: true,
+            width: PosTextSize.size2));*/
+    bytess += generatorr.text('Impresión Termica',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    bytess += generatorr.text('Esta es una prueba:' + msg + ' ' + id_device,
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    /*bytes += generator.text(
+        'Regular: aA bB cC dD eE fF gG hH iI jJ kK lL mM nN oO pP qQ rR sS tT uU vV wW xX yY zZ');
+    bytes += generator.text('Special 1: àÀ èÈ éÉ ûÛ üÜ çÇ ôÔ');
+    bytes += generator.text('Special 2: blåbærgrød');
+
+    bytes += generator.text('Bold text', styles: PosStyles(bold: true));
+    bytes += generator.text('Reverse text', styles: PosStyles(reverse: true));
+    bytes += generator.text('Underlined text',
+        styles: PosStyles(underline: true), linesAfter: 1);
+    bytes +=
+        generator.text('Align left', styles: PosStyles(align: PosAlign.left));
+    bytes += generator.text('Align center', styles: PosStyles(align: PosAlign.center));
+    bytes += generator.text('Align right',styles: PosStyles(align: PosAlign.right), linesAfter: 1);
+
+    bytes += generator.text('Text size 200%',
+        styles: PosStyles(
+          height: PosTextSize.size2,
+          width: PosTextSize.size2,
+        ));*/
+
+    //bytes += generator.feed(2);
+    bytess += generatorr.cut();
+    return bytess;
   }
 }

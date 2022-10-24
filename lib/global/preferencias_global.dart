@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,20 +21,30 @@ class Preferencias {
   static String _positionColor = '0';
   static String _sucursal = '';
   static String _serie = '';
-  static String _impresora = '';
+  static dynamic _impresora = {};
+  static String _mac = '';
   static String _papel = '';
 
   static Future init() async {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  static String get impresora {
+  static String get mac {
+    return _prefs.getString('MAC') ?? _mac;
+  }
+
+  static set mac(String mac) {
+    _mac = mac;
+    _prefs.setString('MAC', mac);
+  }
+
+  static dynamic get impresora {
     return _prefs.getString('IMPRESORA') ?? _impresora;
   }
 
-  static set impresora(String impresora) {
+  static set impresora(dynamic impresora) {
     _impresora = impresora;
-    _prefs.setString('IMPRESORA', impresora);
+    _prefs.setString('IMPRESORA', "$impresora");
   }
 
   static String get papel {
