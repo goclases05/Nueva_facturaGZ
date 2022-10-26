@@ -15,6 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 //import 'package:intl/intl.dart';
 
 /*ListView.builder(
@@ -324,11 +326,12 @@ class _PrintScreenState extends State<PrintScreen> {
                 Expanded(
                     child: TextButton.icon(
                   onPressed: () async {
+                    final storage = new FlutterSecureStorage();
                     SharedPreferences prefs =
                         await SharedPreferences.getInstance();
+                    dynamic device_store=await storage.read(key: 'IMPRESORA');
                     //final dynamic din = await Preferencias.impresora as dynamic;
-                    PrinterBluetooth device = await (prefs
-                        .getString('IMPRESORA') as PrinterBluetooth);
+                    PrinterBluetooth device = device_store;
 
                     print('device: ${Preferencias.impresora}');
                     await _startPrint(device);
@@ -421,14 +424,264 @@ class _PrintScreenState extends State<PrintScreen> {
             align: PosAlign.center,
             bold: true,
             width: PosTextSize.size2));*/
-    bytess += generatorr.text('Impresión Termica',
+
+    //nombre empresa
+    bytess += generatorr.text('Corporación H&T',
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,
             bold: true,
             codeTable: 'CP1252'));
 
-    bytess += generatorr.text('Esta es una prueba:' + msg + ' ' + id_device,
+    //DIreccion empresa
+    bytess += generatorr.text('4ta calle 5-63 zona 8',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+    
+    //NIT EMPRESA
+    bytess += generatorr.text('NIT: 857421-96',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+    
+    //TELEFONO EMPRESA
+    bytess += generatorr.text('Tel: 5522-3355',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //NOMBRE COMERCIAL
+    bytess += generatorr.text('Hich Tecto',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+    
+
+    //espacio
+    bytess += generatorr.feed(1);
+    
+    //FEL
+    bytess += generatorr.text('Factura Electrónica Documento Tributario',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //FECHA EMITIDA
+    bytess += generatorr.text('25 de octuble 2022',
+        styles: const PosStyles(
+            align: PosAlign.right,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //AUTORIZACION
+    bytess += generatorr.text('Número de Autorización:',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+    
+    bytess += generatorr.text('BBaSDFDFDF-56556-aSDFAS',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+      
+    bytess += generatorr.text('Serie: BBDF65',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    bytess += generatorr.text('Número de DTE: 25633554785',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //No
+    bytess += generatorr.text('No: 128',
+        styles: const PosStyles(
+            align: PosAlign.right,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+    
+    //espacio
+    bytess += generatorr.feed(1);
+
+    
+    //SERIE
+    bytess += generatorr.text('Serie: DGTD',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+    
+    //VENDEDOR
+    bytess += generatorr.text('Vendedor : Jerson Hernandez',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    //CLIENTE
+    bytess += generatorr.text('Cliente: Magdalena España de la Rosa',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    //NIT CLIENTE
+    bytess += generatorr.text('NIT: 54545454',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));  
+
+    //DIRECCION CLIENTE
+    bytess += generatorr.text('Dirección: 8va ave 7-88 Villa Nueva',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+    
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //CONDICIONES DE PAGO
+    bytess += generatorr.text('Condiciónes de pago:',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    bytess += generatorr.text('Contado',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //TABLA PRODUCTOS
+    generatorr.row([
+      PosColumn(
+        text: 'Descripción',
+        width: 9,
+        styles: const PosStyles(align: PosAlign.right, underline: true),
+      ),
+      PosColumn(
+        text: 'Subtotal',
+        width: 3,
+        styles: const PosStyles(align: PosAlign.right, underline: true),
+      ),
+    ]);
+
+    //DESCUENTO DE PRODUCTOS
+    generatorr.row([
+      PosColumn(
+        text: 'Descuentos(-):',
+        width: 9,
+        styles: const PosStyles(align: PosAlign.right, underline: true),
+      ),
+      PosColumn(
+        text: 'Q0.00',
+        width: 3,
+        styles: const PosStyles(align: PosAlign.right, underline: true),
+      ),
+    ]);
+
+    //TOTAL PRODUCTOS
+    generatorr.row([
+      PosColumn(
+        text: 'Total:',
+        width: 9,
+        styles:const PosStyles(align: PosAlign.right, underline: true),
+      ),
+      PosColumn(
+        text: 'Q0.00',
+        width: 3,
+        styles: const PosStyles(align: PosAlign.right, underline: true),
+      ),
+    ]);
+
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+
+    //TOTAL LETRAS
+    bytess += generatorr.text('novecientos cuarenta con 00/100',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //Frases 
+    bytess += generatorr.text('Sujeto a pagos trimestrales',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+
+    //DATOS DE CERTIFICADOR
+    bytess += generatorr.text('Certificador: Megaprint S.A',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    bytess += generatorr.text('NIT: 558471-63',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    bytess += generatorr.text('Fecha: 85-69-2022 10:00',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //datos del sistema
+    bytess += generatorr.text('Factura realizada en www.gozeri.com',
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,

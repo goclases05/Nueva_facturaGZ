@@ -4,7 +4,7 @@ import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
 import 'dart:io' show Platform;
-import 'package:image/image.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ImpresorasPrint extends StatefulWidget {
   ImpresorasPrint({Key? key, required this.id_tmp}) : super(key: key);
@@ -81,14 +81,15 @@ class _ImpresorasPrint extends State<ImpresorasPrint> {
                           : (Preferencias.mac == _devices[i].address)
                               ? true
                               : false,
-                      onChanged: (value) {
+                      onChanged: (value) async{
                         print(' el valor ' + value.toString());
-
+                        final storage = new FlutterSecureStorage();
+                        dynamic vare=_devices[i];
                         if (value) {
-                          Preferencias.impresora = _devices[i];
+                          await storage.write(key: 'IMPRESORA', value: vare);
                           Preferencias.mac = _devices[i].address.toString();
                         } else {
-                          Preferencias.impresora = {};
+                          await storage.write(key: 'IMPRESORA', value: '');
                           Preferencias.mac = '';
                         }
                         /*print(
