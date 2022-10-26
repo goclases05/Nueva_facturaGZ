@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
@@ -81,15 +83,28 @@ class _ImpresorasPrint extends State<ImpresorasPrint> {
                           : (Preferencias.mac == _devices[i].address)
                               ? true
                               : false,
-                      onChanged: (value) async{
+                      onChanged: (value) async {
                         print(' el valor ' + value.toString());
+
                         final storage = new FlutterSecureStorage();
-                        dynamic vare=_devices[i];
+
+                        Map map = {
+                          'name': _devices[i].name,
+                          'address': _devices[i].address,
+                          'type': _devices[i].type
+                        };
+
+                        final js = json.encode(map);
+                        print(js);
+                        //dynamic vare = _devices![i];
+                        Preferencias.impresora = js;
+                        print('este es el shared : ' + Preferencias.impresora);
                         if (value) {
-                          await storage.write(key: 'IMPRESORA', value: vare);
+                          //await storage.write(key: 'IMPRESORA', value: vare);
+
                           Preferencias.mac = _devices[i].address.toString();
                         } else {
-                          await storage.write(key: 'IMPRESORA', value: '');
+                          //await storage.write(key: 'IMPRESORA', value: '');
                           Preferencias.mac = '';
                         }
                         /*print(

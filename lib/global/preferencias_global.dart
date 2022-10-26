@@ -38,13 +38,13 @@ class Preferencias {
     _prefs.setString('MAC', mac);
   }
 
-  static dynamic get impresora {
+  static String get impresora {
     return _prefs.getString('IMPRESORA') ?? _impresora;
   }
 
-  static set impresora(dynamic impresora) {
+  static set impresora(String impresora) {
     _impresora = impresora;
-    _prefs.setString('IMPRESORA', "$impresora");
+    _prefs.setString('IMPRESORA', impresora);
   }
 
   static String get papel {

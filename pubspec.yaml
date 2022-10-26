@@ -41,10 +41,10 @@ dependencies:
   awesome_snackbar_content: ^0.0.8 #aleras tipo toast
   bubble_tab_indicator: ^0.1.6 #tabs
   pull_to_refresh_plus: ^2.0.3 #pull to 
-  #count_stepper: ^0.0.4 #contador de productos
+  count_stepper: ^0.0.4 #contador de productos
   badges: ^2.0.3 
-  #custom_bottom_sheet: ^1.1.2
-  #intl: ^0.17.0
+  custom_bottom_sheet: ^1.1.2
+  intl: ^0.17.0
   esc_pos_bluetooth: ^0.4.1
   esc_pos_utils: ^1.1.0
   #esc_pos_utils_plus: ^2.0.1+6
@@ -54,7 +54,7 @@ dependencies:
   flutter_rating_bar: ^4.0.1 #estrellas rating articulos
   textfield_search: ^0.10.0 #buscador de clientes
   #carousel_slider: ^4.1.1 #slider
-  flutter_secure_storage: ^6.0.0
+  #flutter_secure_storage: ^6.0.0
 
 dev_dependencies:
   flutter_test:

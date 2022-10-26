@@ -50,6 +50,7 @@ class PrintScreen extends StatefulWidget {
 
 class _PrintScreenState extends State<PrintScreen> {
   PrinterBluetoothManager _printerManager = PrinterBluetoothManager();
+
   final List<Map<String, dynamic>> data = [
     {'title': 'uurururu', 'price': 15, 'qty': 2},
     {'title': 'wewerdd', 'price': 2, 'qty': 20},
@@ -62,6 +63,8 @@ class _PrintScreenState extends State<PrintScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _printerManager.startScan(Duration(seconds: 2));
+
     int _total = 0;
     List<DropdownMenuItem<String>> menuItems = [];
     final authService = Provider.of<AuthService>(context, listen: false);
@@ -326,15 +329,29 @@ class _PrintScreenState extends State<PrintScreen> {
                 Expanded(
                     child: TextButton.icon(
                   onPressed: () async {
-                    final storage = new FlutterSecureStorage();
+                    /*final storage = new FlutterSecureStorage();
                     SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    dynamic device_store=await storage.read(key: 'IMPRESORA');
+                        await SharedPreferences.getInstance();*/
+                    //dynamic device_store=await storage.read(key: 'IMPRESORA');
                     //final dynamic din = await Preferencias.impresora as dynamic;
-                    PrinterBluetooth device = device_store;
+                    //PrinterBluetooth device = await Preferencias.impresora as dynamic;
+                    print('entro');
 
-                    print('device: ${Preferencias.impresora}');
-                    await _startPrint(device);
+                    _printerManager.scanResults.listen((devices) async {
+                      print(devices);
+                      devices.forEach((printer) async {
+                        print(printer);
+                        //get saved printer
+                        if (printer.address == Preferencias.mac) {
+                          //store the element.
+
+                          await _startPrint(printer);
+                        }
+                      });
+                    });
+                    print('salio');
+                    //print('el deivis : ' + device['name']);
+
                     /*var facturar = await facturaService.facturar(widget.id_tmp);
                     var js = json.decode(facturar);
                     if (js['MENSAJE'] == 'OK') {
@@ -425,35 +442,34 @@ class _PrintScreenState extends State<PrintScreen> {
             bold: true,
             width: PosTextSize.size2));*/
 
+    //DIreccion empresa
+    bytess += generatorr.text('4ta calle 5-63 zona 8',
+        styles: const PosStyles(
+                width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+            .copyWith(align: PosAlign.center));
+
     //nombre empresa
     bytess += generatorr.text('Corporación H&T',
+        styles: const PosStyles(
+                width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+            .copyWith(align: PosAlign.center));
+
+/*
+    //NIT EMPRESA
+    bytess += generatorr.text('NIT: 857421-96',
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,
             bold: true,
             codeTable: 'CP1252'));
 
-    //DIreccion empresa
-    bytess += generatorr.text('4ta calle 5-63 zona 8',
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            codeTable: 'CP1252'));
-    
-    //NIT EMPRESA
-    bytess += generatorr.text('NIT: 857421-96',
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            codeTable: 'CP1252'));
-    
     //TELEFONO EMPRESA
     bytess += generatorr.text('Tel: 5522-3355',
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,
+            bold: true,
             codeTable: 'CP1252'));
-
 
     //espacio
     bytess += generatorr.feed(1);
@@ -463,12 +479,12 @@ class _PrintScreenState extends State<PrintScreen> {
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,
+            bold: true,
             codeTable: 'CP1252'));
-    
 
     //espacio
     bytess += generatorr.feed(1);
-    
+
     //FEL
     bytess += generatorr.text('Factura Electrónica Documento Tributario',
         styles: const PosStyles(
@@ -497,17 +513,19 @@ class _PrintScreenState extends State<PrintScreen> {
             width: PosTextSize.size1,
             bold: true,
             codeTable: 'CP1252'));
-    
+
     bytess += generatorr.text('BBaSDFDFDF-56556-aSDFAS',
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,
+            bold: true,
             codeTable: 'CP1252'));
-      
+
     bytess += generatorr.text('Serie: BBDF65',
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,
+            bold: true,
             codeTable: 'CP1252'));
 
     bytess += generatorr.text('Número de DTE: 25633554785',
@@ -526,18 +544,17 @@ class _PrintScreenState extends State<PrintScreen> {
             align: PosAlign.right,
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
-    
+
     //espacio
     bytess += generatorr.feed(1);
 
-    
     //SERIE
     bytess += generatorr.text('Serie: DGTD',
         styles: const PosStyles(
             align: PosAlign.left,
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
-    
+
     //VENDEDOR
     bytess += generatorr.text('Vendedor : Jerson Hernandez',
         styles: const PosStyles(
@@ -558,7 +575,7 @@ class _PrintScreenState extends State<PrintScreen> {
             align: PosAlign.left,
             width: PosTextSize.size1,
             bold: true,
-            codeTable: 'CP1252'));  
+            codeTable: 'CP1252'));
 
     //DIRECCION CLIENTE
     bytess += generatorr.text('Dirección: 8va ave 7-88 Villa Nueva',
@@ -566,7 +583,7 @@ class _PrintScreenState extends State<PrintScreen> {
             align: PosAlign.left,
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
-    
+
     //espacio
     bytess += generatorr.feed(1);
 
@@ -621,7 +638,7 @@ class _PrintScreenState extends State<PrintScreen> {
       PosColumn(
         text: 'Total:',
         width: 9,
-        styles:const PosStyles(align: PosAlign.right, underline: true),
+        styles: const PosStyles(align: PosAlign.right, underline: true),
       ),
       PosColumn(
         text: 'Q0.00',
@@ -630,10 +647,8 @@ class _PrintScreenState extends State<PrintScreen> {
       ),
     ]);
 
-
     //espacio
     bytess += generatorr.feed(1);
-
 
     //TOTAL LETRAS
     bytess += generatorr.text('novecientos cuarenta con 00/100',
@@ -646,7 +661,7 @@ class _PrintScreenState extends State<PrintScreen> {
     //espacio
     bytess += generatorr.feed(1);
 
-    //Frases 
+    //Frases
     bytess += generatorr.text('Sujeto a pagos trimestrales',
         styles: const PosStyles(
             align: PosAlign.center,
@@ -655,7 +670,6 @@ class _PrintScreenState extends State<PrintScreen> {
 
     //espacio
     bytess += generatorr.feed(1);
-
 
     //DATOS DE CERTIFICADOR
     bytess += generatorr.text('Certificador: Megaprint S.A',
@@ -676,7 +690,6 @@ class _PrintScreenState extends State<PrintScreen> {
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
 
-
     //espacio
     bytess += generatorr.feed(1);
 
@@ -686,7 +699,7 @@ class _PrintScreenState extends State<PrintScreen> {
             align: PosAlign.center,
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
-
+*/
     /*bytes += generator.text(
         'Regular: aA bB cC dD eE fF gG hH iI jJ kK lL mM nN oO pP qQ rR sS tT uU vV wW xX yY zZ');
     bytes += generator.text('Special 1: àÀ èÈ éÉ ûÛ üÜ çÇ ôÔ');
