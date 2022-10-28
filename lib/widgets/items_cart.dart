@@ -26,6 +26,7 @@ class _ItemsCart extends State<ItemsCart> {
     Producto p=Producto.fromJson(j);
       print('esta es : ');
     print(p.codigo);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -116,11 +117,11 @@ class _ItemsCart extends State<ItemsCart> {
     if(ListDet.list_load) 
       // ignore: curly_braces_in_flow_control_structures
       return Container(
-        height: MediaQuery.of(context).size.height*0.2,
         padding: const EdgeInsets.all(0),
-        child: const Center(
-            child: CircularProgressIndicator(
-              color: Colors.cyan,
+        child: Center(
+            child: LinearProgressIndicator(
+              color: widget.colorPrimary,
+              backgroundColor: Colors.white,
             ),
       ));
     if(ListDet.contenido==false){

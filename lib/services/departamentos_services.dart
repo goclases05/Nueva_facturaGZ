@@ -10,9 +10,9 @@ class DepartamentoService extends ChangeNotifier {
   List<Departamento> depa = [];
   bool isLoading = true;
 
-  DepartamentoService() {
-    this.LoadDepa();
-  }
+  /*DepartamentoService() {
+    //this.LoadDepa();
+  }*/
 
   Future LoadDepa() async {
     this.isLoading = true;

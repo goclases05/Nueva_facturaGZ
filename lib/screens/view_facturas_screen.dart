@@ -128,16 +128,16 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                       final _facturacion =
                                           Provider.of<Facturacion>(context,
                                               listen: false);
-                                      await _facturacion
+                                       _facturacion
                                           .list_cart(list_tmp[index].idFactTmp);
-                                      await _facturacion.read_cliente('read',
+                                       _facturacion.read_cliente('read',
                                           '0', list_tmp[index].idFactTmp);
 
-                                      await _facturacion.serie(
+                                       _facturacion.serie(
                                           list_tmp[index].idFactTmp,
                                           'read',
                                           '');
-                                      await _facturacion.transacciones(
+                                       _facturacion.transacciones(
                                           list_tmp[index].idFactTmp);
                                       // ignore: use_build_context_synchronously
                                       Navigator.push(

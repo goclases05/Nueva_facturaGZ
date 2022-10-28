@@ -153,19 +153,21 @@ Widget menuItem(int id, String title, IconData icon, bool selected,
       onTap: () async {
         if (id == 0) {
           final _facturacion = Provider.of<Facturacion>(context, listen: false);
-          final _depa =
-              Provider.of<DepartamentoService>(context, listen: false);
-          final _cart = Provider.of<Cart>(context, listen: false);
           final factuProv = await _facturacion.new_tmpFactura();
           print('factura no: ${factuProv[0]}');
           print('clave : ${factuProv[1]}');
-          _depa.isLoading = true;
+
+          final _cart = Provider.of<Cart>(context, listen: false);
           _cart.cantidad = 0;
+
+          final _depa=Provider.of<DepartamentoService>(context, listen: false);
+          _depa.isLoading = true;
           _depa.LoadDepa();
 
-          _facturacion.new_tmpFactura();
-
+          
+          
           if (_facturacion.tmp_creada == '') {
+            print('tap tap 5');
             var snackBar = SnackBar(
               /// need to set following properties for best effect of awesome_snackbar_content
               duration: const Duration(seconds: 1),

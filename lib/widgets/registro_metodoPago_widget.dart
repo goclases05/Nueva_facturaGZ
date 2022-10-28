@@ -31,6 +31,8 @@ class _RegistroMetodoPagoState extends State<RegistroMetodoPago> {
   Widget build(BuildContext context) {
     final Metodo = Provider.of<Facturacion>(context);
 
+    _controlPago.text=Metodo.total_fac;
+
     List<DropdownMenuItem<String>> menuItems = [];
     List<DropdownMenuItem<String>> bancosItems = [];
     if (Metodo.loadMetodo)

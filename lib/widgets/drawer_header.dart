@@ -152,7 +152,10 @@ class _HeaderDrawerState extends State<HeaderDrawer> {
                     dropdownColor: widget.colorPrimary,
                     onChanged: (String? newValue) async {
                       selectedValue = newValue!;
-                      Preferencias.sucursal = await selectedValue;
+                      Preferencias.sucursal=selectedValue;
+
+                      authService.Series();
+
                       setState(() {});
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).pop();

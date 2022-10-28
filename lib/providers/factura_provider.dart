@@ -13,6 +13,7 @@ class Facturacion extends ChangeNotifier {
 
   //serie
   String initialSerie = '0';
+  bool cargainiSerie=true;
 
   //lista de la carta
   bool contenido = false;
@@ -45,6 +46,7 @@ class Facturacion extends ChangeNotifier {
 
   Future serie(String tmp, String accion, String serie) async {
     if (accion == 'read') {
+      cargainiSerie=true;
       initialSerie = '0';
       notifyListeners();
       print(
@@ -55,10 +57,12 @@ class Facturacion extends ChangeNotifier {
       final resp = await http.get(uri);
       if (resp.body == '0') {
         initialSerie = (Preferencias.serie == '') ? '0' : Preferencias.serie;
+        cargainiSerie=false;
         notifyListeners();
         return this.serie(tmp, 'add', initialSerie);
       } else {
         initialSerie = resp.body;
+        cargainiSerie=false;
         return notifyListeners();
       }
     } else if (accion == 'add') {

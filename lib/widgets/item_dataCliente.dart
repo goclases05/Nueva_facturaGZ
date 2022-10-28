@@ -19,6 +19,7 @@ class ItemCliente extends StatefulWidget {
 }
 
 class _ItemCliente extends State<ItemCliente> {
+  
   Future<List> fetchData() async {
     await Future.delayed(Duration(milliseconds: 0));
     final String _baseUrl = "app.gozeri.com";
