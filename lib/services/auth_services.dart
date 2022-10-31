@@ -7,6 +7,7 @@ import 'package:factura_gozeri/models/sucursales_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+//import 'package:package_info_plus/package_info_plus.dart';
 
 class AuthService extends ChangeNotifier {
   final String _baseUrl = "app.gozeri.com";
@@ -64,7 +65,32 @@ class AuthService extends ChangeNotifier {
   Future<String> readUsuario() async {
     await Sucursales();
     await Series();
-    return await storage.read(key: 'USUARIO') ?? '';
+
+    //membresia
+    final empresa = Preferencias.data_empresa;
+    //PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String version = '1.0.0'; // packageInfo.version;
+
+    print(
+        "https://app.gozeri.com/flutter_gozeri/membresia.php?empresa=${empresa}&version=" +
+            version);
+    final Uri uri = Uri.parse(
+        "https://app.gozeri.com/flutter_gozeri/membresia.php?empresa=${empresa}&version=" +
+            version);
+
+    final resp = await http.get(uri);
+    final us = await storage.read(key: 'USUARIO') ?? '';
+    print('holi8ii8 ' + resp.toString());
+    if (us == '') {
+      return '';
+    } else {
+      if (resp.body == 'OK') {
+        return await storage.read(key: 'USUARIO') ?? '';
+      } else {
+        return resp.body;
+      }
+    }
+    //membresia
   }
 
   Future Sucursales() async {

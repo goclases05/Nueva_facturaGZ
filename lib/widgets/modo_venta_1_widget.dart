@@ -174,152 +174,148 @@ class _ModoVenta1State extends State<ModoVenta1> {
                       borderRadius:
                           const BorderRadius.all(Radius.circular(5.0)),
                     ),
-                    child: Expanded(
-                      child: Row(children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                if (widget.listProd.facturar == '1') {
+                    child: Row(children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (widget.listProd.facturar == '1') {
+                                _counterValue--;
+                                print(_counterValue);
+                                myController.text = _counterValue.toString();
+                              } else {
+                                if (_counterValue <= 0) {
+                                  _counterValue++;
+                                  print(_counterValue);
+                                  myController.text = _counterValue.toString();
+                                } else if (_counterValue > 1) {
                                   _counterValue--;
                                   print(_counterValue);
                                   myController.text = _counterValue.toString();
-                                } else {
-                                  if (_counterValue <= 0) {
-                                    _counterValue++;
-                                    print(_counterValue);
-                                    myController.text =
-                                        _counterValue.toString();
-                                  } else if (_counterValue > 1) {
-                                    _counterValue--;
-                                    print(_counterValue);
-                                    myController.text =
-                                        _counterValue.toString();
-                                  }
                                 }
-
-                                myController.selection =
-                                    TextSelection.fromPosition(TextPosition(
-                                        offset: myController.text.length));
-                              });
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.all(0),
-                              padding: const EdgeInsets.all(8),
-                              decoration: const BoxDecoration(
-                                  //color: Theme.of(context).primaryColor,
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(15),
-                                      bottomLeft: Radius.circular(15))),
-                              child: Icon(
-                                Icons.remove,
-                                color: widget.colorPrimary,
-                                size: 25,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          color: Colors.white,
-                          margin: EdgeInsets.symmetric(vertical: 2),
-                          width: MediaQuery.of(context).size.width * 0.2,
-                          child: TextField(
-                            controller: myController,
-                            //initialValue: myController.text,
-                            textAlign: TextAlign.center,
-                            keyboardType: TextInputType.number,
-                            onChanged: (value) {
-                              if (value == '') {
-                                myController.text = value;
-                                setState(() {
-                                  _counterValue = 0;
-                                });
-                              } else {
-                                setState(() {
-                                  if (widget.listProd.facturar == 1) {
-                                    _counterValue = int.parse(value);
-                                  } else {
-                                    final stock_p =
-                                        double.parse(widget.listProd.stock)
-                                            .round();
-                                    if (int.parse(value) <= 1) {
-                                      _counterValue = 1;
-                                    } else if (double.parse(value) >=
-                                        double.parse(widget.listProd.stock)) {
-                                      _counterValue = stock_p;
-                                    } else {
-                                      _counterValue = int.parse(value);
-                                    }
-                                  }
-
-                                  /* myController.text = value.toString();
-                          // this changes cursor position
-                          myController.selection =
-                              TextSelection.fromPosition(TextPosition(
-                                  offset: myController.text.length));*/
-                                });
                               }
-                            },
-                            /*validator: (value) {
-                      /*if (value != null && value.length >= 1) {
-                        return null;
-                      } else {
-                        return 'Inserte un Usuario| Correo ';
-                      }*/
-                    },*/
-                            cursorColor: widget.colorPrimary,
-                            decoration: const InputDecoration(
-                              fillColor: Colors.white,
-                              hintText: "0.00",
-                              enabledBorder: InputBorder.none,
-                              focusedBorder: InputBorder.none,
+
+                              myController.selection =
+                                  TextSelection.fromPosition(TextPosition(
+                                      offset: myController.text.length));
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.all(0),
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                                //color: Theme.of(context).primaryColor,
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    bottomLeft: Radius.circular(15))),
+                            child: Icon(
+                              Icons.remove,
+                              color: widget.colorPrimary,
+                              size: 25,
                             ),
                           ),
                         ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
+                      ),
+                      Container(
+                        color: Colors.white,
+                        margin: EdgeInsets.symmetric(vertical: 2),
+                        width: MediaQuery.of(context).size.width * 0.2,
+                        child: TextField(
+                          controller: myController,
+                          //initialValue: myController.text,
+                          textAlign: TextAlign.center,
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) {
+                            if (value == '') {
+                              myController.text = value;
                               setState(() {
-                                if (widget.listProd.facturar == '1') {
-                                  _counterValue++;
+                                _counterValue = 0;
+                              });
+                            } else {
+                              setState(() {
+                                if (widget.listProd.facturar == 1) {
+                                  _counterValue = int.parse(value);
                                 } else {
-                                  print(_counterValue);
-                                  if (_counterValue >=
-                                      int.parse(widget.listProd.stock)) {
-                                    _counterValue =
-                                        int.parse(widget.listProd.stock);
-                                    print(_counterValue);
+                                  final stock_p =
+                                      double.parse(widget.listProd.stock)
+                                          .round();
+                                  if (int.parse(value) <= 1) {
+                                    _counterValue = 1;
+                                  } else if (double.parse(value) >=
+                                      double.parse(widget.listProd.stock)) {
+                                    _counterValue = stock_p;
                                   } else {
-                                    _counterValue++;
-                                    print(_counterValue);
+                                    _counterValue = int.parse(value);
                                   }
                                 }
 
-                                myController.selection =
-                                    TextSelection.fromPosition(TextPosition(
-                                        offset: myController.text.length));
+                                /* myController.text = value.toString();
+                        // this changes cursor position
+                        myController.selection =
+                            TextSelection.fromPosition(TextPosition(
+                                offset: myController.text.length));*/
                               });
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.all(0),
-                              padding: const EdgeInsets.all(8),
-                              decoration: const BoxDecoration(
-                                  //color: Theme.of(context).primaryColor,
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(15),
-                                      bottomRight: Radius.circular(15))),
-                              child: Icon(
-                                Icons.add,
-                                color: widget.colorPrimary,
-                                size: 25,
-                              ),
+                            }
+                          },
+                          /*validator: (value) {
+                    /*if (value != null && value.length >= 1) {
+                      return null;
+                    } else {
+                      return 'Inserte un Usuario| Correo ';
+                    }*/
+                    },*/
+                          cursorColor: widget.colorPrimary,
+                          decoration: const InputDecoration(
+                            fillColor: Colors.white,
+                            hintText: "0.00",
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (widget.listProd.facturar == '1') {
+                                _counterValue++;
+                              } else {
+                                print(_counterValue);
+                                if (_counterValue >=
+                                    int.parse(widget.listProd.stock)) {
+                                  _counterValue =
+                                      int.parse(widget.listProd.stock);
+                                  print(_counterValue);
+                                } else {
+                                  _counterValue++;
+                                  print(_counterValue);
+                                }
+                              }
+
+                              myController.selection =
+                                  TextSelection.fromPosition(TextPosition(
+                                      offset: myController.text.length));
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.all(0),
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                                //color: Theme.of(context).primaryColor,
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(15),
+                                    bottomRight: Radius.circular(15))),
+                            child: Icon(
+                              Icons.add,
+                              color: widget.colorPrimary,
+                              size: 25,
                             ),
                           ),
                         ),
-                      ]),
-                    )),
+                      ),
+                    ])),
               ],
             )),
           ],

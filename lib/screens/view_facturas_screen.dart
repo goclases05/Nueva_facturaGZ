@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
+import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/models/data_facturas_models.dart';
 import 'package:factura_gozeri/print/print_page.dart';
@@ -24,6 +26,8 @@ class ViewFacturas extends StatefulWidget {
 }
 
 class _ViewFacturasState extends State<ViewFacturas> {
+  PrinterBluetoothManager _printerManager = PrinterBluetoothManager();
+
   List<DataFacturas> list_tmp = [];
   List<DataFacturas> list_emi = [];
   int i = 0;
@@ -73,6 +77,17 @@ class _ViewFacturasState extends State<ViewFacturas> {
     }
     setState(() {});
     return true;
+  }
+
+  @override
+  void initState() {
+    if (widget.accion == 'Emitidas') {
+      _printerManager.startScan(const Duration(seconds: 2));
+    } else {
+      _printerManager.stopScan();
+    }
+
+    super.initState();
   }
 
   @override
@@ -128,16 +143,16 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                       final _facturacion =
                                           Provider.of<Facturacion>(context,
                                               listen: false);
-                                       _facturacion
+                                      _facturacion
                                           .list_cart(list_tmp[index].idFactTmp);
-                                       _facturacion.read_cliente('read',
-                                          '0', list_tmp[index].idFactTmp);
+                                      _facturacion.read_cliente('read', '0',
+                                          list_tmp[index].idFactTmp);
 
-                                       _facturacion.serie(
+                                      _facturacion.serie(
                                           list_tmp[index].idFactTmp,
                                           'read',
                                           '');
-                                       _facturacion.transacciones(
+                                      _facturacion.transacciones(
                                           list_tmp[index].idFactTmp);
                                       // ignore: use_build_context_synchronously
                                       Navigator.push(
@@ -171,8 +186,8 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                     padding: const EdgeInsets.all(5),
                                     decoration: BoxDecoration(
                                         //color: Theme.of(context).primaryColor,
-                                        color:
-                                            Color.fromARGB(255, 236, 125, 117),
+                                        color: const Color.fromARGB(
+                                            255, 236, 125, 117),
                                         borderRadius:
                                             BorderRadius.circular(10)),
                                     child: const Icon(
@@ -200,7 +215,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                               onTap: () {},
                             );
                           })
-                      : Center(child: Text('Sin data'))
+                      : const Center(child: Text('Sin data'))
                   : (widget.accion == 'Emitidas')
                       ? (list_emi.length > 0)
                           ? ListView.separated(
@@ -274,16 +289,110 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                       ),
                                       GestureDetector(
                                         onTap: () {
-                                          print('print ' +
-                                              list_emi[index].idFactTmp);
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => PrintSC(
-                                                  id_tmp:
-                                                      list_emi[index].idFactTmp,
-                                                ),
-                                              ));
+                                          // ignore: await_only_futures
+
+                                          _printerManager.scanResults
+                                              .listen((devices) async {
+                                            print(devices);
+
+                                            if (Preferencias.mac == '') {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: ((context) {
+                                                    if (devices.length == 0) {
+                                                      return const AlertDialog(
+                                                        backgroundColor:
+                                                            Color.fromARGB(255,
+                                                                236, 133, 115),
+                                                        content: Text(
+                                                          'No se encontraron impresoras disponibles.',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                      );
+                                                    }
+
+                                                    return AlertDialog(
+                                                      title: const Text(
+                                                          'Impresoras Disponibles'),
+                                                      content: Container(
+                                                        height:
+                                                            300.0, // Change as per your requirement
+                                                        width:
+                                                            300.0, // Change as per your requirement
+                                                        child: ListView.builder(
+                                                          shrinkWrap: true,
+                                                          itemCount:
+                                                              devices.length,
+                                                          itemBuilder:
+                                                              (BuildContext
+                                                                      context,
+                                                                  int i) {
+                                                            return ListTile(
+                                                              title: Text(
+                                                                  "${devices[i].name}"),
+                                                              subtitle: Text(
+                                                                  "${devices[i].address}"),
+                                                              trailing: Row(
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .min,
+                                                                children: [
+                                                                  GestureDetector(
+                                                                    onTap: () {
+                                                                      _printerManager
+                                                                          .stopScan();
+                                                                      _startPrint(
+                                                                          devices[
+                                                                              i]);
+                                                                    },
+                                                                    child:
+                                                                        Container(
+                                                                      margin:
+                                                                          const EdgeInsets.all(
+                                                                              5),
+                                                                      padding:
+                                                                          const EdgeInsets.all(
+                                                                              10),
+                                                                      decoration: BoxDecoration(
+                                                                          //color: Theme.of(context).primaryColor,
+                                                                          color: widget.colorPrimary,
+                                                                          borderRadius: BorderRadius.circular(15)),
+                                                                      child:
+                                                                          const Icon(
+                                                                        Icons
+                                                                            .print,
+                                                                        color: Colors
+                                                                            .white,
+                                                                        size:
+                                                                            25,
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                              onTap: () {},
+                                                            );
+                                                          },
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }));
+                                            } else {
+                                              //impresion en predeterminada
+
+                                              devices.forEach((printer) async {
+                                                print(printer);
+                                                //get saved printer
+                                                if (printer.address ==
+                                                    Preferencias.mac) {
+                                                  //store the element.
+                                                  await _startPrint(printer);
+                                                }
+                                              });
+                                            }
+                                          });
                                         },
                                         child: Container(
                                           margin:
@@ -338,5 +447,330 @@ class _ViewFacturasState extends State<ViewFacturas> {
                           : const Center(child: Text('Sin data'))
                       : const Center(child: Text('Sin acciones'))),
         ));
+  }
+
+  Future<void> _startPrint(PrinterBluetooth printer) async {
+    _printerManager.selectPrinter(printer);
+    showDialog(
+      context: context,
+      builder: (_) => const AlertDialog(
+        backgroundColor: Color.fromARGB(255, 115, 160, 236),
+        content: Text(
+          'Imprimiendo...',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+    final result = await _printerManager.printTicket(
+        await testTicket(printer.name.toString(), printer.address.toString()));
+    Navigator.of(context, rootNavigator: true).pop(result);
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: (result.msg == 'Success')
+            ? const Color.fromARGB(255, 109, 224, 186)
+            : const Color.fromARGB(255, 201, 124, 124),
+        content: Text(
+          (result.msg == 'Success') ? 'Listo..' : result.msg,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  Future<List<int>> testTicket(String msg, String id_device) async {
+    // Using default profile
+    final profile = await CapabilityProfile.load();
+    final generatorr = Generator(PaperSize.mm58, profile);
+    List<int> bytess = [];
+
+    /*bytess += generatorr.text('Impresión Factura',
+        styles: const PosStyles(
+            codeTable: 'CP1252',
+            align: PosAlign.center,
+            bold: true,
+            width: PosTextSize.size2));*/
+
+    //DIreccion empresa
+    bytess += generatorr.text('4ta calle 5-63 zona 8',
+        styles: const PosStyles(
+                width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+            .copyWith(align: PosAlign.center));
+
+    //nombre empresa
+    bytess += generatorr.text('Corporación H&T',
+        styles: const PosStyles(
+                width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+            .copyWith(align: PosAlign.center));
+
+/*
+    //NIT EMPRESA
+    bytess += generatorr.text('NIT: 857421-96',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    //TELEFONO EMPRESA
+    bytess += generatorr.text('Tel: 5522-3355',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //NOMBRE COMERCIAL
+    bytess += generatorr.text('Hich Tecto',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //FEL
+    bytess += generatorr.text('Factura Electrónica Documento Tributario',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //FECHA EMITIDA
+    bytess += generatorr.text('25 de octuble 2022',
+        styles: const PosStyles(
+            align: PosAlign.right,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //AUTORIZACION
+    bytess += generatorr.text('Número de Autorización:',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    bytess += generatorr.text('BBaSDFDFDF-56556-aSDFAS',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    bytess += generatorr.text('Serie: BBDF65',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    bytess += generatorr.text('Número de DTE: 25633554785',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //No
+    bytess += generatorr.text('No: 128',
+        styles: const PosStyles(
+            align: PosAlign.right,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //SERIE
+    bytess += generatorr.text('Serie: DGTD',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    //VENDEDOR
+    bytess += generatorr.text('Vendedor : Jerson Hernandez',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    //CLIENTE
+    bytess += generatorr.text('Cliente: Magdalena España de la Rosa',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    //NIT CLIENTE
+    bytess += generatorr.text('NIT: 54545454',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    //DIRECCION CLIENTE
+    bytess += generatorr.text('Dirección: 8va ave 7-88 Villa Nueva',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //CONDICIONES DE PAGO
+    bytess += generatorr.text('Condiciónes de pago:',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    bytess += generatorr.text('Contado',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //TABLA PRODUCTOS
+    generatorr.row([
+      PosColumn(
+        text: 'Descripción',
+        width: 9,
+        styles: const PosStyles(align: PosAlign.right, underline: true),
+      ),
+      PosColumn(
+        text: 'Subtotal',
+        width: 3,
+        styles: const PosStyles(align: PosAlign.right, underline: true),
+      ),
+    ]);
+
+    //DESCUENTO DE PRODUCTOS
+    generatorr.row([
+      PosColumn(
+        text: 'Descuentos(-):',
+        width: 9,
+        styles: const PosStyles(align: PosAlign.right, underline: true),
+      ),
+      PosColumn(
+        text: 'Q0.00',
+        width: 3,
+        styles: const PosStyles(align: PosAlign.right, underline: true),
+      ),
+    ]);
+
+    //TOTAL PRODUCTOS
+    generatorr.row([
+      PosColumn(
+        text: 'Total:',
+        width: 9,
+        styles: const PosStyles(align: PosAlign.right, underline: true),
+      ),
+      PosColumn(
+        text: 'Q0.00',
+        width: 3,
+        styles: const PosStyles(align: PosAlign.right, underline: true),
+      ),
+    ]);
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //TOTAL LETRAS
+    bytess += generatorr.text('novecientos cuarenta con 00/100',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //Frases
+    bytess += generatorr.text('Sujeto a pagos trimestrales',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //DATOS DE CERTIFICADOR
+    bytess += generatorr.text('Certificador: Megaprint S.A',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    bytess += generatorr.text('NIT: 558471-63',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    bytess += generatorr.text('Fecha: 85-69-2022 10:00',
+        styles: const PosStyles(
+            align: PosAlign.left,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //datos del sistema
+    bytess += generatorr.text('Factura realizada en www.gozeri.com',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            codeTable: 'CP1252'));
+*/
+    /*bytes += generator.text(
+        'Regular: aA bB cC dD eE fF gG hH iI jJ kK lL mM nN oO pP qQ rR sS tT uU vV wW xX yY zZ');
+    bytes += generator.text('Special 1: àÀ èÈ éÉ ûÛ üÜ çÇ ôÔ');
+    bytes += generator.text('Special 2: blåbærgrød');
+
+    bytes += generator.text('Bold text', styles: PosStyles(bold: true));
+    bytes += generator.text('Reverse text', styles: PosStyles(reverse: true));
+    bytes += generator.text('Underlined text',
+        styles: PosStyles(underline: true), linesAfter: 1);
+    bytes +=
+        generator.text('Align left', styles: PosStyles(align: PosAlign.left));
+    bytes += generator.text('Align center', styles: PosStyles(align: PosAlign.center));
+    bytes += generator.text('Align right',styles: PosStyles(align: PosAlign.right), linesAfter: 1);
+
+    bytes += generator.text('Text size 200%',
+        styles: PosStyles(
+          height: PosTextSize.size2,
+          width: PosTextSize.size2,
+        ));*/
+
+    //bytes += generator.feed(2);
+    bytess += generatorr.cut();
+    return bytess;
   }
 }

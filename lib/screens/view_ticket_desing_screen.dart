@@ -180,26 +180,23 @@ class ViewTicket extends StatelessWidget {
                           height: 10,
                         ),
                         //facturada
-                        if (encabezado[0].dte != '')
-                          TitleText(
-                              'Factura Electrónica Documento Tributario Electrónico',
-                              18,
-                              TextAlign.center),
+                        (encabezado[0].dte != '')
+                            ? TitleText(
+                                'Factura Electrónica Documento Tributario Electrónico',
+                                18,
+                                TextAlign.center)
+                            : Container(),
 
                         //fecha
                         const SizedBox(
                           height: 15,
                         ),
-                        Container(
-                          width: MediaQuery.of(context).size.width * 1,
-                          child: Expanded(
-                            child: Text(
-                              encabezado[0].fecha_letras,
-                              textAlign: TextAlign.end,
-                              style: const TextStyle(
-                                fontSize: 11,
-                              ),
-                            ),
+
+                        Text(
+                          encabezado[0].fecha_letras,
+                          textAlign: TextAlign.end,
+                          style: const TextStyle(
+                            fontSize: 11,
                           ),
                         ),
 
@@ -209,21 +206,26 @@ class ViewTicket extends StatelessWidget {
                         //n autorizacion
                         (encabezado[0].dte != '')
                             ? Container(
+                                padding: const EdgeInsets.all(0),
                                 child: Column(
-                                children: [
-                                  TitleText('Número de Autorización:', 13,
-                                      TextAlign.center),
-                                  SimpleText(
-                                      encabezado[0].dte, 13, TextAlign.center),
-                                  claveValor('Serie: ', encabezado[0].serieDte,
-                                      MainAxisAlignment.center),
-                                  claveValor(
-                                      'Número de DTE: ',
-                                      encabezado[0].noDte,
-                                      MainAxisAlignment.center),
-                                ],
-                              ))
-                            : Container(),
+                                  children: [
+                                    TitleText('Número de Autorización:', 13,
+                                        TextAlign.center),
+                                    SimpleText(encabezado[0].dte, 13,
+                                        TextAlign.center),
+                                    claveValor(
+                                        'Serie: ',
+                                        encabezado[0].serieDte,
+                                        MainAxisAlignment.center),
+                                    claveValor(
+                                        'Número de DTE: ',
+                                        encabezado[0].noDte,
+                                        MainAxisAlignment.center),
+                                  ],
+                                ))
+                            : Container(
+                                padding: const EdgeInsets.all(0),
+                              ),
 
                         const SizedBox(
                           height: 20,

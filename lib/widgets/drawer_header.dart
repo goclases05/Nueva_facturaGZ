@@ -47,14 +47,12 @@ class _HeaderDrawerState extends State<HeaderDrawer> {
     List<DropdownMenuItem<String>> menuItems = [];
     for (var i = 0; i < authService.list_sucu.length; i++) {
       menuItems.add(DropdownMenuItem(
-          child: Expanded(
-            child: Text(
-              authService.list_sucu[i].nombre,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  //color: Colors.black38
-                  ),
-            ),
+          child: Text(
+            authService.list_sucu[i].nombre,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                //color: Colors.black38
+                ),
           ),
           value: authService.list_sucu[i].idSucursal));
       ;
@@ -152,7 +150,7 @@ class _HeaderDrawerState extends State<HeaderDrawer> {
                     dropdownColor: widget.colorPrimary,
                     onChanged: (String? newValue) async {
                       selectedValue = newValue!;
-                      Preferencias.sucursal=selectedValue;
+                      Preferencias.sucursal = selectedValue;
 
                       authService.Series();
 

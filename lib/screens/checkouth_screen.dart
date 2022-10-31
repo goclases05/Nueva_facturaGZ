@@ -1,3 +1,6 @@
+import 'package:factura_gozeri/controllers/mantenimiento_screen.dart';
+import 'package:factura_gozeri/controllers/membresia_screen.dart';
+import 'package:factura_gozeri/controllers/version_screen.dart';
 import 'package:factura_gozeri/screens/escritorio_screen.dart';
 import 'package:factura_gozeri/screens/home2_screen.dart';
 import 'package:flutter/material.dart';
@@ -22,12 +25,14 @@ class CheckOuthScreen extends StatelessWidget {
               gradient: LinearGradient(
                   begin: Alignment.topRight,
                   end: Alignment.bottomRight,
-                  colors: [Colors.white,  Colors.white])),
+                  colors: [Colors.white, Colors.white])),
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                SizedBox(height: 20,),
+                SizedBox(
+                  height: 20,
+                ),
                 Column(
                   children: [
                     Image.asset(
@@ -50,7 +55,10 @@ class CheckOuthScreen extends StatelessWidget {
                   color: Colors.white,
                   backgroundColor: Color.fromARGB(255, 178, 235, 242),
                 )*/
-                Image.asset("assets/out_preloader_image.gif",width: MediaQuery.of(context).size.width*0.4,)
+                Image.asset(
+                  "assets/out_preloader_image.gif",
+                  width: MediaQuery.of(context).size.width * 0.4,
+                )
               ]),
         ),
         Center(
@@ -73,10 +81,40 @@ class CheckOuthScreen extends StatelessWidget {
                                 transitionDuration: Duration(seconds: 0)))
                         .then((value) => Navigator.of(context).pop());
                   });
+                } else if (snapshot.data == 'membresia') {
+                  Future.microtask(() {
+                    //Future.delayed(Duration(seconds: 5));
+                    Navigator.pushReplacement(
+                            context,
+                            PageRouteBuilder(
+                                pageBuilder: (_, __, ___) => MembresiaScreen(),
+                                transitionDuration: Duration(seconds: 0)))
+                        .then((value) => Navigator.of(context).pop());
+                  });
+                } else if (snapshot.data == 'version') {
+                  Future.microtask(() {
+                    //Future.delayed(Duration(seconds: 5));
+                    Navigator.pushReplacement(
+                            context,
+                            PageRouteBuilder(
+                                pageBuilder: (_, __, ___) => VersionScreen(),
+                                transitionDuration: Duration(seconds: 0)))
+                        .then((value) => Navigator.of(context).pop());
+                  });
+                } else if (snapshot.data == 'mantenimiento') {
+                  Future.microtask(() {
+                    //Future.delayed(Duration(seconds: 5));
+                    Navigator.pushReplacement(
+                            context,
+                            PageRouteBuilder(
+                                pageBuilder: (_, __, ___) =>
+                                    MantenimientoScreen(),
+                                transitionDuration: Duration(seconds: 0)))
+                        .then((value) => Navigator.of(context).pop());
+                  });
                 } else {
                   Future.microtask(() {
                     //Future.delayed(Duration(seconds: 5));
-
                     Navigator.pushReplacement(
                             context,
                             PageRouteBuilder(
