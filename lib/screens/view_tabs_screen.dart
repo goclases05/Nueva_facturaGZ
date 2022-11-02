@@ -1,7 +1,12 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:factura_gozeri/print/print_print.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
+import 'package:factura_gozeri/screens/no_internet_screen.dart';
 import 'package:factura_gozeri/search/items_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:badges/badges.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
@@ -23,39 +28,72 @@ class ViewTabsScreen extends StatefulWidget {
 }
 
 class _ViewTabsScreen extends State<ViewTabsScreen> {
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
+  Future<void> initialActivity() async {
+    late ConnectivityResult result;
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      print(e.toString());
+      return;
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
+  }
+
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
+    initialActivity();
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
   }
 
   @override
   void dispose() {
+    // TODO: implement dispose
     super.dispose();
+    _connectivitySubscription.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    print('conexion :' + _connectionStatus.name);
+    if (_connectionStatus.name != 'wifi' &&
+        _connectionStatus.name != 'mobile') {
+      return const NoInternet();
+    }
 
     //final departamentoService = Provider.of<DepartamentoService>(context);
-
-
-
-    
 
     /*if (departamentoService.isLoading)
       return LoadingScreen(
         colorPrimary: widget.colorPrimary,
       );*/
 
-    return Consumer<DepartamentoService>(builder: (context, departamentoService, child){
+    return Consumer<DepartamentoService>(
+        builder: (context, departamentoService, child) {
       List<String> data = [];
       List<String> data_id = [];
       int initPosition = 0;
 
       List<Tab> _tabs = [];
       List<Widget> _views = [];
-
 
       for (int i = 0; i < departamentoService.depa.length; i++) {
         data.add(departamentoService.depa[i].departamento);
@@ -75,12 +113,12 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
 
       if (departamentoService.isLoading)
         return LoadingScreen(
-        colorPrimary: widget.colorPrimary,
-      );
+          colorPrimary: widget.colorPrimary,
+        );
 
-        return DefaultTabController(
-          length: _tabs.length,
-          child: Scaffold(
+      return DefaultTabController(
+        length: _tabs.length,
+        child: Scaffold(
             appBar: AppBar(
               backgroundColor: Colors.white,
               foregroundColor: widget.colorPrimary,
@@ -121,7 +159,8 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                       ),
                       child: IconButton(
                         onPressed: () async {
-                          final _facturacion =Provider.of<Facturacion>(context, listen: false);
+                          final _facturacion =
+                              Provider.of<Facturacion>(context, listen: false);
 
                           _facturacion.list_cart(widget.id_tmp);
 
@@ -168,8 +207,46 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
             body: TabBarView(
               children: _views,
             ),
-          ),
-        );
-      });
+            bottomSheet: Row(children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.05,
+              ),
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  child: TextButton.icon(
+                    onPressed: () async {
+                      final _facturacion =
+                          Provider.of<Facturacion>(context, listen: false);
+                      _facturacion.list_cart(widget.id_tmp);
+                      _facturacion.read_cliente('read', '0', widget.id_tmp);
+                      _facturacion.serie(widget.id_tmp, 'read', '');
+                      _facturacion.transacciones(widget.id_tmp);
+
+                      // ignore: use_build_context_synchronously
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => PrintScreen(
+                                    id_tmp: widget.id_tmp,
+                                    colorPrimary: widget.colorPrimary,
+                                    serie: _facturacion.initialSerie,
+                                  )));
+                    },
+                    icon: const Icon(Icons.receipt_long),
+                    label: const Text('Ver Detalles  ➔'),
+                    style: TextButton.styleFrom(
+                      primary: Colors.white,
+                      backgroundColor: Colors.green,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.05,
+              ),
+            ])),
+      );
+    });
   }
 }

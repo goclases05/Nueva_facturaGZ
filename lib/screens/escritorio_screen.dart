@@ -1,14 +1,19 @@
+import 'dart:async';
+
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/print/impresoras_print.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/seattings_provider.dart';
+import 'package:factura_gozeri/screens/no_internet_screen.dart';
 import 'package:factura_gozeri/screens/screens.dart';
 import 'package:factura_gozeri/services/auth_services.dart';
 import 'package:factura_gozeri/services/departamentos_services.dart';
 import 'package:factura_gozeri/widgets/drawer_header.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class EscritorioScreen extends StatefulWidget {
@@ -20,9 +25,55 @@ class EscritorioScreen extends StatefulWidget {
 
 class _EscritorioScreenState extends State<EscritorioScreen> {
   int currentPage = 1;
+  ConnectivityResult _connectionStatus = ConnectivityResult.wifi;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
+  Future<void> initialActivity() async {
+    late ConnectivityResult result;
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      print(e.toString());
+      return;
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initialActivity();
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _connectivitySubscription.cancel();
+  }
 
   @override
   Widget build(BuildContext context) {
+    print('conexion :' + _connectionStatus.name);
+    if (_connectionStatus.name != 'wifi' &&
+        _connectionStatus.name != 'mobile') {
+      return NoInternet();
+    }
     Size size = MediaQuery.of(context).size;
     final settings = Provider.of<settingsProvider>(context, listen: false);
     final authService = Provider.of<AuthService>(context, listen: false);
@@ -31,7 +82,7 @@ class _EscritorioScreenState extends State<EscritorioScreen> {
     Color colorSecundario = const Color.fromRGBO(242, 242, 247, 1);
 
     return WillPopScope(
-      onWillPop: ()=>_onback(context),
+      onWillPop: () => _onback(context),
       child: Scaffold(
           appBar: AppBar(
               foregroundColor: colorPrimary,
@@ -163,12 +214,11 @@ Widget menuItem(int id, String title, IconData icon, bool selected,
           final _cart = Provider.of<Cart>(context, listen: false);
           _cart.cantidad = 0;
 
-          final _depa=Provider.of<DepartamentoService>(context, listen: false);
+          final _depa =
+              Provider.of<DepartamentoService>(context, listen: false);
           _depa.isLoading = true;
           _depa.LoadDepa();
 
-          
-          
           if (_facturacion.tmp_creada == '') {
             print('tap tap 5');
             var snackBar = SnackBar(
@@ -229,30 +279,30 @@ Widget menuItem(int id, String title, IconData icon, bool selected,
   );
 }
 
-Future<bool> _onback(BuildContext context)async{
-  bool? exitApp=await showDialog(
-          context: context,
-          builder: ((context) {
-            return  AlertDialog(
-              title: const Text(
-                  '¿Quieres salir de la Aplicación?', style: TextStyle(fontSize:15,)),
-              actions: [
-                TextButton(
-                  onPressed: (){
-                    Navigator.of(context).pop(false);
-                  }, 
-                  child: const Text('No')
-                ),
-                TextButton(
-                  onPressed: (){
-                    Navigator.of(context).pop(true);
-                  }, 
-                  child: const Text('Si')
-                )
-              ],
-            );
-          }),
-        ); 
+Future<bool> _onback(BuildContext context) async {
+  bool? exitApp = await showDialog(
+    context: context,
+    builder: ((context) {
+      return AlertDialog(
+        title: const Text('¿Quieres salir de la Aplicación?',
+            style: TextStyle(
+              fontSize: 15,
+            )),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('No')),
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Si'))
+        ],
+      );
+    }),
+  );
 
-    return exitApp??false;
+  return exitApp ?? false;
 }

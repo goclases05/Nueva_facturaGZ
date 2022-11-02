@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/items_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/providers/seattings_provider.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:factura_gozeri/screens/no_internet_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -29,9 +33,9 @@ class AppState extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => DepartamentoService()),
         ChangeNotifierProvider(create: (_) => Cart()),
-        ChangeNotifierProvider(create: (_)=> ItemProvider()),
-        ChangeNotifierProvider(create: (_)=> settingsProvider()),
-        ChangeNotifierProvider(create: (_)=>PrintProvider()),
+        ChangeNotifierProvider(create: (_) => ItemProvider()),
+        ChangeNotifierProvider(create: (_) => settingsProvider()),
+        ChangeNotifierProvider(create: (_) => PrintProvider()),
         ChangeNotifierProvider(
           create: (context) => Facturacion(),
         )
@@ -41,15 +45,21 @@ class AppState extends StatelessWidget {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(
       statusBarColor: Colors.transparent,
       //statusBarColor: const Color(0xff0061a7),
     ));
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Gozeri Facturacion',

@@ -13,7 +13,7 @@ class Facturacion extends ChangeNotifier {
 
   //serie
   String initialSerie = '0';
-  bool cargainiSerie=true;
+  bool cargainiSerie = true;
 
   //lista de la carta
   bool contenido = false;
@@ -46,7 +46,7 @@ class Facturacion extends ChangeNotifier {
 
   Future serie(String tmp, String accion, String serie) async {
     if (accion == 'read') {
-      cargainiSerie=true;
+      cargainiSerie = true;
       initialSerie = '0';
       notifyListeners();
       print(
@@ -57,12 +57,12 @@ class Facturacion extends ChangeNotifier {
       final resp = await http.get(uri);
       if (resp.body == '0') {
         initialSerie = (Preferencias.serie == '') ? '0' : Preferencias.serie;
-        cargainiSerie=false;
+        cargainiSerie = false;
         notifyListeners();
         return this.serie(tmp, 'add', initialSerie);
       } else {
         initialSerie = resp.body;
-        cargainiSerie=false;
+        cargainiSerie = false;
         return notifyListeners();
       }
     } else if (accion == 'add') {
@@ -268,6 +268,31 @@ class Facturacion extends ChangeNotifier {
       print(result);
       return result;
     }
+  }
+
+  Future<dynamic> delete_producto(String id_tmp, String id_item) async {
+    print(
+        "https://app.gozeri.com/flutter_gozeri/factura/edit_articulo_detalle_car.php?id_tmp=${id_tmp}&id_item=${id_item}");
+    final Uri uri = Uri.parse(
+        "https://app.gozeri.com/flutter_gozeri/factura/edit_articulo_detalle_car.php?id_tmp=${id_tmp}&id_item=${id_item}");
+
+    final resp = await http.get(uri);
+    if (resp.body == 'OK') {
+      await list_cart(id_tmp);
+      return;
+    }
+    return resp.body;
+  }
+
+  //elimina transacion
+  Future<dynamic> delete_transaccion(String id_tmp, String trans) async {
+    print(
+        "https://app.gozeri.com/flutter_gozeri/factura/fac_metodoPago.php?id_tmp=${id_tmp}&id_trans=${trans}&accion=delete");
+    final Uri uri = Uri.parse(
+        "https://app.gozeri.com/flutter_gozeri/factura/fac_metodoPago.php?id_tmp=${id_tmp}&id_trans=${trans}&accion=delete");
+
+    final resp = await http.get(uri);
+    return resp.body;
   }
 
   Future<dynamic> read_cliente(

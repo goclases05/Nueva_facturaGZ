@@ -11,7 +11,8 @@ import 'package:provider/provider.dart';
 
 class ItemsCart extends StatefulWidget {
   // ignore: non_constant_identifier_names
-  ItemsCart({Key? key, required this.id_tmp, required this.colorPrimary}) : super(key: key);
+  ItemsCart({Key? key, required this.id_tmp, required this.colorPrimary})
+      : super(key: key);
   String id_tmp;
   Color colorPrimary;
 
@@ -21,10 +22,10 @@ class ItemsCart extends StatefulWidget {
 
 class _ItemsCart extends State<ItemsCart> {
   void customBottomSheet(BuildContext context, List<dynamic> listProd) {
-    String j=jsonEncode(listProd[0]);
+    String j = jsonEncode(listProd[0]);
 
-    Producto p=Producto.fromJson(j);
-      print('esta es : ');
+    Producto p = Producto.fromJson(j);
+    print('esta es : ');
     print(p.codigo);
 
     showModalBottomSheet(
@@ -78,7 +79,7 @@ class _ItemsCart extends State<ItemsCart> {
                                     child: Column(
                                       children: [
                                         ArticuloSheet(
-                                            listProd:p,
+                                            listProd: p,
                                             colorPrimary: widget.colorPrimary,
                                             id_tmp: widget.id_tmp),
                                       ],
@@ -107,24 +108,25 @@ class _ItemsCart extends State<ItemsCart> {
   void dispose() {
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     final ListDet = Provider.of<Facturacion>(context);
     /*Future.delayed(Duration.zero, () {
         List_det.list_cart(widget.id_tmp);
     });*/
-    
-    if(ListDet.list_load) 
+
+    if (ListDet.list_load)
       // ignore: curly_braces_in_flow_control_structures
       return Container(
-        padding: const EdgeInsets.all(0),
-        child: Center(
+          padding: const EdgeInsets.all(0),
+          child: Center(
             child: LinearProgressIndicator(
               color: widget.colorPrimary,
               backgroundColor: Colors.white,
             ),
-      ));
-    if(ListDet.contenido==false){
+          ));
+    if (ListDet.contenido == false) {
       // ignore: curly_braces_in_flow_control_structures
       return Container(
         alignment: Alignment.center,
@@ -147,58 +149,60 @@ class _ItemsCart extends State<ItemsCart> {
               );
             },
             style: TextButton.styleFrom(
-                primary: Colors.white,
-                backgroundColor: Colors.green),
+                primary: Colors.white, backgroundColor: Colors.green),
             icon: const Text("Agregar Articulos")),
       );
     }
 
-      return ListView.builder(
+    return ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
         scrollDirection: Axis.vertical,
         shrinkWrap: true,
         itemCount: ListDet.list_det.length,
         itemBuilder: ((context, index) {
+          print(ListDet.list_det[0]);
+          String producto = ListDet.list_det[index].productos[0].producto;
+          String precio2 = ListDet.list_det[index].dataFact.precio;
+          String cantidadS = ListDet.list_det[index].dataFact.cantidad;
+          String item_id = ListDet.list_det[index].dataFact.idTmpItem;
 
-            print(ListDet.list_det[0]);
-            String producto=ListDet.list_det[index].productos[0].producto;
-            String precio2=ListDet.list_det[index].dataFact.precio;
-            String cantidadS=ListDet.list_det[index].dataFact.cantidad;
+          String foto = ListDet.list_det[index].productos[0].url +
+              ListDet.list_det[index].productos[0].foto;
 
-            String foto=ListDet.list_det[index].productos[0].url+ListDet.list_det[index].productos[0].foto;
-
-            return Container(
-              decoration: BoxDecoration(
+          return Container(
+            decoration: BoxDecoration(
                 border: Border.all(
-                  color: const Color.fromARGB(255, 207, 216, 220),
-                  style: BorderStyle.solid
-                )
-              ),
-              child: ListTile(
-                leading: FadeInImage(
-                  placeholder: const AssetImage(
-                      'assets/productos_gz.jpg'),
+                    color: const Color.fromARGB(255, 207, 216, 220),
+                    style: BorderStyle.solid)),
+            child: ListTile(
+              leading: FadeInImage(
+                  placeholder: const AssetImage('assets/productos_gz.jpg'),
                   image: NetworkImage(foto),
-                  width: MediaQuery.of(context).size.width *0.15),
-                title: Text(producto,style: TextStyle(fontSize:15,fontWeight: FontWeight.bold)),
-                subtitle: Text('${cantidadS} * ${Preferencias.moneda}${precio2}'),
-                trailing: IconButton(
-                  icon: Icon(Icons.delete_outline, color: Colors.red[300],size: 30,),
-                  onPressed: (){},
+                  width: MediaQuery.of(context).size.width * 0.15),
+              title: Text(producto,
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+              subtitle: Text('${cantidadS} * ${Preferencias.moneda}${precio2}'),
+              trailing: IconButton(
+                icon: Icon(
+                  Icons.delete_outline,
+                  color: Colors.red[300],
+                  size: 30,
                 ),
-                onTap: (){
-                  //customBottomSheet(context,lispr ListDet.list_det[index].productos[0]);
-                  
-                  
-                  customBottomSheet(context, ListDet.list_det[index].productos);
+                onPressed: () async {
+                  print('adios articulo');
+                  await ListDet.delete_producto(widget.id_tmp, item_id);
+                  ListDet.transacciones(widget.id_tmp);
+                  print('listo');
                 },
               ),
-            );
+              onTap: () {
+                //customBottomSheet(context,lispr ListDet.list_det[index].productos[0]);
 
-
-          }
-        )
-      );
+                //customBottomSheet(context, ListDet.list_det[index].productos);
+              },
+            ),
+          );
+        }));
     /*return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,

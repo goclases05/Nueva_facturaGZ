@@ -1,21 +1,77 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:factura_gozeri/controllers/mantenimiento_screen.dart';
 import 'package:factura_gozeri/controllers/membresia_screen.dart';
 import 'package:factura_gozeri/controllers/version_screen.dart';
 import 'package:factura_gozeri/screens/escritorio_screen.dart';
 import 'package:factura_gozeri/screens/home2_screen.dart';
+import 'package:factura_gozeri/screens/no_internet_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'package:factura_gozeri/services/services.dart';
 import 'package:factura_gozeri/screens/screens.dart';
 
-class CheckOuthScreen extends StatelessWidget {
+class CheckOuthScreen extends StatefulWidget {
   const CheckOuthScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final authService = Provider.of<AuthService>(context, listen: false);
+  State<CheckOuthScreen> createState() => _CheckOuthScreenState();
+}
 
+class _CheckOuthScreenState extends State<CheckOuthScreen> {
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
+  Future<void> initialActivity() async {
+    late ConnectivityResult result;
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      print(e.toString());
+      return;
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initialActivity();
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _connectivitySubscription.cancel();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print('conexion :' + _connectionStatus.name);
+    if (_connectionStatus.name != 'wifi' &&
+        _connectionStatus.name != 'mobile') {
+      return NoInternet();
+    }
+    final authService = Provider.of<AuthService>(context, listen: false);
     return Scaffold(
       body: Stack(children: [
         Container(

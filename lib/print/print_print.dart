@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:factura_gozeri/global/globals.dart';
@@ -7,12 +9,14 @@ import 'package:factura_gozeri/print/print_page.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/screens/escritorio_screen.dart';
+import 'package:factura_gozeri/screens/no_internet_screen.dart';
 import 'package:factura_gozeri/screens/view_tabs_facturacion_screen.dart';
 import 'package:factura_gozeri/services/auth_services.dart';
 import 'package:factura_gozeri/widgets/item_dataCliente.dart';
 import 'package:factura_gozeri/widgets/items_cart.dart';
 import 'package:factura_gozeri/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,35 +55,68 @@ class PrintScreen extends StatefulWidget {
 
 class _PrintScreenState extends State<PrintScreen> {
   PrinterBluetoothManager _printerManager = PrinterBluetoothManager();
-
   int open = 0;
+
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
+  Future<void> initialActivity() async {
+    late ConnectivityResult result;
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      print(e.toString());
+      return;
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
+    initialActivity();
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    _printerManager.startScan(Duration(seconds: 2));
     super.initState();
   }
 
-  @override 
+  @override
   void dispose() {
     // TODO: implement dispose
-    
+    _connectivitySubscription.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    _printerManager.startScan(Duration(seconds: 2));
-
     int _total = 0;
     List<DropdownMenuItem<String>> menuItems = [];
 
+    print('conexion :' + _connectionStatus.name);
+    if (_connectionStatus.name != 'wifi' &&
+        _connectionStatus.name != 'mobile') {
+      return const NoInternet();
+    }
+
     final authService = Provider.of<AuthService>(context, listen: false);
-    
+
     final facturaService = Provider.of<Facturacion>(context, listen: false);
 
-
     return WillPopScope(
-      onWillPop: () async{
+      onWillPop: () async {
         _printerManager.stopScan();
         return true;
       },
@@ -109,76 +146,78 @@ class _PrintScreenState extends State<PrintScreen> {
                     child: Card(
                         child: Container(
                       padding: const EdgeInsets.only(left: 10),
-                      child:Consumer<Facturacion>(builder: ((context, serieProv, child) {
-    
-                          List<DropdownMenuItem<String>> menuItems = [];
-    
-                          menuItems.add(const DropdownMenuItem(
-                              value: '0',
+                      child: Consumer<Facturacion>(
+                          builder: ((context, serieProv, child) {
+                        List<DropdownMenuItem<String>> menuItems = [];
+
+                        menuItems.add(const DropdownMenuItem(
+                            value: '0',
+                            child: Text(
+                              'Selecciona una serie',
+                              textAlign: TextAlign.center,
+                            )));
+                        print('valor de drop ' + serieProv.initialSerie);
+
+                        for (var i = 0;
+                            i < authService.list_serie.length;
+                            i++) {
+                          print('item ' + authService.list_serie[i].idSerie);
+
+                          menuItems.add(DropdownMenuItem(
+                              value: authService.list_serie[i].idSerie,
                               child: Text(
-                                'Selecciona una serie',
+                                authService.list_serie[i].nombre,
                                 textAlign: TextAlign.center,
                               )));
-                          print('valor de drop ' + serieProv.initialSerie);
-    
-                          for (var i = 0; i < authService.list_serie.length; i++) {
-                            print('item ' + authService.list_serie[i].idSerie);
-    
-                            menuItems.add(DropdownMenuItem(
-                                value: authService.list_serie[i].idSerie,
-                                child: Text(
-                                  authService.list_serie[i].nombre,
-                                  textAlign: TextAlign.center,
-                                )));
-                          }
-    
-                          if(serieProv.cargainiSerie==true){
-                            return  Center(
-                            child: LinearProgressIndicator(
-                              color: widget.colorPrimary,
-                              backgroundColor: Colors.white,
-                            ));
-                          }
-                            
-    
-                            return DropdownButton(
-                              itemHeight: null,
-                              value: facturaService
-                                  .initialSerie, //facturaService.initialSerie,
-                              isExpanded: true,
-                              dropdownColor: Color.fromARGB(255, 241, 238, 241),
-                              onChanged: (String? newValue) async {
-                                var cambio = await facturaService.serie(
-                                    widget.id_tmp, 'add', newValue!);
-                                if (cambio != '1') {
-                                  //Preferencias.serie = newValue!;
-                                  SnackBar snackBar = SnackBar(
-                                    padding: EdgeInsets.all(20),
-                                    content: Text(
-                                      '${cambio}',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    backgroundColor: Color.fromARGB(255, 224, 96, 113),
-                                  );
-                                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                } else {
-                                  facturaService.initialSerie = newValue;
-                                  setState(() {});
-                                }
-                              },
-                              items: menuItems,
-                              elevation: 0,
-                              style: const TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold),
-                              //icon: Icon(Icons.arrow_drop_down),
-                              iconDisabledColor: Colors.red,
-                              iconEnabledColor: widget.colorPrimary,
-                              underline: SizedBox(),
-                            );
-    
-                      })), 
+                        }
+
+                        if (serieProv.cargainiSerie == true) {
+                          return Center(
+                              child: LinearProgressIndicator(
+                            color: widget.colorPrimary,
+                            backgroundColor: Colors.white,
+                          ));
+                        }
+
+                        return DropdownButton(
+                          itemHeight: null,
+                          value: facturaService
+                              .initialSerie, //facturaService.initialSerie,
+                          isExpanded: true,
+                          dropdownColor: Color.fromARGB(255, 241, 238, 241),
+                          onChanged: (String? newValue) async {
+                            var cambio = await facturaService.serie(
+                                widget.id_tmp, 'add', newValue!);
+                            if (cambio != '1') {
+                              //Preferencias.serie = newValue!;
+                              SnackBar snackBar = SnackBar(
+                                padding: EdgeInsets.all(20),
+                                content: Text(
+                                  '${cambio}',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor:
+                                    Color.fromARGB(255, 224, 96, 113),
+                              );
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
+                            } else {
+                              facturaService.initialSerie = newValue;
+                              setState(() {});
+                            }
+                          },
+                          items: menuItems,
+                          elevation: 0,
+                          style: const TextStyle(
+                              color: Colors.black54,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold),
+                          //icon: Icon(Icons.arrow_drop_down),
+                          iconDisabledColor: Colors.red,
+                          iconEnabledColor: widget.colorPrimary,
+                          underline: SizedBox(),
+                        );
+                      })),
                     )),
                   )
                 ],
@@ -206,7 +245,8 @@ class _PrintScreenState extends State<PrintScreen> {
                                   border: Border.all(
                                       width: 2,
                                       style: BorderStyle.solid,
-                                      color: Color.fromARGB(255, 199, 193, 197)),
+                                      color:
+                                          Color.fromARGB(255, 199, 193, 197)),
                                   borderRadius: BorderRadius.circular(8)),
                               child: Column(children: [
                                 (fact.loadTransaccion)
@@ -229,6 +269,27 @@ class _PrintScreenState extends State<PrintScreen> {
                                         itemCount: fact.list_transaccion.length,
                                         itemBuilder: (context, index) {
                                           return ListTile(
+                                            leading: IconButton(
+                                                onPressed: () async {
+                                                  final dele = await facturaService
+                                                      .delete_transaccion(
+                                                          widget.id_tmp,
+                                                          fact
+                                                              .list_transaccion[
+                                                                  index]
+                                                              .idTrans);
+                                                  if (dele.toString() == 'OK') {
+                                                    facturaService
+                                                        .transacciones(
+                                                            widget.id_tmp);
+                                                  } else {
+                                                    print('error');
+                                                  }
+                                                },
+                                                icon: Icon(
+                                                  Icons.close,
+                                                  color: widget.colorPrimary,
+                                                )),
                                             title: Text(fact
                                                 .list_transaccion[index].forma),
                                             trailing: Text(Preferencias.moneda +
@@ -332,7 +393,8 @@ class _PrintScreenState extends State<PrintScreen> {
                                         },
                                         style: TextButton.styleFrom(
                                             primary: Colors.white,
-                                            backgroundColor: widget.colorPrimary),
+                                            backgroundColor:
+                                                widget.colorPrimary),
                                         icon: const Text("Continuar")),
                               )
                             ],
@@ -360,22 +422,21 @@ class _PrintScreenState extends State<PrintScreen> {
                       //final dynamic din = await Preferencias.impresora as dynamic;
                       //PrinterBluetooth device = await Preferencias.impresora as dynamic;
                       print('entro');
-    
+                      _printerManager.stopScan();
                       _printerManager.scanResults.listen((devices) async {
                         print(devices);
                         devices.forEach((printer) async {
-                          print(printer);
+                          //print(printer);
                           //get saved printer
                           if (printer.address == Preferencias.mac) {
                             //store the element.
-    
                             await _startPrint(printer);
                           }
                         });
                       });
                       print('salio');
                       //print('el deivis : ' + device['name']);
-    
+
                       /*var facturar = await facturaService.facturar(widget.id_tmp);
                       var js = json.decode(facturar);
                       if (js['MENSAJE'] == 'OK') {
