@@ -63,9 +63,6 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<String> readUsuario() async {
-    await Sucursales();
-    await Series();
-
     //membresia
     final empresa = Preferencias.data_empresa;
     //PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -85,6 +82,8 @@ class AuthService extends ChangeNotifier {
       return '';
     } else {
       if (resp.body == 'OK') {
+        await Sucursales();
+        await Series();
         return await storage.read(key: 'USUARIO') ?? '';
       } else {
         return resp.body;

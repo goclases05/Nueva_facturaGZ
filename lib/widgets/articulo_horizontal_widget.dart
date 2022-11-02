@@ -196,19 +196,13 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                       children: [
                         ClipRRect(
                             borderRadius: BorderRadius.circular(15),
-                            child: Hero(
-                              tag: 'List_${widget.listProd.idProd}',
-                              child: /*Image.network(
-                                  widget.listProd.url + widget.listProd.foto,
-                                  width: MediaQuery.of(context).size.width * 0.3))*/
-                                  FadeInImage(
-                                      placeholder: const AssetImage(
-                                          'assets/productos_gz.jpg'),
-                                      image: NetworkImage(widget.listProd.url +
-                                          widget.listProd.foto),
-                                      width: MediaQuery.of(context).size.width *
-                                          0.25),
-                            )),
+                            child: FadeInImage(
+                                placeholder: const AssetImage(
+                                    'assets/productos_gz.jpg'),
+                                image: NetworkImage(widget.listProd.url +
+                                    widget.listProd.foto),
+                                width: MediaQuery.of(context).size.width *
+                                    0.25)),
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(8),

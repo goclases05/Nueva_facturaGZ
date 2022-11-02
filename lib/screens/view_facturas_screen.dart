@@ -81,11 +81,11 @@ class _ViewFacturasState extends State<ViewFacturas> {
 
   @override
   void initState() {
-    if (widget.accion == 'Emitidas') {
+    /*if (widget.accion == 'Emitidas') {
       _printerManager.startScan(const Duration(seconds: 2));
     } else {
       _printerManager.stopScan();
-    }
+    }*/
 
     super.initState();
   }
@@ -290,7 +290,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                       GestureDetector(
                                         onTap: () {
                                           // ignore: await_only_futures
-
+                                          
                                           _printerManager.scanResults
                                               .listen((devices) async {
                                             print(devices);

@@ -30,98 +30,101 @@ class _EscritorioScreenState extends State<EscritorioScreen> {
     Color colorPrimary = settings.colorPrimary;
     Color colorSecundario = const Color.fromRGBO(242, 242, 247, 1);
 
-    return Scaffold(
-        appBar: AppBar(
-            foregroundColor: colorPrimary,
-            title: Image.asset(
-              'assets/gozeri_blanco2.png',
-              color: colorPrimary,
-              width: size.width * 0.25,
-            ),
-            backgroundColor: Colors.white,
-            elevation: 0,
-            actions: [
-              CircleAvatar(
-                backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
-                child: IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ImpresorasPrint(id_tmp: ''),
-                        ));
-                  },
-                  icon: Icon(Icons.print),
-                  color: colorPrimary,
-                ),
+    return WillPopScope(
+      onWillPop: ()=>_onback(context),
+      child: Scaffold(
+          appBar: AppBar(
+              foregroundColor: colorPrimary,
+              title: Image.asset(
+                'assets/gozeri_blanco2.png',
+                color: colorPrimary,
+                width: size.width * 0.25,
               ),
-              const SizedBox(
-                width: 10,
-              ),
-              CircleAvatar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              actions: [
+                CircleAvatar(
                   backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
-                  child: PopupMenuButton(
-                      icon: Icon(
-                        Icons.more_vert,
-                        color: colorPrimary,
-                      ),
-                      // Callback that sets the selected popup menu item.
-                      onSelected: (value) {
-                        if (value == 'exit') {
-                          authService.logout();
-                          Navigator.pushReplacementNamed(context, 'checking');
-                        } else if (value == 'settings') {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SettingsScreen(),
-                            ),
-                          );
-                        }
-                      },
-                      itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                            const PopupMenuItem(
-                              value: "settings",
-                              child: ListTile(
-                                title: Text("Ajustes"),
-                                trailing: Icon(
-                                  Icons.settings,
-                                ),
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: "exit",
-                              child: ListTile(
-                                title: Text("Cerrar Sesión"),
-                                trailing: Icon(
-                                  Icons.logout,
-                                ),
-                              ),
-                            )
-                          ])),
-              const SizedBox(
-                width: 20,
-              ),
-            ]),
-        drawer: Drawer(
-          backgroundColor: const Color.fromRGBO(241, 242, 247, 1),
-          child: SingleChildScrollView(
-            child: Container(
-              child: Column(
-                children: [
-                  HeaderDrawer(
-                    colorPrimary: colorPrimary,
-                    cont: context,
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ImpresorasPrint(id_tmp: ''),
+                          ));
+                    },
+                    icon: Icon(Icons.print),
+                    color: colorPrimary,
                   ),
-                  MyDrawerList(context, colorPrimary)
-                ],
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                CircleAvatar(
+                    backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
+                    child: PopupMenuButton(
+                        icon: Icon(
+                          Icons.more_vert,
+                          color: colorPrimary,
+                        ),
+                        // Callback that sets the selected popup menu item.
+                        onSelected: (value) {
+                          if (value == 'exit') {
+                            authService.logout();
+                            Navigator.pushReplacementNamed(context, 'checking');
+                          } else if (value == 'settings') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SettingsScreen(),
+                              ),
+                            );
+                          }
+                        },
+                        itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                              const PopupMenuItem(
+                                value: "settings",
+                                child: ListTile(
+                                  title: Text("Ajustes"),
+                                  trailing: Icon(
+                                    Icons.settings,
+                                  ),
+                                ),
+                              ),
+                              const PopupMenuItem(
+                                value: "exit",
+                                child: ListTile(
+                                  title: Text("Cerrar Sesión"),
+                                  trailing: Icon(
+                                    Icons.logout,
+                                  ),
+                                ),
+                              )
+                            ])),
+                const SizedBox(
+                  width: 20,
+                ),
+              ]),
+          drawer: Drawer(
+            backgroundColor: const Color.fromRGBO(241, 242, 247, 1),
+            child: SingleChildScrollView(
+              child: Container(
+                child: Column(
+                  children: [
+                    HeaderDrawer(
+                      colorPrimary: colorPrimary,
+                      cont: context,
+                    ),
+                    MyDrawerList(context, colorPrimary)
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        body: (currentPage == 1)
-            ? TabsFacturacion(colorPrimary: colorPrimary)
-            : Text(currentPage.toString()));
+          body: (currentPage == 1)
+              ? TabsFacturacion(colorPrimary: colorPrimary)
+              : Text(currentPage.toString())),
+    );
   }
 }
 
@@ -224,4 +227,32 @@ Widget menuItem(int id, String title, IconData icon, bool selected,
       ),
     ),
   );
+}
+
+Future<bool> _onback(BuildContext context)async{
+  bool? exitApp=await showDialog(
+          context: context,
+          builder: ((context) {
+            return  AlertDialog(
+              title: const Text(
+                  '¿Quieres salir de la Aplicación?', style: TextStyle(fontSize:15,)),
+              actions: [
+                TextButton(
+                  onPressed: (){
+                    Navigator.of(context).pop(false);
+                  }, 
+                  child: const Text('No')
+                ),
+                TextButton(
+                  onPressed: (){
+                    Navigator.of(context).pop(true);
+                  }, 
+                  child: const Text('Si')
+                )
+              ],
+            );
+          }),
+        ); 
+
+    return exitApp??false;
 }

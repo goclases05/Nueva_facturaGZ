@@ -27,7 +27,7 @@ class _ArticuloSheetState extends State<ArticuloSheet> {
         Chip(
           label: Text(widget.listProd.codigo),
           avatar: Icon(
-            Icons.key,
+            Icons.memory,
             color: widget.colorPrimary,
           ),
         ),
