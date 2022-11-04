@@ -1,4 +1,4 @@
-package com.example.factura_gozeri
+package com.gozeri.factura_gozeri
 
 import io.flutter.embedding.android.FlutterActivity
 
