@@ -32,6 +32,7 @@ class Facturacion extends ChangeNotifier {
   List<Transacciones> list_transaccion = [];
   String total_fac = '0';
   String saldo = '0';
+  String abonosi2='0';
 
   //variables para cliente
   String cliente = '';
@@ -126,6 +127,7 @@ class Facturacion extends ChangeNotifier {
     notifyListeners();
     var result;
     double abonosi = 0;
+    this.abonosi2='0';
     for (int o = 0; o < len; o++) {
       result = Transacciones.fromJson(js['TRANSACCIONES'][o]);
       /*list_det.addAll(result);*/
@@ -136,6 +138,7 @@ class Facturacion extends ChangeNotifier {
     double y = double.parse(js['TOTAL']);
     total_fac = y.toString();
     saldo = (double.parse(js['TOTAL']) - abonosi).toString();
+    abonosi2=abonosi2.toString();
     loadTransaccion = false;
     return notifyListeners();
   }

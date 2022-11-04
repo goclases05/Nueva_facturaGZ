@@ -4,11 +4,13 @@ import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/models/data_facturas_models.dart';
+import 'package:factura_gozeri/models/view_factura_print.dart';
 import 'package:factura_gozeri/print/print_page.dart';
 import 'package:factura_gozeri/print/print_print.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/screens/screens.dart';
+import 'package:factura_gozeri/services/departamentos_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh_plus/pull_to_refresh_plus.dart';
@@ -81,13 +83,20 @@ class _ViewFacturasState extends State<ViewFacturas> {
 
   @override
   void initState() {
-    /*if (widget.accion == 'Emitidas') {
+    if (widget.accion == 'Emitidas') {
       _printerManager.startScan(const Duration(seconds: 2));
     } else {
       _printerManager.stopScan();
-    }*/
+    }
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _printerManager.stopScan();
+    super.dispose();
   }
 
   @override
@@ -140,6 +149,11 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                 children: [
                                   GestureDetector(
                                     onTap: () async {
+                                      _printerManager.stopScan();
+                                      final _depa =Provider.of<DepartamentoService>(context, listen: false);
+                                      _depa.isLoading = true;
+                                      _depa.LoadDepa();
+
                                       final _facturacion =
                                           Provider.of<Facturacion>(context,
                                               listen: false);
@@ -236,6 +250,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                     children: [
                                       GestureDetector(
                                         onTap: () {
+                                          _printerManager.stopScan();
                                           final printProvider =
                                               Provider.of<PrintProvider>(
                                                   context,
@@ -341,11 +356,13 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                                 children: [
                                                                   GestureDetector(
                                                                     onTap: () {
+                                                                      
                                                                       _printerManager
                                                                           .stopScan();
                                                                       _startPrint(
                                                                           devices[
-                                                                              i]);
+                                                                              i], list_emi[index]
+                                                            .idFactTmp);
                                                                     },
                                                                     child:
                                                                         Container(
@@ -388,7 +405,8 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                 if (printer.address ==
                                                     Preferencias.mac) {
                                                   //store the element.
-                                                  await _startPrint(printer);
+                                                  await _startPrint(printer, list_emi[index]
+                                                            .idFactTmp);
                                                 }
                                               });
                                             }
@@ -449,7 +467,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
         ));
   }
 
-  Future<void> _startPrint(PrinterBluetooth printer) async {
+  Future<void> _startPrint(PrinterBluetooth printer, String id_factura) async {
     _printerManager.selectPrinter(printer);
     showDialog(
       context: context,
@@ -462,7 +480,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
       ),
     );
     final result = await _printerManager.printTicket(
-        await testTicket(printer.name.toString(), printer.address.toString()));
+        await testTicket(id_factura));
     Navigator.of(context, rootNavigator: true).pop(result);
     showDialog(
       context: context,
@@ -478,75 +496,131 @@ class _ViewFacturasState extends State<ViewFacturas> {
     );
   }
 
-  Future<List<int>> testTicket(String msg, String id_device) async {
+  Future<List<int>> testTicket(String id_factura) async {
+
+    final print_data = Provider.of<PrintProvider>(context, listen: false);
+    await print_data.dataFac(id_factura);
+    List<Encabezado> encabezado = print_data.list;
+    List<Detalle> detalle = print_data.list_detalle;
+
+    int sede = 0;
+    //0= empresa
+    //1= sucursal
+    if ((encabezado[0].fel == '0' && encabezado[0].felSucu == '1') ||
+        (encabezado[0].fel == '1' && encabezado[0].felSucu == '1')) {
+      sede = 1;
+    } else if (encabezado[0].fel == '1' &&
+        encabezado[0].felSucu == '0') {
+      sede = 0;
+    }
+
+
     // Using default profile
     final profile = await CapabilityProfile.load();
     final generatorr = Generator(PaperSize.mm58, profile);
+    
     List<int> bytess = [];
+    bytess+=generatorr.setGlobalCodeTable('CP1252');
 
-    /*bytess += generatorr.text('Impresión Factura',
+    //nombre de la empresa
+    (sede == 1)?
+    bytess += generatorr.text(encabezado[0].nombreEmpresaSucu,
         styles: const PosStyles(
             codeTable: 'CP1252',
             align: PosAlign.center,
             bold: true,
-            width: PosTextSize.size2));*/
+            width: PosTextSize.size2))
+    :
+    bytess += generatorr.text(encabezado[0].nombreEmpresa,
+        styles: const PosStyles(
+            codeTable: 'CP1252',
+            align: PosAlign.center,
+            bold: true,
+            width: PosTextSize.size2));
 
     //DIreccion empresa
-    bytess += generatorr.text('4ta calle 5-63 zona 8',
+    (sede == 1)?
+    bytess += generatorr.text(encabezado[0].direccionSucu,
+        styles: const PosStyles(
+                width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+            .copyWith(align: PosAlign.center))
+    :
+    bytess += generatorr.text(encabezado[0].direccion,
         styles: const PosStyles(
                 width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
             .copyWith(align: PosAlign.center));
 
-    //nombre empresa
-    bytess += generatorr.text('Corporación H&T',
-        styles: const PosStyles(
-                width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
-            .copyWith(align: PosAlign.center));
-
-/*
     //NIT EMPRESA
-    bytess += generatorr.text('NIT: 857421-96',
+    if(encabezado[0].nit_emisor != ''){
+        bytess += generatorr.text('NIT: ${encabezado[0].nit_emisor}',
         styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            bold: true,
-            codeTable: 'CP1252'));
+                width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+            .copyWith(align: PosAlign.center));
+    }
 
     //TELEFONO EMPRESA
-    bytess += generatorr.text('Tel: 5522-3355',
+    if(sede == 1){
+      
+      if(encabezado[0].teleSucu != ''){
+        bytess += generatorr.text('Teléfono: ${encabezado[0].teleSucu}',
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,
             bold: true,
             codeTable: 'CP1252'));
+      }
+    }else if(encabezado[0].telefono != ''){
+
+      bytess += generatorr.text('Teléfono: ${encabezado[0].telefono}',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+
+    }
 
     //espacio
     bytess += generatorr.feed(1);
 
     //NOMBRE COMERCIAL
-    bytess += generatorr.text('Hich Tecto',
+    if(sede == 1){
+      if(encabezado[0].nombre_comercial_sucu != ''){
+        bytess += generatorr.text(encabezado[0].nombre_comercial_sucu,
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,
             bold: true,
             codeTable: 'CP1252'));
+      }
+    }else if(encabezado[0].nombre_comercial_emp != ''){
+      bytess += generatorr.text(encabezado[0].nombre_comercial_emp,
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size1,
+            bold: true,
+            codeTable: 'CP1252'));
+    }
 
     //espacio
     bytess += generatorr.feed(1);
 
     //FEL
-    bytess += generatorr.text('Factura Electrónica Documento Tributario',
+    if(encabezado[0].dte != ''){
+      bytess += generatorr.text('Factura Electrónica Documento Tributario',
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,
             bold: true,
             codeTable: 'CP1252'));
+    }
+    
 
     //espacio
     bytess += generatorr.feed(1);
 
     //FECHA EMITIDA
-    bytess += generatorr.text('25 de octuble 2022',
+    bytess += generatorr.text(encabezado[0].fecha_letras,
         styles: const PosStyles(
             align: PosAlign.right,
             width: PosTextSize.size1,
@@ -556,39 +630,44 @@ class _ViewFacturasState extends State<ViewFacturas> {
     bytess += generatorr.feed(1);
 
     //AUTORIZACION
-    bytess += generatorr.text('Número de Autorización:',
+    if(encabezado[0].dte != ''){
+
+        bytess += generatorr.text('Número de Autorización:',
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,
             bold: true,
             codeTable: 'CP1252'));
 
-    bytess += generatorr.text('BBaSDFDFDF-56556-aSDFAS',
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            bold: true,
-            codeTable: 'CP1252'));
+        bytess += generatorr.text(encabezado[0].dte,
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
 
-    bytess += generatorr.text('Serie: BBDF65',
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            bold: true,
-            codeTable: 'CP1252'));
+        bytess += generatorr.text('Serie: ${encabezado[0].serieDte}',
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
 
-    bytess += generatorr.text('Número de DTE: 25633554785',
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            bold: true,
-            codeTable: 'CP1252'));
+        bytess += generatorr.text('Número de DTE: ${encabezado[0].noDte}',
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
+
+    }
+    
 
     //espacio
     bytess += generatorr.feed(1);
 
     //No
-    bytess += generatorr.text('No: 128',
+    bytess += generatorr.text('No: ${ encabezado[0].no}',
         styles: const PosStyles(
             align: PosAlign.right,
             width: PosTextSize.size1,
@@ -598,28 +677,28 @@ class _ViewFacturasState extends State<ViewFacturas> {
     bytess += generatorr.feed(1);
 
     //SERIE
-    bytess += generatorr.text('Serie: DGTD',
+    bytess += generatorr.text('Serie: ${encabezado[0].serie}',
         styles: const PosStyles(
             align: PosAlign.left,
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
 
     //VENDEDOR
-    bytess += generatorr.text('Vendedor : Jerson Hernandez',
+    bytess += generatorr.text('Vendedor : ${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
         styles: const PosStyles(
             align: PosAlign.left,
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
 
     //CLIENTE
-    bytess += generatorr.text('Cliente: Magdalena España de la Rosa',
+    bytess += generatorr.text('Cliente: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
         styles: const PosStyles(
             align: PosAlign.left,
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
 
     //NIT CLIENTE
-    bytess += generatorr.text('NIT: 54545454',
+    bytess += generatorr.text('NIT: ${encabezado[0].nit}',
         styles: const PosStyles(
             align: PosAlign.left,
             width: PosTextSize.size1,
@@ -627,11 +706,14 @@ class _ViewFacturasState extends State<ViewFacturas> {
             codeTable: 'CP1252'));
 
     //DIRECCION CLIENTE
-    bytess += generatorr.text('Dirección: 8va ave 7-88 Villa Nueva',
+    if(encabezado[0].direccionCli != ''){
+      bytess += generatorr.text('Dirección: ${encabezado[0].direccionCli}',
         styles: const PosStyles(
             align: PosAlign.left,
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
+    }
+    
 
     //espacio
     bytess += generatorr.feed(1);
@@ -644,7 +726,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
             bold: true,
             codeTable: 'CP1252'));
 
-    bytess += generatorr.text('Contado',
+    bytess += generatorr.text('${encabezado[0].forma}',
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,
@@ -655,11 +737,11 @@ class _ViewFacturasState extends State<ViewFacturas> {
     bytess += generatorr.feed(1);
 
     //TABLA PRODUCTOS
-    generatorr.row([
+    bytess += generatorr.row([
       PosColumn(
         text: 'Descripción',
         width: 9,
-        styles: const PosStyles(align: PosAlign.right, underline: true),
+        styles: const PosStyles(align: PosAlign.left, underline: true),
       ),
       PosColumn(
         text: 'Subtotal',
@@ -668,29 +750,66 @@ class _ViewFacturasState extends State<ViewFacturas> {
       ),
     ]);
 
-    //DESCUENTO DE PRODUCTOS
-    generatorr.row([
+
+
+
+    //Detalle productos
+    for(int al=0;al<detalle.length;al++){
+
+      double tota = double.parse(detalle[al].cantidad) *
+            double.parse(detalle[al].precio);
+      bytess += generatorr.row([
+        PosColumn(
+          text: '${detalle[al].producto}',
+          width: 9,
+          styles: const PosStyles(align: PosAlign.left, underline: true),
+        ),
+        PosColumn(
+          text: '',
+          width: 3,
+          styles: const PosStyles(align: PosAlign.right, underline: true),
+        ),
+      ]);
+      bytess += generatorr.row([
+        PosColumn(
+          text: '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
+          width: 9,
+          styles: const PosStyles(align: PosAlign.left, underline: true),
+        ),
+        PosColumn(
+          text: '${detalle[al].contenido}${tota}',
+          width: 3,
+          styles: const PosStyles(align: PosAlign.right, underline: true),
+        ),
+      ]);
+
+
+    }
+
+    //DESCUENTOS
+    bytess += generatorr.row([
       PosColumn(
-        text: 'Descuentos(-):',
+        text: 'Descuento(-):',
         width: 9,
         styles: const PosStyles(align: PosAlign.right, underline: true),
       ),
       PosColumn(
-        text: 'Q0.00',
+        text: encabezado[0].contenido + encabezado[0].descuento,
         width: 3,
         styles: const PosStyles(align: PosAlign.right, underline: true),
       ),
     ]);
+    
 
     //TOTAL PRODUCTOS
-    generatorr.row([
+    bytess += generatorr.row([
       PosColumn(
         text: 'Total:',
         width: 9,
         styles: const PosStyles(align: PosAlign.right, underline: true),
       ),
       PosColumn(
-        text: 'Q0.00',
+        text: encabezado[0].contenido + encabezado[0].total,
         width: 3,
         styles: const PosStyles(align: PosAlign.right, underline: true),
       ),
@@ -700,7 +819,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
     bytess += generatorr.feed(1);
 
     //TOTAL LETRAS
-    bytess += generatorr.text('novecientos cuarenta con 00/100',
+    bytess += generatorr.text('${encabezado[0].totalLetas}',
         styles: const PosStyles(
             align: PosAlign.left,
             width: PosTextSize.size1,
@@ -711,33 +830,40 @@ class _ViewFacturasState extends State<ViewFacturas> {
     bytess += generatorr.feed(1);
 
     //Frases
-    bytess += generatorr.text('Sujeto a pagos trimestrales',
+    for(int rl=0;rl<encabezado[0].frases.length;rl++){
+      bytess += generatorr.text(encabezado[0].frases[rl],
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
+    }
 
     //espacio
     bytess += generatorr.feed(1);
 
     //DATOS DE CERTIFICADOR
-    bytess += generatorr.text('Certificador: Megaprint S.A',
+    if(encabezado[0].dte != ''){
+
+      bytess += generatorr.text('Certificador: ${encabezado[0].certificador}',
         styles: const PosStyles(
             align: PosAlign.left,
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
 
-    bytess += generatorr.text('NIT: 558471-63',
-        styles: const PosStyles(
-            align: PosAlign.left,
-            width: PosTextSize.size1,
-            codeTable: 'CP1252'));
+      bytess += generatorr.text('NIT: ${encabezado[0].nitCert}',
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              codeTable: 'CP1252'));
 
-    bytess += generatorr.text('Fecha: 85-69-2022 10:00',
-        styles: const PosStyles(
-            align: PosAlign.left,
-            width: PosTextSize.size1,
-            codeTable: 'CP1252'));
+      bytess += generatorr.text('Fecha: ${encabezado[0].fechaCert}',
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              codeTable: 'CP1252'));
+
+    }
+    
 
     //espacio
     bytess += generatorr.feed(1);
@@ -748,29 +874,9 @@ class _ViewFacturasState extends State<ViewFacturas> {
             align: PosAlign.center,
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
-*/
-    /*bytes += generator.text(
-        'Regular: aA bB cC dD eE fF gG hH iI jJ kK lL mM nN oO pP qQ rR sS tT uU vV wW xX yY zZ');
-    bytes += generator.text('Special 1: àÀ èÈ éÉ ûÛ üÜ çÇ ôÔ');
-    bytes += generator.text('Special 2: blåbærgrød');
-
-    bytes += generator.text('Bold text', styles: PosStyles(bold: true));
-    bytes += generator.text('Reverse text', styles: PosStyles(reverse: true));
-    bytes += generator.text('Underlined text',
-        styles: PosStyles(underline: true), linesAfter: 1);
-    bytes +=
-        generator.text('Align left', styles: PosStyles(align: PosAlign.left));
-    bytes += generator.text('Align center', styles: PosStyles(align: PosAlign.center));
-    bytes += generator.text('Align right',styles: PosStyles(align: PosAlign.right), linesAfter: 1);
-
-    bytes += generator.text('Text size 200%',
-        styles: PosStyles(
-          height: PosTextSize.size2,
-          width: PosTextSize.size2,
-        ));*/
-
-    //bytes += generator.feed(2);
+            
     bytess += generatorr.cut();
     return bytess;
   }
+
 }
