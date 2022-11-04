@@ -192,6 +192,12 @@ class _PrintScreenState extends State<PrintScreen> {
                             if (cambio != '1') {
                               //Preferencias.serie = newValue!;
                               SnackBar snackBar = SnackBar(
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                                margin: const EdgeInsets.only(
+                                    bottom: 100, right: 20, left: 20),
                                 padding: EdgeInsets.all(20),
                                 content: Text(
                                   '${cambio}',
@@ -422,62 +428,75 @@ class _PrintScreenState extends State<PrintScreen> {
                       //dynamic device_store=await storage.read(key: 'IMPRESORA');
                       //final dynamic din = await Preferencias.impresora as dynamic;
                       //PrinterBluetooth device = await Preferencias.impresora as dynamic;
-                      if(facturaService.list_det.length<1){
+                      if (facturaService.list_det.length < 1) {
                         //no tiene articulos agregados
-                        SnackBar snackBar = const SnackBar(
+                        SnackBar snackBar = SnackBar(
+                          margin: EdgeInsets.only(
+                              bottom:
+                                  (MediaQuery.of(context).size.height * 0.95),
+                              right: 20,
+                              left: 20),
                           dismissDirection: DismissDirection.up,
-                          padding: EdgeInsets.all(20),
-                          content: Text(
+                          padding: const EdgeInsets.all(20),
+                          content: const Text(
                             'Error: Agrega articulos a la factura',
                             style: TextStyle(color: Colors.white),
                           ),
                           backgroundColor: Color.fromARGB(255, 208, 96, 88),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-                      }else if(facturaService.initialSerie=='0'){
+                      } else if (facturaService.initialSerie == '0') {
                         //no tiene seleccionada una serie
-                        SnackBar snackBar = const SnackBar(
-                          dismissDirection: DismissDirection.up,
-                          padding: EdgeInsets.all(20),
-                          content: Text(
+                        SnackBar snackBar = SnackBar(
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          margin: const EdgeInsets.only(
+                              bottom: 100, right: 20, left: 20),
+                          padding: const EdgeInsets.all(20),
+                          content: const Text(
                             'Error: Seleccióna una serie',
                             style: TextStyle(color: Colors.white),
                           ),
                           backgroundColor: Color.fromARGB(255, 208, 96, 88),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-                      }else if(facturaService.id==''){
-                          SnackBar snackBar = const SnackBar(
-                            dismissDirection: DismissDirection.up,
-                            padding: EdgeInsets.all(20),
-                            content: Text(
-                              'Error: Seleccióne un cliente',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            backgroundColor: Color.fromARGB(255, 208, 96, 88),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-                      }else if(double.parse(facturaService.abonosi2) >= double.parse(facturaService.total_fac)){
+                      } else if (facturaService.id == '') {
+                        SnackBar snackBar = SnackBar(
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          margin: const EdgeInsets.only(
+                              bottom: 100, right: 20, left: 20),
+                          padding: const EdgeInsets.all(20),
+                          content: const Text(
+                            'Error: Seleccióne un cliente',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Color.fromARGB(255, 208, 96, 88),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      } else if (double.parse(facturaService.saldo) >=
+                          double.parse(facturaService.total_fac)) {
                         //no aplico pagos a la factura
                         SnackBar snackBar = const SnackBar(
-                            dismissDirection: DismissDirection.up,
-                            padding: EdgeInsets.all(20),
-                            content: Text(
-                              'Error: El saldo es menor al total',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            backgroundColor: Color.fromARGB(255, 208, 96, 88),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-                      }else{
+                          dismissDirection: DismissDirection.up,
+                          padding: EdgeInsets.all(20),
+                          content: Text(
+                            'Error: Aplicar pago',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Color.fromARGB(255, 208, 96, 88),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      } else {
                         //FACTURANDO
-                        var facturar = await facturaService.facturar(widget.id_tmp);
+                        var facturar =
+                            await facturaService.facturar(widget.id_tmp);
                         var js = json.decode(facturar);
-                        
+
                         if (js['MENSAJE'] == 'OK') {
                           SnackBar snackBar = const SnackBar(
                             padding: EdgeInsets.all(20),
@@ -491,7 +510,8 @@ class _PrintScreenState extends State<PrintScreen> {
 
                           print('entro');
                           _printerManager.stopScan();
-                          await _printerManager.scanResults.listen((devices) async {
+                          await _printerManager.scanResults
+                              .listen((devices) async {
                             print(devices);
 
                             if (Preferencias.mac == '') {
@@ -501,20 +521,17 @@ class _PrintScreenState extends State<PrintScreen> {
                                     if (devices.length == 0) {
                                       return const AlertDialog(
                                         backgroundColor:
-                                            Color.fromARGB(255,
-                                                236, 133, 115),
+                                            Color.fromARGB(255, 236, 133, 115),
                                         content: Text(
                                           'No se encontraron impresoras disponibles.',
-                                          style: TextStyle(
-                                              color:
-                                                  Colors.white),
+                                          style: TextStyle(color: Colors.white),
                                         ),
                                       );
                                     }
 
                                     return AlertDialog(
-                                      title: const Text(
-                                          'Impresoras Disponibles'),
+                                      title:
+                                          const Text('Impresoras Disponibles'),
                                       content: Container(
                                         height:
                                             300.0, // Change as per your requirement
@@ -522,33 +539,24 @@ class _PrintScreenState extends State<PrintScreen> {
                                             300.0, // Change as per your requirement
                                         child: ListView.builder(
                                           shrinkWrap: true,
-                                          itemCount:
-                                              devices.length,
+                                          itemCount: devices.length,
                                           itemBuilder:
-                                              (BuildContext
-                                                      context,
-                                                  int i) {
+                                              (BuildContext context, int i) {
                                             return ListTile(
-                                              title: Text(
-                                                  "${devices[i].name}"),
-                                              subtitle: Text(
-                                                  "${devices[i].address}"),
+                                              title: Text("${devices[i].name}"),
+                                              subtitle:
+                                                  Text("${devices[i].address}"),
                                               trailing: Row(
-                                                mainAxisSize:
-                                                    MainAxisSize
-                                                        .min,
+                                                mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   GestureDetector(
                                                     onTap: () {
-                                                      
                                                       _printerManager
                                                           .stopScan();
                                                       _startPrint(
-                                                          devices[
-                                                              i], js['ID']);
+                                                          devices[i], js['ID']);
                                                     },
-                                                    child:
-                                                        Container(
+                                                    child: Container(
                                                       margin:
                                                           const EdgeInsets.all(
                                                               5),
@@ -557,16 +565,16 @@ class _PrintScreenState extends State<PrintScreen> {
                                                               10),
                                                       decoration: BoxDecoration(
                                                           //color: Theme.of(context).primaryColor,
-                                                          color: widget.colorPrimary,
-                                                          borderRadius: BorderRadius.circular(15)),
-                                                      child:
-                                                          const Icon(
-                                                        Icons
-                                                            .print,
-                                                        color: Colors
-                                                            .white,
-                                                        size:
-                                                            25,
+                                                          color: widget
+                                                              .colorPrimary,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      15)),
+                                                      child: const Icon(
+                                                        Icons.print,
+                                                        color: Colors.white,
+                                                        size: 25,
                                                       ),
                                                     ),
                                                   )
@@ -585,8 +593,7 @@ class _PrintScreenState extends State<PrintScreen> {
                               devices.forEach((printer) async {
                                 print(printer);
                                 //get saved printer
-                                if (printer.address ==
-                                    Preferencias.mac) {
+                                if (printer.address == Preferencias.mac) {
                                   //store the element.
                                   await _startPrint(printer, js['ID']);
                                 }
@@ -595,7 +602,7 @@ class _PrintScreenState extends State<PrintScreen> {
                           });
                           print('salio');
                           // ignore: use_build_context_synchronously
-                          
+
                         } else {
                           SnackBar snackBar = SnackBar(
                             padding: const EdgeInsets.all(20),
@@ -610,7 +617,6 @@ class _PrintScreenState extends State<PrintScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
                           print(facturar);
                         }
-
                       }
                     },
                     icon: const Icon(Icons.print),
@@ -641,8 +647,8 @@ class _PrintScreenState extends State<PrintScreen> {
         ),
       ),
     );
-    final result = await _printerManager.printTicket(
-        await testTicket(id_factura));
+    final result =
+        await _printerManager.printTicket(await testTicket(id_factura));
     Navigator.of(context, rootNavigator: true).pop(result);
     showDialog(
       context: context,
@@ -657,14 +663,13 @@ class _PrintScreenState extends State<PrintScreen> {
       ),
     );
     Navigator.of(context, rootNavigator: true).pop(result);
-    if(result.msg=='Success'){
-      Navigator.push(context,MaterialPageRoute(builder: (_) => const EscritorioScreen()));
+    if (result.msg == 'Success') {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => const EscritorioScreen()));
     }
-
   }
 
   Future<List<int>> testTicket(String id_factura) async {
-
     final print_data = Provider.of<PrintProvider>(context, listen: false);
     await print_data.dataFac(id_factura);
     List<Encabezado> encabezado = print_data.list;
@@ -676,112 +681,104 @@ class _PrintScreenState extends State<PrintScreen> {
     if ((encabezado[0].fel == '0' && encabezado[0].felSucu == '1') ||
         (encabezado[0].fel == '1' && encabezado[0].felSucu == '1')) {
       sede = 1;
-    } else if (encabezado[0].fel == '1' &&
-        encabezado[0].felSucu == '0') {
+    } else if (encabezado[0].fel == '1' && encabezado[0].felSucu == '0') {
       sede = 0;
     }
-
 
     // Using default profile
     final profile = await CapabilityProfile.load();
     final generatorr = Generator(PaperSize.mm58, profile);
-    
+
     List<int> bytess = [];
-    bytess+=generatorr.setGlobalCodeTable('CP1252');
+    bytess += generatorr.setGlobalCodeTable('CP1252');
 
     //nombre de la empresa
-    (sede == 1)?
-    bytess += generatorr.text(encabezado[0].nombreEmpresaSucu,
-        styles: const PosStyles(
-            codeTable: 'CP1252',
-            align: PosAlign.center,
-            bold: true,
-            width: PosTextSize.size2))
-    :
-    bytess += generatorr.text(encabezado[0].nombreEmpresa,
-        styles: const PosStyles(
-            codeTable: 'CP1252',
-            align: PosAlign.center,
-            bold: true,
-            width: PosTextSize.size2));
+    (sede == 1)
+        ? bytess += generatorr.text(encabezado[0].nombreEmpresaSucu,
+            styles: const PosStyles(
+                codeTable: 'CP1252',
+                align: PosAlign.center,
+                bold: true,
+                width: PosTextSize.size1))
+        : bytess += generatorr.text(encabezado[0].nombreEmpresa,
+            styles: const PosStyles(
+                codeTable: 'CP1252',
+                align: PosAlign.center,
+                bold: true,
+                width: PosTextSize.size1));
 
     //DIreccion empresa
-    (sede == 1)?
-    bytess += generatorr.text(encabezado[0].direccionSucu,
-        styles: const PosStyles(
-                width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
-            .copyWith(align: PosAlign.center))
-    :
-    bytess += generatorr.text(encabezado[0].direccion,
-        styles: const PosStyles(
-                width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
-            .copyWith(align: PosAlign.center));
+    (sede == 1)
+        ? bytess += generatorr.text(encabezado[0].direccionSucu,
+            styles: const PosStyles(
+                    width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+                .copyWith(align: PosAlign.center))
+        : bytess += generatorr.text(encabezado[0].direccion,
+            styles: const PosStyles(
+                    width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+                .copyWith(align: PosAlign.center));
 
     //NIT EMPRESA
-    if(encabezado[0].nit_emisor != ''){
-        bytess += generatorr.text('NIT: ${encabezado[0].nit_emisor}',
-        styles: const PosStyles(
-                width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
-            .copyWith(align: PosAlign.center));
+    if (encabezado[0].nit_emisor != '') {
+      bytess += generatorr.text('NIT: ${encabezado[0].nit_emisor}',
+          styles: const PosStyles(
+                  width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+              .copyWith(align: PosAlign.center));
     }
 
     //TELEFONO EMPRESA
-    if(sede == 1){
-      
-      if(encabezado[0].teleSucu != ''){
+    if (sede == 1) {
+      if (encabezado[0].teleSucu != '') {
         bytess += generatorr.text('Teléfono: ${encabezado[0].teleSucu}',
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            bold: true,
-            codeTable: 'CP1252'));
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
       }
-    }else if(encabezado[0].telefono != ''){
-
+    } else if (encabezado[0].telefono != '') {
       bytess += generatorr.text('Teléfono: ${encabezado[0].telefono}',
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            bold: true,
-            codeTable: 'CP1252'));
-
+          styles: const PosStyles(
+              align: PosAlign.center,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
     }
 
     //espacio
     bytess += generatorr.feed(1);
 
     //NOMBRE COMERCIAL
-    if(sede == 1){
-      if(encabezado[0].nombre_comercial_sucu != ''){
+    if (sede == 1) {
+      if (encabezado[0].nombre_comercial_sucu != '') {
         bytess += generatorr.text(encabezado[0].nombre_comercial_sucu,
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            bold: true,
-            codeTable: 'CP1252'));
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
       }
-    }else if(encabezado[0].nombre_comercial_emp != ''){
+    } else if (encabezado[0].nombre_comercial_emp != '') {
       bytess += generatorr.text(encabezado[0].nombre_comercial_emp,
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            bold: true,
-            codeTable: 'CP1252'));
+          styles: const PosStyles(
+              align: PosAlign.center,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
     }
 
     //espacio
     bytess += generatorr.feed(1);
 
     //FEL
-    if(encabezado[0].dte != ''){
+    if (encabezado[0].dte != '') {
       bytess += generatorr.text('Factura Electrónica Documento Tributario',
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            bold: true,
-            codeTable: 'CP1252'));
+          styles: const PosStyles(
+              align: PosAlign.center,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
     }
-    
 
     //espacio
     bytess += generatorr.feed(1);
@@ -797,44 +794,41 @@ class _PrintScreenState extends State<PrintScreen> {
     bytess += generatorr.feed(1);
 
     //AUTORIZACION
-    if(encabezado[0].dte != ''){
+    if (encabezado[0].dte != '') {
+      bytess += generatorr.text('Número de Autorización:',
+          styles: const PosStyles(
+              align: PosAlign.center,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
 
-        bytess += generatorr.text('Número de Autorización:',
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            bold: true,
-            codeTable: 'CP1252'));
+      bytess += generatorr.text(encabezado[0].dte,
+          styles: const PosStyles(
+              align: PosAlign.center,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
 
-        bytess += generatorr.text(encabezado[0].dte,
-            styles: const PosStyles(
-                align: PosAlign.center,
-                width: PosTextSize.size1,
-                bold: true,
-                codeTable: 'CP1252'));
+      bytess += generatorr.text('Serie: ${encabezado[0].serieDte}',
+          styles: const PosStyles(
+              align: PosAlign.center,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
 
-        bytess += generatorr.text('Serie: ${encabezado[0].serieDte}',
-            styles: const PosStyles(
-                align: PosAlign.center,
-                width: PosTextSize.size1,
-                bold: true,
-                codeTable: 'CP1252'));
-
-        bytess += generatorr.text('Número de DTE: ${encabezado[0].noDte}',
-            styles: const PosStyles(
-                align: PosAlign.center,
-                width: PosTextSize.size1,
-                bold: true,
-                codeTable: 'CP1252'));
-
+      bytess += generatorr.text('Número de DTE: ${encabezado[0].noDte}',
+          styles: const PosStyles(
+              align: PosAlign.center,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
     }
-    
 
     //espacio
     bytess += generatorr.feed(1);
 
     //No
-    bytess += generatorr.text('No: ${ encabezado[0].no}',
+    bytess += generatorr.text('No: ${encabezado[0].no}',
         styles: const PosStyles(
             align: PosAlign.right,
             width: PosTextSize.size1,
@@ -851,14 +845,16 @@ class _PrintScreenState extends State<PrintScreen> {
             codeTable: 'CP1252'));
 
     //VENDEDOR
-    bytess += generatorr.text('Vendedor : ${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
+    bytess += generatorr.text(
+        'Vendedor : ${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
         styles: const PosStyles(
             align: PosAlign.left,
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
 
     //CLIENTE
-    bytess += generatorr.text('Cliente: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
+    bytess += generatorr.text(
+        'Cliente: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
         styles: const PosStyles(
             align: PosAlign.left,
             width: PosTextSize.size1,
@@ -873,20 +869,19 @@ class _PrintScreenState extends State<PrintScreen> {
             codeTable: 'CP1252'));
 
     //DIRECCION CLIENTE
-    if(encabezado[0].direccionCli != ''){
+    if (encabezado[0].direccionCli != '') {
       bytess += generatorr.text('Dirección: ${encabezado[0].direccionCli}',
-        styles: const PosStyles(
-            align: PosAlign.left,
-            width: PosTextSize.size1,
-            codeTable: 'CP1252'));
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              codeTable: 'CP1252'));
     }
-    
 
     //espacio
     bytess += generatorr.feed(1);
 
     //CONDICIONES DE PAGO
-    bytess += generatorr.text('Condiciónes de pago:',
+    bytess += generatorr.text('Condiciones de pago:',
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,
@@ -908,49 +903,44 @@ class _PrintScreenState extends State<PrintScreen> {
       PosColumn(
         text: 'Descripción',
         width: 9,
-        styles: const PosStyles(align: PosAlign.left, underline: true),
+        styles: const PosStyles(align: PosAlign.left, bold: true),
       ),
       PosColumn(
         text: 'Subtotal',
         width: 3,
-        styles: const PosStyles(align: PosAlign.right, underline: true),
+        styles: const PosStyles(align: PosAlign.right, bold: true),
       ),
     ]);
 
-
-
-
     //Detalle productos
-    for(int al=0;al<detalle.length;al++){
-
-      double tota = double.parse(detalle[al].cantidad) *
-            double.parse(detalle[al].precio);
+    for (int al = 0; al < detalle.length; al++) {
+      double tota =
+          double.parse(detalle[al].cantidad) * double.parse(detalle[al].precio);
       bytess += generatorr.row([
         PosColumn(
           text: '${detalle[al].producto}',
           width: 9,
-          styles: const PosStyles(align: PosAlign.left, underline: true),
+          styles: const PosStyles(align: PosAlign.left),
         ),
         PosColumn(
           text: '',
           width: 3,
-          styles: const PosStyles(align: PosAlign.right, underline: true),
+          styles: const PosStyles(align: PosAlign.right),
         ),
       ]);
       bytess += generatorr.row([
         PosColumn(
-          text: '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
+          text:
+              '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
           width: 9,
-          styles: const PosStyles(align: PosAlign.left, underline: true),
+          styles: const PosStyles(align: PosAlign.left),
         ),
         PosColumn(
           text: '${detalle[al].contenido}${tota}',
           width: 3,
-          styles: const PosStyles(align: PosAlign.right, underline: true),
+          styles: const PosStyles(align: PosAlign.right),
         ),
       ]);
-
-
     }
 
     //DESCUENTOS
@@ -958,27 +948,26 @@ class _PrintScreenState extends State<PrintScreen> {
       PosColumn(
         text: 'Descuento(-):',
         width: 9,
-        styles: const PosStyles(align: PosAlign.right, underline: true),
+        styles: const PosStyles(align: PosAlign.right, bold: true),
       ),
       PosColumn(
         text: encabezado[0].contenido + encabezado[0].descuento,
         width: 3,
-        styles: const PosStyles(align: PosAlign.right, underline: true),
+        styles: const PosStyles(align: PosAlign.right, bold: true),
       ),
     ]);
-    
 
     //TOTAL PRODUCTOS
     bytess += generatorr.row([
       PosColumn(
         text: 'Total:',
         width: 9,
-        styles: const PosStyles(align: PosAlign.right, underline: true),
+        styles: const PosStyles(align: PosAlign.right, bold: true),
       ),
       PosColumn(
         text: encabezado[0].contenido + encabezado[0].total,
         width: 3,
-        styles: const PosStyles(align: PosAlign.right, underline: true),
+        styles: const PosStyles(align: PosAlign.right, bold: true),
       ),
     ]);
 
@@ -997,25 +986,24 @@ class _PrintScreenState extends State<PrintScreen> {
     bytess += generatorr.feed(1);
 
     //Frases
-    for(int rl=0;rl<encabezado[0].frases.length;rl++){
+    for (int rl = 0; rl < encabezado[0].frases.length; rl++) {
       bytess += generatorr.text(encabezado[0].frases[rl],
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            codeTable: 'CP1252'));
+          styles: const PosStyles(
+              align: PosAlign.center,
+              width: PosTextSize.size1,
+              codeTable: 'CP1252'));
     }
 
     //espacio
     bytess += generatorr.feed(1);
 
     //DATOS DE CERTIFICADOR
-    if(encabezado[0].dte != ''){
-
+    if (encabezado[0].dte != '') {
       bytess += generatorr.text('Certificador: ${encabezado[0].certificador}',
-        styles: const PosStyles(
-            align: PosAlign.left,
-            width: PosTextSize.size1,
-            codeTable: 'CP1252'));
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              codeTable: 'CP1252'));
 
       bytess += generatorr.text('NIT: ${encabezado[0].nitCert}',
           styles: const PosStyles(
@@ -1028,22 +1016,19 @@ class _PrintScreenState extends State<PrintScreen> {
               align: PosAlign.left,
               width: PosTextSize.size1,
               codeTable: 'CP1252'));
-
     }
-    
 
     //espacio
     bytess += generatorr.feed(1);
 
     //datos del sistema
-    bytess += generatorr.text('Factura realizada en www.gozeri.com',
+    bytess += generatorr.text('Realizado en www.gozeri.com',
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size1,
             codeTable: 'CP1252'));
-            
+
     bytess += generatorr.cut();
     return bytess;
   }
-
 }

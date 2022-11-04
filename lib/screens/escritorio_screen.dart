@@ -25,6 +25,7 @@ class EscritorioScreen extends StatefulWidget {
 
 class _EscritorioScreenState extends State<EscritorioScreen> {
   int currentPage = 1;
+
   ConnectivityResult _connectionStatus = ConnectivityResult.wifi;
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;

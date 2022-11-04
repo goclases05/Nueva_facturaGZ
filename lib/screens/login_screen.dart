@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:factura_gozeri/providers/loginform_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -291,16 +292,35 @@ class _LoginForm extends StatelessWidget {
                   ),
                   Expanded(
                     child: Text(
-                      "Si no cuentas con un usuario, comunicate con una empresa registrada.",
+                      "Si no cuentas con un usuario, comunicate con una empresa registrada. Si tu empresa no se encuentra registrada para más información visita :",
                       textAlign: TextAlign.start,
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
+            Container(
+              width: MediaQuery.of(context).size.width * 1,
+              child: Center(
+                child: TextButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.cyan)),
+                  onPressed: _launchUrl,
+                  child: Text('www.gozeri.com',
+                      style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            )
           ],
         ),
       ),
     );
+  }
+}
+
+Future<void> _launchUrl() async {
+  final Uri _url = Uri.parse('https://www.gozeri.com/es/registro?ADD=CONTROL');
+  if (!await launchUrl(_url)) {
+    throw 'Could not launch $_url';
   }
 }

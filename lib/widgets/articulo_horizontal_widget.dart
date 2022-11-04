@@ -197,12 +197,12 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                         ClipRRect(
                             borderRadius: BorderRadius.circular(15),
                             child: FadeInImage(
-                                placeholder: const AssetImage(
-                                    'assets/productos_gz.jpg'),
-                                image: NetworkImage(widget.listProd.url +
-                                    widget.listProd.foto),
-                                width: MediaQuery.of(context).size.width *
-                                    0.25)),
+                                placeholder:
+                                    const AssetImage('assets/productos_gz.jpg'),
+                                image: NetworkImage(
+                                    widget.listProd.url + widget.listProd.foto),
+                                width:
+                                    MediaQuery.of(context).size.width * 0.25)),
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(8),
@@ -490,9 +490,15 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                         return GestureDetector(
                           onTap: () {
                             if (widget.listProd.facturar == '1') {
-                              const snackBar = SnackBar(
+                              final snackBar = SnackBar(
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                                margin: EdgeInsets.only(
+                                    bottom: 100, right: 20, left: 20),
                                 padding: EdgeInsets.all(20),
-                                content: Text(
+                                content: const Text(
                                   'Item agregado al carrito!',
                                   style: TextStyle(color: Colors.white),
                                 ),
@@ -513,9 +519,15 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                             } else {
                               if (_counterValue >
                                   int.parse(widget.listProd.stock)) {
-                                const snackBar = SnackBar(
-                                  padding: EdgeInsets.all(20),
-                                  content: Text(
+                                final snackBar = SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  margin: const EdgeInsets.only(
+                                      bottom: 100, right: 20, left: 20),
+                                  padding: const EdgeInsets.all(20),
+                                  content: const Text(
                                     'Articulo sin Stock!',
                                     style: TextStyle(color: Colors.white),
                                   ),
@@ -527,9 +539,15 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(snackBar);
                               } else {
-                                const snackBar = SnackBar(
-                                  padding: EdgeInsets.all(20),
-                                  content: Text(
+                                final snackBar = SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  margin: const EdgeInsets.only(
+                                      bottom: 100, right: 20, left: 20),
+                                  padding: const EdgeInsets.all(20),
+                                  content: const Text(
                                     'Item agregado al carrito!',
                                     style: TextStyle(color: Colors.white),
                                   ),
