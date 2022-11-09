@@ -1,3 +1,4 @@
+import 'package:factura_gozeri/global/preferencias_global.dart';
 import 'package:factura_gozeri/providers/seattings_provider.dart';
 import 'package:factura_gozeri/screens/checkouth_screen.dart';
 import 'package:factura_gozeri/screens/escritorio_screen.dart';
@@ -55,11 +56,17 @@ class _SettingsScreen extends State<SettingsScreen> {
               leading: CircleAvatar(
                   backgroundColor: settings.colorPrimary,
                   child: const Icon(
-                    Icons.filter_none,
+                    Icons.print,
                     color: Colors.white,
                   )),
-              title: const Text('Serie Predeterminada '),
-              onTap: (() {}),
+              title: Text("Impresión Sunmi"),
+              trailing: Switch(
+                  value: Preferencias.sunmi_preferencia,
+                  onChanged: (value) async {
+                    Preferencias.sunmi_preferencia = value;
+                    setState(() {});
+                  }),
+              onTap: () {},
             ),
             const Divider(color: Colors.grey),
             ExpansionTile(

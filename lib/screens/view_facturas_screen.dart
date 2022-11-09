@@ -1,21 +1,24 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
-import 'package:esc_pos_utils/esc_pos_utils.dart';
-import 'package:factura_gozeri/global/globals.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils.dart';
+import 'package:factura_gozeri/global/preferencias_global.dart';
 import 'package:factura_gozeri/models/data_facturas_models.dart';
 import 'package:factura_gozeri/models/view_factura_print.dart';
-import 'package:factura_gozeri/print/print_page.dart';
 import 'package:factura_gozeri/print/print_print.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
-import 'package:factura_gozeri/screens/screens.dart';
+import 'package:factura_gozeri/screens/view_ticket_desing_screen.dart';
 import 'package:factura_gozeri/services/departamentos_services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh_plus/pull_to_refresh_plus.dart';
-
-import 'package:http/http.dart' as http;
+import 'package:sunmi_printer_plus/enums.dart';
+import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
+import 'package:sunmi_printer_plus/sunmi_style.dart';
 
 class ViewFacturas extends StatefulWidget {
   ViewFacturas({Key? key, required this.colorPrimary, required this.accion})
@@ -35,6 +38,13 @@ class _ViewFacturasState extends State<ViewFacturas> {
   int i = 0;
   final RefreshController refreshController =
       RefreshController(initialRefresh: true);
+
+  //SUNMIN
+  bool printBinded = false;
+  int paperSize = 0;
+  String serialNumber = "";
+  String printerVersion = "";
+  //SUNMIN
 
   Future<bool> getCursosData({bool isRefresh = false}) async {
     // Read all values
@@ -83,19 +93,53 @@ class _ViewFacturasState extends State<ViewFacturas> {
 
   @override
   void initState() {
-    if (widget.accion == 'Emitidas') {
-      _printerManager.startScan(const Duration(seconds: 2));
-    } else {
-      _printerManager.stopScan();
-    }
-
     super.initState();
+    if (Preferencias.sunmi_preferencia) {
+      _bindingPrinter().then((bool? isBind) async {
+        SunmiPrinter.paperSize().then((int size) {
+          setState(() {
+            paperSize = size;
+          });
+        });
+
+        SunmiPrinter.printerVersion().then((String version) {
+          setState(() {
+            printerVersion = version;
+          });
+        });
+
+        SunmiPrinter.serialNumber().then((String serial) {
+          setState(() {
+            serialNumber = serial;
+          });
+        });
+
+        setState(() {
+          printBinded = isBind!;
+        });
+      });
+    } else {
+      if (widget.accion == 'Emitidas') {
+        _printerManager.startScan(const Duration(seconds: 5));
+      } else {
+        _printerManager.stopScan();
+      }
+    }
+  }
+
+  /// must binding ur printer at first init in app
+  Future<bool?> _bindingPrinter() async {
+    final bool? result = await SunmiPrinter.bindingPrinter();
+    return result;
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
-    _printerManager.stopScan();
+    if (Preferencias.sunmi_preferencia == false) {
+      _printerManager.stopScan();
+    }
+
     super.dispose();
   }
 
@@ -149,7 +193,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                 children: [
                                   GestureDetector(
                                     onTap: () async {
-                                      _printerManager.stopScan();
+                                      //_printerManager.stopScan();
                                       final _depa =
                                           Provider.of<DepartamentoService>(
                                               context,
@@ -232,7 +276,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                               onTap: () {},
                             );
                           })
-                      : const Center(child: Text('Sin data'))
+                      : Center(child: Text('Sin data'))
                   : (widget.accion == 'Emitidas')
                       ? (list_emi.length > 0)
                           ? ListView.separated(
@@ -253,7 +297,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                     children: [
                                       GestureDetector(
                                         onTap: () {
-                                          _printerManager.stopScan();
+                                          //_printerManager.stopScan();
                                           final printProvider =
                                               Provider.of<PrintProvider>(
                                                   context,
@@ -306,116 +350,147 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                         ),
                                       ),
                                       GestureDetector(
-                                        onTap: () {
+                                        onTap: () async {
                                           // ignore: await_only_futures
 
-                                          _printerManager.scanResults
-                                              .listen((devices) async {
-                                            print(devices);
+                                          if (Preferencias.sunmi_preferencia) {
+                                            await print_sunmi(context,
+                                                list_emi[index].idFactTmp);
+                                          } else {
+                                            //PRINT NO SUNMIN
 
-                                            if (Preferencias.mac == '') {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: ((context) {
-                                                    if (devices.length == 0) {
-                                                      return const AlertDialog(
-                                                        backgroundColor:
-                                                            Color.fromARGB(255,
-                                                                236, 133, 115),
-                                                        content: Text(
-                                                          'No se encontraron impresoras disponibles.',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white),
+                                            _printerManager.scanResults
+                                                .listen((devices) async {
+                                              print(devices);
+
+                                              if (Preferencias.mac == '') {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: ((context) {
+                                                      if (devices.length == 0) {
+                                                        return const AlertDialog(
+                                                          backgroundColor:
+                                                              Color.fromARGB(
+                                                                  255,
+                                                                  236,
+                                                                  133,
+                                                                  115),
+                                                          content: Text(
+                                                            'No se encontraron impresoras disponibles.',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        );
+                                                      }
+
+                                                      return AlertDialog(
+                                                        title: const Text(
+                                                            'Impresoras Disponibles'),
+                                                        content: Container(
+                                                          height:
+                                                              300.0, // Change as per your requirement
+                                                          width:
+                                                              300.0, // Change as per your requirement
+                                                          child:
+                                                              ListView.builder(
+                                                            shrinkWrap: true,
+                                                            itemCount:
+                                                                devices.length,
+                                                            itemBuilder:
+                                                                (BuildContext
+                                                                        context,
+                                                                    int i) {
+                                                              return ListTile(
+                                                                title: Text(
+                                                                    "${devices[i].name}"),
+                                                                subtitle: Text(
+                                                                    "${devices[i].address}"),
+                                                                trailing: Row(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  children: [
+                                                                    GestureDetector(
+                                                                      onTap:
+                                                                          () async {
+                                                                        if (Preferencias
+                                                                            .sunmi_preferencia) {
+                                                                          print(
+                                                                              'hola sunmi');
+                                                                          //IMPRESION SUNMI
+                                                                          await SunmiPrinter
+                                                                              .initPrinter();
+                                                                          await SunmiPrinter.startTransactionPrint(
+                                                                              true);
+                                                                          await SunmiPrinter.printQRCode(
+                                                                              'https://github.com/brasizza/sunmi_printer');
+                                                                          await SunmiPrinter.lineWrap(
+                                                                              2);
+                                                                          await SunmiPrinter.exitTransactionPrint(
+                                                                              true);
+                                                                          print(
+                                                                              'fin sunmi ');
+                                                                          //IMPRESION SUNMI
+                                                                        } else {
+                                                                          _printerManager
+                                                                              .stopScan();
+                                                                          _startPrint(
+                                                                              devices[i],
+                                                                              list_emi[index].idFactTmp);
+                                                                        }
+                                                                      },
+                                                                      child:
+                                                                          Container(
+                                                                        margin:
+                                                                            const EdgeInsets.all(5),
+                                                                        padding:
+                                                                            const EdgeInsets.all(10),
+                                                                        decoration: BoxDecoration(
+                                                                            //color: Theme.of(context).primaryColor,
+                                                                            color: widget.colorPrimary,
+                                                                            borderRadius: BorderRadius.circular(15)),
+                                                                        child:
+                                                                            const Icon(
+                                                                          Icons
+                                                                              .print,
+                                                                          color:
+                                                                              Colors.white,
+                                                                          size:
+                                                                              25,
+                                                                        ),
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                                onTap: () {},
+                                                              );
+                                                            },
+                                                          ),
                                                         ),
                                                       );
-                                                    }
+                                                    }));
+                                              } else {
+                                                //impresion en predeterminada
 
-                                                    return AlertDialog(
-                                                      title: const Text(
-                                                          'Impresoras Disponibles'),
-                                                      content: Container(
-                                                        height:
-                                                            300.0, // Change as per your requirement
-                                                        width:
-                                                            300.0, // Change as per your requirement
-                                                        child: ListView.builder(
-                                                          shrinkWrap: true,
-                                                          itemCount:
-                                                              devices.length,
-                                                          itemBuilder:
-                                                              (BuildContext
-                                                                      context,
-                                                                  int i) {
-                                                            return ListTile(
-                                                              title: Text(
-                                                                  "${devices[i].name}"),
-                                                              subtitle: Text(
-                                                                  "${devices[i].address}"),
-                                                              trailing: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                children: [
-                                                                  GestureDetector(
-                                                                    onTap: () {
-                                                                      _printerManager
-                                                                          .stopScan();
-                                                                      _startPrint(
-                                                                          devices[
-                                                                              i],
-                                                                          list_emi[index]
-                                                                              .idFactTmp);
-                                                                    },
-                                                                    child:
-                                                                        Container(
-                                                                      margin:
-                                                                          const EdgeInsets.all(
-                                                                              5),
-                                                                      padding:
-                                                                          const EdgeInsets.all(
-                                                                              10),
-                                                                      decoration: BoxDecoration(
-                                                                          //color: Theme.of(context).primaryColor,
-                                                                          color: widget.colorPrimary,
-                                                                          borderRadius: BorderRadius.circular(15)),
-                                                                      child:
-                                                                          const Icon(
-                                                                        Icons
-                                                                            .print,
-                                                                        color: Colors
-                                                                            .white,
-                                                                        size:
-                                                                            25,
-                                                                      ),
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                              onTap: () {},
-                                                            );
-                                                          },
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }));
-                                            } else {
-                                              //impresion en predeterminada
+                                                devices
+                                                    .forEach((printer) async {
+                                                  print(printer);
+                                                  //get saved printer
+                                                  if (printer.address ==
+                                                      Preferencias.mac) {
+                                                    //store the element.
+                                                    await _startPrint(
+                                                        printer,
+                                                        list_emi[index]
+                                                            .idFactTmp);
+                                                  }
+                                                });
+                                              }
+                                            });
 
-                                              devices.forEach((printer) async {
-                                                print(printer);
-                                                //get saved printer
-                                                if (printer.address ==
-                                                    Preferencias.mac) {
-                                                  //store the element.
-                                                  await _startPrint(
-                                                      printer,
-                                                      list_emi[index]
-                                                          .idFactTmp);
-                                                }
-                                              });
-                                            }
-                                          });
+                                            //PRINT NO SUNMIN
+                                          }
                                         },
                                         child: Container(
                                           margin:
@@ -863,4 +938,145 @@ class _ViewFacturasState extends State<ViewFacturas> {
     bytess += generatorr.cut();
     return bytess;
   }
+}
+
+print_sunmi(BuildContext context, String id_factura) async {
+  final print_data = Provider.of<PrintProvider>(context, listen: false);
+  await print_data.dataFac(id_factura);
+  List<Encabezado> encabezado = print_data.list;
+  List<Detalle> detalle = print_data.list_detalle;
+
+  int sede = 0;
+  //0= empresa
+  //1= sucursal
+  if ((encabezado[0].fel == '0' && encabezado[0].felSucu == '1') ||
+      (encabezado[0].fel == '1' && encabezado[0].felSucu == '1')) {
+    sede = 1;
+  } else if (encabezado[0].fel == '1' && encabezado[0].felSucu == '0') {
+    sede = 0;
+  }
+
+  await SunmiPrinter.initPrinter();
+  await SunmiPrinter.startTransactionPrint(true);
+
+  /*if (sede == 1) {
+    if (encabezado[0].foto != '') {
+      String url = encabezado[0].rutaSucu + encabezado[0].foto;
+      // convert image to Uint8List format
+      Uint8List byte = (await NetworkAssetBundle(Uri.parse(url)).load(url))
+          .buffer
+          .asUint8List();
+      await SunmiPrinter.setAlignment(SunmiPrintAlign.CENTER);
+      await SunmiPrinter.startTransactionPrint(true);
+      await SunmiPrinter.printImage(byte);
+    }
+  } else {
+    if (encabezado[0].logoNom != '') {
+      String url = encabezado[0].logoUrl + encabezado[0].logoNom;
+      // convert image to Uint8List format
+      Uint8List byte = (await NetworkAssetBundle(Uri.parse(url)).load(url))
+          .buffer
+          .asUint8List();
+      await SunmiPrinter.setAlignment(SunmiPrintAlign.CENTER);
+      await SunmiPrinter.startTransactionPrint(true);
+      await SunmiPrinter.printImage(byte);
+    }
+  }*/
+  //await SunmiPrinter.lineWrap(2);
+
+  //nombre de empresa
+  await SunmiPrinter.printText(
+      (sede == 1)
+          ? '${encabezado[0].nombreEmpresaSucu}'
+          : '${encabezado[0].nombreEmpresa}',
+      style: SunmiStyle(
+        bold: true,
+        align: SunmiPrintAlign.CENTER,
+      ));
+
+  //Direccion de empresa
+  await SunmiPrinter.printText(
+      (sede == 1)
+          ? '${encabezado[0].direccionSucu}'
+          : '${encabezado[0].direccion}',
+      style: SunmiStyle(
+        bold: true,
+        align: SunmiPrintAlign.CENTER,
+      ));
+
+  //nit emisor
+  if (encabezado[0].nit_emisor != '') {
+    await SunmiPrinter.printText('NIT: ${encabezado[0].nit_emisor}',
+        style: SunmiStyle(
+          bold: true,
+          align: SunmiPrintAlign.CENTER,
+        ));
+  }
+
+  //telefono emisor
+  if (sede == 1) {
+    if (encabezado[0].teleSucu != '') {
+      await SunmiPrinter.printText('Tel: ${encabezado[0].teleSucu}',
+          style: SunmiStyle(
+            bold: true,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    }
+  } else {
+    if (encabezado[0].telefono != '') {
+      await SunmiPrinter.printText('Tel: ${encabezado[0].telefono}',
+          style: SunmiStyle(
+            bold: true,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    }
+  }
+
+  await SunmiPrinter.lineWrap(2);
+
+  //nombre comercial
+  if (sede == 1) {
+    if (encabezado[0].nombre_comercial_sucu != '') {
+      await SunmiPrinter.printText('${encabezado[0].nombre_comercial_sucu}',
+          style: SunmiStyle(
+            bold: true,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    }
+  } else {
+    if (encabezado[0].nombre_comercial_emp != '') {
+      await SunmiPrinter.printText('${encabezado[0].nombre_comercial_emp}',
+          style: SunmiStyle(
+            bold: true,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    }
+  }
+
+  await SunmiPrinter.lineWrap(2);
+  //FEL
+  /*if (encabezado[0].dte != '') {
+    await SunmiPrinter.printText('Factura Electrónica Documento Tributario',
+        style: SunmiStyle(
+          bold: true,
+          align: SunmiPrintAlign.CENTER,
+        ));
+  }*/
+
+  /*await SunmiPrinter.printQRCode('https://github.com/brasizza/sunmi_printer');
+  await SunmiPrinter.printText('Normal font',
+      style: SunmiStyle(fontSize: SunmiFontSize.MD));*/
+
+  await SunmiPrinter.exitTransactionPrint(true);
+}
+
+Future<Uint8List> readFileBytes(String path) async {
+  ByteData fileData = await rootBundle.load(path);
+  Uint8List fileUnit8List = fileData.buffer
+      .asUint8List(fileData.offsetInBytes, fileData.lengthInBytes);
+  return fileUnit8List;
+}
+
+Future<Uint8List> _getImageFromAsset(String iconPath) async {
+  return await readFileBytes(iconPath);
 }

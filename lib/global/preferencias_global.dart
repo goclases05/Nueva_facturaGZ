@@ -24,6 +24,7 @@ class Preferencias {
   static dynamic _impresora = {};
   static String _mac = '';
   static String _papel = '';
+  static bool _sunmi_preferencia = false;
 
   static Future init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -36,6 +37,15 @@ class Preferencias {
   static set mac(String mac) {
     _mac = mac;
     _prefs.setString('MAC', mac);
+  }
+
+  static bool get sunmi_preferencia {
+    return _prefs.getBool('SUNMI') ?? _sunmi_preferencia;
+  }
+
+  static set sunmi_preferencia(bool sunmi_preferencia) {
+    _sunmi_preferencia = sunmi_preferencia;
+    _prefs.setBool('SUNMI', sunmi_preferencia);
   }
 
   static String get impresora {

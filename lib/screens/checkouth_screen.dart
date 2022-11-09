@@ -7,6 +7,7 @@ import 'package:factura_gozeri/controllers/version_screen.dart';
 import 'package:factura_gozeri/screens/escritorio_screen.dart';
 import 'package:factura_gozeri/screens/home2_screen.dart';
 import 'package:factura_gozeri/screens/no_internet_screen.dart';
+import 'package:factura_gozeri/screens/sunmi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -174,7 +175,8 @@ class _CheckOuthScreenState extends State<CheckOuthScreen> {
                     Navigator.pushReplacement(
                             context,
                             PageRouteBuilder(
-                                pageBuilder: (_, __, ___) => EscritorioScreen(),
+                                pageBuilder: (_, __, ___) =>
+                                    EscritorioScreen(), //EscritorioScreen(),
                                 transitionDuration: Duration(seconds: 0)))
                         .then((value) => Navigator.of(context).pop());
                   });

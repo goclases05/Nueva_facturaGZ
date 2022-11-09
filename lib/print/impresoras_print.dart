@@ -145,7 +145,7 @@ class _ImpresorasPrint extends State<ImpresorasPrint> {
   }
 
   void initPrinter() {
-    _printerManager.startScan(Duration(seconds: 2));
+    _printerManager.startScan(Duration(seconds: 5));
     //_printerManager.stopScan();
     _printerManager.scanResults.listen((val) {
       if (!mounted) return;
