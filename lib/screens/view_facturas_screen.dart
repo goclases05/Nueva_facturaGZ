@@ -16,6 +16,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh_plus/pull_to_refresh_plus.dart';
+import 'package:sunmi_printer_plus/column_maker.dart';
 import 'package:sunmi_printer_plus/enums.dart';
 import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
 import 'package:sunmi_printer_plus/sunmi_style.dart';
@@ -57,6 +58,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
     if (isRefresh == true) {
       i = 0;
       list_emi.clear();
+      list_tmp.clear();
     }
     print(
         "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
@@ -941,6 +943,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
 }
 
 print_sunmi(BuildContext context, String id_factura) async {
+
   final print_data = Provider.of<PrintProvider>(context, listen: false);
   await print_data.dataFac(id_factura);
   List<Encabezado> encabezado = print_data.list;
@@ -955,6 +958,16 @@ print_sunmi(BuildContext context, String id_factura) async {
   } else if (encabezado[0].fel == '1' && encabezado[0].felSucu == '0') {
     sede = 0;
   }
+  showDialog(
+    context: context,
+    builder: (_) => const AlertDialog(
+      backgroundColor: Color.fromARGB(255, 115, 160, 236),
+      content: Text(
+        'Imprimiendo...',
+        style: TextStyle(color: Colors.white),
+      ),
+    ),
+  );
 
   await SunmiPrinter.initPrinter();
   await SunmiPrinter.startTransactionPrint(true);
@@ -1032,7 +1045,7 @@ print_sunmi(BuildContext context, String id_factura) async {
     }
   }
 
-  await SunmiPrinter.lineWrap(2);
+  await SunmiPrinter.lineWrap(1);
 
   //nombre comercial
   if (sede == 1) {
@@ -1053,30 +1066,220 @@ print_sunmi(BuildContext context, String id_factura) async {
     }
   }
 
-  await SunmiPrinter.lineWrap(2);
+  await SunmiPrinter.lineWrap(1);
   //FEL
-  /*if (encabezado[0].dte != '') {
+  if (encabezado[0].dte != '') {
     await SunmiPrinter.printText('Factura Electrónica Documento Tributario',
         style: SunmiStyle(
           bold: true,
           align: SunmiPrintAlign.CENTER,
         ));
-  }*/
+  }
+
+  await SunmiPrinter.lineWrap(1);
+
+  //FECHA EN LETRAS
+  await SunmiPrinter.printText('${encabezado[0].fecha_letras}',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.RIGHT,
+  ));
+
+  await SunmiPrinter.lineWrap(1);
+
+  if (encabezado[0].dte != '') {
+    await SunmiPrinter.printText('Número de Autorización:',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.CENTER,
+    ));
+    await SunmiPrinter.printText('${encabezado[0].dte}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.CENTER,
+    ));
+    await SunmiPrinter.printText('Serie: ${encabezado[0].serieDte}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.CENTER,
+    ));
+    await SunmiPrinter.printText('Número de DTE: ${encabezado[0].noDte}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.CENTER,
+    ));
+  }
+
+  await SunmiPrinter.lineWrap(1);
+
+  //No
+  await SunmiPrinter.printText('No: ${encabezado[0].no}',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.RIGHT,
+  ));
+
+  await SunmiPrinter.lineWrap(1);
+
+  //serie
+  await SunmiPrinter.printText('Serie: ${encabezado[0].serie}',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.LEFT,
+  ));
+
+  //vendedor
+  await SunmiPrinter.printText('Vendedor : ${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.LEFT,
+  ));
+  //cliente
+  await SunmiPrinter.printText('Cliente: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.LEFT,
+  ));
+   //nit cliente
+  await SunmiPrinter.printText('NIT: ${encabezado[0].nit}',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.LEFT,
+  ));
+
+  //direccion cliente
+  if (encabezado[0].direccionCli != '') {
+    await SunmiPrinter.printText('Dirección: ${encabezado[0].direccionCli}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.LEFT,
+    ));
+  }
+
+  await SunmiPrinter.lineWrap(1);
+
+   //condiciones de pago
+  await SunmiPrinter.printText('Condiciones de pago:',
+  style: SunmiStyle(
+    bold: true,
+    align: SunmiPrintAlign.CENTER,
+  ));
+  //forma
+  await SunmiPrinter.printText('${encabezado[0].forma}',
+  style: SunmiStyle(
+    bold: true,
+    align: SunmiPrintAlign.CENTER,
+  ));
+
+  await SunmiPrinter.lineWrap(1);
+
+  await SunmiPrinter.line();
+  await SunmiPrinter.printRow(cols: [
+    ColumnMaker(
+        text: 'Descripción',
+        width: 20,
+        align: SunmiPrintAlign.LEFT),
+    ColumnMaker(
+        text: 'Subtotal',
+        width: 10,
+        align: SunmiPrintAlign.CENTER),
+  ]);
+  await SunmiPrinter.line();
+
+  //DETALLES
+  for (int al = 0; al < detalle.length; al++) {
+    double tota =double.parse(detalle[al].cantidad) * double.parse(detalle[al].precio);
+    await SunmiPrinter.printRow(cols: [
+      ColumnMaker(
+          text: '${detalle[al].producto}',
+          width: 24,
+          align: SunmiPrintAlign.LEFT),
+      ColumnMaker(
+          text: '',
+          width: 6,
+          align: SunmiPrintAlign.CENTER),
+    ]);
+
+    await SunmiPrinter.printRow(cols: [
+      ColumnMaker(
+          text: '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
+          width: 20,
+          align: SunmiPrintAlign.LEFT),
+      ColumnMaker(
+          text: '${detalle[al].contenido}${tota}',
+          width: 10,
+          align: SunmiPrintAlign.RIGHT),
+    ]);
+  }
+  await SunmiPrinter.line();
+  await SunmiPrinter.printRow(cols: [
+    ColumnMaker(
+        text:'Descuento(-):',
+        width: 20,
+        align: SunmiPrintAlign.RIGHT),
+    ColumnMaker(
+        text: encabezado[0].contenido + encabezado[0].descuento,
+        width: 10,
+        align: SunmiPrintAlign.CENTER),
+  ]);
+  await SunmiPrinter.printRow(cols: [
+    ColumnMaker(
+        text:'Total:',
+        width: 20,
+        align: SunmiPrintAlign.RIGHT),
+    ColumnMaker(
+        text:  encabezado[0].contenido + encabezado[0].total,
+        width: 10,
+        align: SunmiPrintAlign.CENTER),
+  ]);
+  await SunmiPrinter.lineWrap(1);
+
+  //total en letras
+  await SunmiPrinter.printText('${encabezado[0].totalLetas}',
+  style: SunmiStyle(
+    bold: true,
+    align: SunmiPrintAlign.CENTER,
+  ));
+
+  //frases
+  for (int rl = 0; rl < encabezado[0].frases.length; rl++) {
+    await SunmiPrinter.printText('${encabezado[0].frases[rl]}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.CENTER,
+    ));
+  }
+  
+  //datos certificador
+  if(encabezado[0].dte!=''){
+    await SunmiPrinter.lineWrap(1);
+    await SunmiPrinter.printText('Certificador: ${encabezado[0].certificador}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.LEFT,
+    ));
+    await SunmiPrinter.printText('NIT: ${encabezado[0].nitCert}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.LEFT,
+    ));
+    await SunmiPrinter.printText('Fecha: ${encabezado[0].fechaCert}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.LEFT,
+    ));
+  }
+  
+  await SunmiPrinter.lineWrap(1);
+  await SunmiPrinter.printText('Realizado en www.gozeri.com',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.CENTER,
+  ));
 
   /*await SunmiPrinter.printQRCode('https://github.com/brasizza/sunmi_printer');
   await SunmiPrinter.printText('Normal font',
       style: SunmiStyle(fontSize: SunmiFontSize.MD));*/
-
+  await SunmiPrinter.lineWrap(2);
   await SunmiPrinter.exitTransactionPrint(true);
-}
-
-Future<Uint8List> readFileBytes(String path) async {
-  ByteData fileData = await rootBundle.load(path);
-  Uint8List fileUnit8List = fileData.buffer
-      .asUint8List(fileData.offsetInBytes, fileData.lengthInBytes);
-  return fileUnit8List;
-}
-
-Future<Uint8List> _getImageFromAsset(String iconPath) async {
-  return await readFileBytes(iconPath);
 }

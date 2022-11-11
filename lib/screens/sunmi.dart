@@ -1,4 +1,4 @@
-  Future<List<int>> testTicket(String id_factura) async {
+/*  Future<List<int>> testTicket(String id_factura) async {
    
 
 
@@ -267,4 +267,4 @@
     bytess += generatorr.cut();
     return bytess;
   }
-}
+}*/

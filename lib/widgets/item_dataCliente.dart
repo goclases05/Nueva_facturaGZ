@@ -74,17 +74,30 @@ class _ItemCliente extends State<ItemCliente> {
                       ),
                     ),
                     child: Column(
-                      /*crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,*/
                       children: [
                         Icon(
                           Icons.remove,
                           color: Colors.grey[600],
                           size: 30,
                         ),
-                        CreateClienteWidget(
-                          colorPrimary: widget.colorPrimary,
-                        ),
+                        Expanded(
+                            child: /*ListView.builder(
+                            controller: controller,
+                            itemCount: 1,
+                            itemBuilder: (_, index) {
+                              return ArticuloSheet(
+                                  listProd: widget
+                                      .listProd); /*Card(
+                                child: Padding(
+                                  padding: EdgeInsets.all(8),
+                                  child: Text("Element at index($index)"),
+                                ),
+                              );*/
+                            },
+                          ),*/
+                                SingleChildScrollView(
+                                    controller: controller,
+                                    child: CreateClienteWidget(colorPrimary: widget.colorPrimary))),
                       ],
                     ),
                   );

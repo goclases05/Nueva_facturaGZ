@@ -56,6 +56,23 @@ class _SettingsScreen extends State<SettingsScreen> {
               leading: CircleAvatar(
                   backgroundColor: settings.colorPrimary,
                   child: const Icon(
+                    Icons.receipt_long,
+                    color: Colors.white,
+                  )),
+              title: Text("Imprimir al facturar"),
+              trailing: Switch(
+                  value: Preferencias.printfactura,
+                  onChanged: (value) async {
+                    Preferencias.printfactura = value;
+                    setState(() {});
+                  }),
+              onTap: () {},
+            ),
+            const Divider(color: Colors.grey),
+            ListTile(
+              leading: CircleAvatar(
+                  backgroundColor: settings.colorPrimary,
+                  child: const Icon(
                     Icons.print,
                     color: Colors.white,
                   )),

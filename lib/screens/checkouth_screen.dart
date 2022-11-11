@@ -23,7 +23,7 @@ class CheckOuthScreen extends StatefulWidget {
 }
 
 class _CheckOuthScreenState extends State<CheckOuthScreen> {
-  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  ConnectivityResult _connectionStatus = ConnectivityResult.wifi;
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 

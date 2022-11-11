@@ -5,6 +5,10 @@ import 'package:factura_gozeri/models/view_factura_print.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sunmi_printer_plus/column_maker.dart';
+import 'package:sunmi_printer_plus/enums.dart';
+import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
+import 'package:sunmi_printer_plus/sunmi_style.dart';
 
 class ViewTicket extends StatefulWidget {
   ViewTicket(
@@ -24,17 +28,59 @@ class ViewTicket extends StatefulWidget {
 class _ViewTicketState extends State<ViewTicket> {
   PrinterBluetoothManager _printerManager = PrinterBluetoothManager();
 
+  //SUNMIN
+  bool printBinded = false;
+  int paperSize = 0;
+  String serialNumber = "";
+  String printerVersion = "";
+  //SUNMIN
+
   @override
   void initState() {
     // TODO: implement initState
-    _printerManager.startScan(const Duration(seconds: 2));
+    if (Preferencias.sunmi_preferencia) {
+      _bindingPrinter().then((bool? isBind) async {
+        SunmiPrinter.paperSize().then((int size) {
+          setState(() {
+            paperSize = size;
+          });
+        });
+
+        SunmiPrinter.printerVersion().then((String version) {
+          setState(() {
+            printerVersion = version;
+          });
+        });
+
+        SunmiPrinter.serialNumber().then((String serial) {
+          setState(() {
+            serialNumber = serial;
+          });
+        });
+
+        setState(() {
+          printBinded = isBind!;
+        });
+      });
+    } else {
+      _printerManager.startScan(const Duration(seconds: 2));
+    }
     super.initState();
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
+    if (Preferencias.sunmi_preferencia == false) {
+      _printerManager.stopScan();
+    }
     super.dispose();
+  }
+
+  /// must binding ur printer at first init in app
+  Future<bool?> _bindingPrinter() async {
+    final bool? result = await SunmiPrinter.bindingPrinter();
+    return result;
   }
 
   @override
@@ -413,81 +459,86 @@ class _ViewTicketState extends State<ViewTicket> {
       child: TextButton.icon(
         onPressed: () {
           //codigo de impresion
-          _printerManager.scanResults.listen((devices) async {
+          if(Preferencias.sunmi_preferencia){
+            print_sunmi(context, widget.factura);
+          }else{
+            
+             _printerManager.scanResults.listen((devices) async {
             print(devices);
 
-            if (Preferencias.mac == '') {
-              showDialog(
-                  context: context,
-                  builder: ((context) {
-                    if (devices.length == 0) {
-                      return const AlertDialog(
-                        backgroundColor: Color.fromARGB(255, 236, 133, 115),
-                        content: Text(
-                          'No se encontraron impresoras disponibles.',
-                          style: TextStyle(color: Colors.white),
+              if (Preferencias.mac == '') {
+                showDialog(
+                    context: context,
+                    builder: ((context) {
+                      if (devices.length == 0) {
+                        return const AlertDialog(
+                          backgroundColor: Color.fromARGB(255, 236, 133, 115),
+                          content: Text(
+                            'No se encontraron impresoras disponibles.',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }
+
+                      return AlertDialog(
+                        title: const Text('Impresoras Disponibles'),
+                        content: Container(
+                          height: 300.0, // Change as per your requirement
+                          width: 300.0, // Change as per your requirement
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: devices.length,
+                            itemBuilder: (BuildContext context, int i) {
+                              return ListTile(
+                                title: Text("${devices[i].name}"),
+                                subtitle: Text("${devices[i].address}"),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        _printerManager.stopScan();
+                                        _startPrint(devices[i], widget.factura);
+                                      },
+                                      child: Container(
+                                        margin: const EdgeInsets.all(5),
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                            //color: Theme.of(context).primaryColor,
+                                            color: widget.colorPrimary,
+                                            borderRadius:
+                                                BorderRadius.circular(15)),
+                                        child: const Icon(
+                                          Icons.print,
+                                          color: Colors.white,
+                                          size: 25,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                onTap: () {},
+                              );
+                            },
+                          ),
                         ),
                       );
-                    }
+                    }));
+              } else {
+                //impresion en predeterminada
 
-                    return AlertDialog(
-                      title: const Text('Impresoras Disponibles'),
-                      content: Container(
-                        height: 300.0, // Change as per your requirement
-                        width: 300.0, // Change as per your requirement
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: devices.length,
-                          itemBuilder: (BuildContext context, int i) {
-                            return ListTile(
-                              title: Text("${devices[i].name}"),
-                              subtitle: Text("${devices[i].address}"),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      _printerManager.stopScan();
-                                      _startPrint(devices[i], widget.factura);
-                                    },
-                                    child: Container(
-                                      margin: const EdgeInsets.all(5),
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                          //color: Theme.of(context).primaryColor,
-                                          color: widget.colorPrimary,
-                                          borderRadius:
-                                              BorderRadius.circular(15)),
-                                      child: const Icon(
-                                        Icons.print,
-                                        color: Colors.white,
-                                        size: 25,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              onTap: () {},
-                            );
-                          },
-                        ),
-                      ),
-                    );
-                  }));
-            } else {
-              //impresion en predeterminada
-
-              devices.forEach((printer) async {
-                print(printer);
-                //get saved printer
-                if (printer.address == Preferencias.mac) {
-                  //store the element.
-                  await _startPrint(printer, widget.factura);
-                }
-              });
-            }
-          });
-
+                devices.forEach((printer) async {
+                  print(printer);
+                  //get saved printer
+                  if (printer.address == Preferencias.mac) {
+                    //store the element.
+                    await _startPrint(printer, widget.factura);
+                  }
+                });
+              }
+              
+            });
+          }
           //codigo de impresion
         },
         style: TextButton.styleFrom(
@@ -966,4 +1017,344 @@ class _ViewTicketState extends State<ViewTicket> {
     bytess += generatorr.cut();
     return bytess;
   }
+}
+print_sunmi(BuildContext context, String id_factura) async {
+
+  final print_data = Provider.of<PrintProvider>(context, listen: false);
+    List<Encabezado> encabezado = print_data.list;
+    List<Detalle> detalle = print_data.list_detalle;
+
+  int sede = 0;
+  //0= empresa
+  //1= sucursal
+  if ((encabezado[0].fel == '0' && encabezado[0].felSucu == '1') ||
+      (encabezado[0].fel == '1' && encabezado[0].felSucu == '1')) {
+    sede = 1;
+  } else if (encabezado[0].fel == '1' && encabezado[0].felSucu == '0') {
+    sede = 0;
+  }
+  showDialog(
+    context: context,
+    builder: (_) => const AlertDialog(
+      backgroundColor: Color.fromARGB(255, 115, 160, 236),
+      content: Text(
+        'Imprimiendo...',
+        style: TextStyle(color: Colors.white),
+      ),
+    ),
+  );
+
+  await SunmiPrinter.initPrinter();
+  await SunmiPrinter.startTransactionPrint(true);
+
+  /*if (sede == 1) {
+    if (encabezado[0].foto != '') {
+      String url = encabezado[0].rutaSucu + encabezado[0].foto;
+      // convert image to Uint8List format
+      Uint8List byte = (await NetworkAssetBundle(Uri.parse(url)).load(url))
+          .buffer
+          .asUint8List();
+      await SunmiPrinter.setAlignment(SunmiPrintAlign.CENTER);
+      await SunmiPrinter.startTransactionPrint(true);
+      await SunmiPrinter.printImage(byte);
+    }
+  } else {
+    if (encabezado[0].logoNom != '') {
+      String url = encabezado[0].logoUrl + encabezado[0].logoNom;
+      // convert image to Uint8List format
+      Uint8List byte = (await NetworkAssetBundle(Uri.parse(url)).load(url))
+          .buffer
+          .asUint8List();
+      await SunmiPrinter.setAlignment(SunmiPrintAlign.CENTER);
+      await SunmiPrinter.startTransactionPrint(true);
+      await SunmiPrinter.printImage(byte);
+    }
+  }*/
+  //await SunmiPrinter.lineWrap(2);
+
+  //nombre de empresa
+  await SunmiPrinter.printText(
+      (sede == 1)
+          ? '${encabezado[0].nombreEmpresaSucu}'
+          : '${encabezado[0].nombreEmpresa}',
+      style: SunmiStyle(
+        bold: true,
+        align: SunmiPrintAlign.CENTER,
+      ));
+
+  //Direccion de empresa
+  await SunmiPrinter.printText(
+      (sede == 1)
+          ? '${encabezado[0].direccionSucu}'
+          : '${encabezado[0].direccion}',
+      style: SunmiStyle(
+        bold: true,
+        align: SunmiPrintAlign.CENTER,
+      ));
+
+  //nit emisor
+  if (encabezado[0].nit_emisor != '') {
+    await SunmiPrinter.printText('NIT: ${encabezado[0].nit_emisor}',
+        style: SunmiStyle(
+          bold: true,
+          align: SunmiPrintAlign.CENTER,
+        ));
+  }
+
+  //telefono emisor
+  if (sede == 1) {
+    if (encabezado[0].teleSucu != '') {
+      await SunmiPrinter.printText('Tel: ${encabezado[0].teleSucu}',
+          style: SunmiStyle(
+            bold: true,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    }
+  } else {
+    if (encabezado[0].telefono != '') {
+      await SunmiPrinter.printText('Tel: ${encabezado[0].telefono}',
+          style: SunmiStyle(
+            bold: true,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    }
+  }
+
+  await SunmiPrinter.lineWrap(1);
+
+  //nombre comercial
+  if (sede == 1) {
+    if (encabezado[0].nombre_comercial_sucu != '') {
+      await SunmiPrinter.printText('${encabezado[0].nombre_comercial_sucu}',
+          style: SunmiStyle(
+            bold: true,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    }
+  } else {
+    if (encabezado[0].nombre_comercial_emp != '') {
+      await SunmiPrinter.printText('${encabezado[0].nombre_comercial_emp}',
+          style: SunmiStyle(
+            bold: true,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    }
+  }
+
+  await SunmiPrinter.lineWrap(1);
+  //FEL
+  if (encabezado[0].dte != '') {
+    await SunmiPrinter.printText('Factura Electrónica Documento Tributario',
+        style: SunmiStyle(
+          bold: true,
+          align: SunmiPrintAlign.CENTER,
+        ));
+  }
+
+  await SunmiPrinter.lineWrap(1);
+
+  //FECHA EN LETRAS
+  await SunmiPrinter.printText('${encabezado[0].fecha_letras}',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.RIGHT,
+  ));
+
+  await SunmiPrinter.lineWrap(1);
+
+  if (encabezado[0].dte != '') {
+    await SunmiPrinter.printText('Número de Autorización:',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.CENTER,
+    ));
+    await SunmiPrinter.printText('${encabezado[0].dte}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.CENTER,
+    ));
+    await SunmiPrinter.printText('Serie: ${encabezado[0].serieDte}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.CENTER,
+    ));
+    await SunmiPrinter.printText('Número de DTE: ${encabezado[0].noDte}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.CENTER,
+    ));
+  }
+
+  await SunmiPrinter.lineWrap(1);
+
+  //No
+  await SunmiPrinter.printText('No: ${encabezado[0].no}',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.RIGHT,
+  ));
+
+  await SunmiPrinter.lineWrap(1);
+
+  //serie
+  await SunmiPrinter.printText('Serie: ${encabezado[0].serie}',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.LEFT,
+  ));
+
+  //vendedor
+  await SunmiPrinter.printText('Vendedor : ${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.LEFT,
+  ));
+  //cliente
+  await SunmiPrinter.printText('Cliente: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.LEFT,
+  ));
+   //nit cliente
+  await SunmiPrinter.printText('NIT: ${encabezado[0].nit}',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.LEFT,
+  ));
+
+  //direccion cliente
+  if (encabezado[0].direccionCli != '') {
+    await SunmiPrinter.printText('Dirección: ${encabezado[0].direccionCli}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.LEFT,
+    ));
+  }
+
+  await SunmiPrinter.lineWrap(1);
+
+   //condiciones de pago
+  await SunmiPrinter.printText('Condiciones de pago:',
+  style: SunmiStyle(
+    bold: true,
+    align: SunmiPrintAlign.CENTER,
+  ));
+  //forma
+  await SunmiPrinter.printText('${encabezado[0].forma}',
+  style: SunmiStyle(
+    bold: true,
+    align: SunmiPrintAlign.CENTER,
+  ));
+
+  await SunmiPrinter.lineWrap(1);
+
+  await SunmiPrinter.line();
+  await SunmiPrinter.printRow(cols: [
+    ColumnMaker(
+        text: 'Descripción',
+        width: 20,
+        align: SunmiPrintAlign.LEFT),
+    ColumnMaker(
+        text: 'Subtotal',
+        width: 10,
+        align: SunmiPrintAlign.CENTER),
+  ]);
+  await SunmiPrinter.line();
+
+  //DETALLES
+  for (int al = 0; al < detalle.length; al++) {
+    double tota =double.parse(detalle[al].cantidad) * double.parse(detalle[al].precio);
+    await SunmiPrinter.printRow(cols: [
+      ColumnMaker(
+          text: '${detalle[al].producto}',
+          width: 24,
+          align: SunmiPrintAlign.LEFT),
+      ColumnMaker(
+          text: '',
+          width: 6,
+          align: SunmiPrintAlign.CENTER),
+    ]);
+
+    await SunmiPrinter.printRow(cols: [
+      ColumnMaker(
+          text: '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
+          width: 20,
+          align: SunmiPrintAlign.LEFT),
+      ColumnMaker(
+          text: '${detalle[al].contenido}${tota}',
+          width: 10,
+          align: SunmiPrintAlign.RIGHT),
+    ]);
+  }
+  await SunmiPrinter.line();
+  await SunmiPrinter.printRow(cols: [
+    ColumnMaker(
+        text:'Descuento(-):',
+        width: 20,
+        align: SunmiPrintAlign.RIGHT),
+    ColumnMaker(
+        text: encabezado[0].contenido + encabezado[0].descuento,
+        width: 10,
+        align: SunmiPrintAlign.CENTER),
+  ]);
+  await SunmiPrinter.printRow(cols: [
+    ColumnMaker(
+        text:'Total:',
+        width: 20,
+        align: SunmiPrintAlign.RIGHT),
+    ColumnMaker(
+        text:  encabezado[0].contenido + encabezado[0].total,
+        width: 10,
+        align: SunmiPrintAlign.CENTER),
+  ]);
+  await SunmiPrinter.lineWrap(1);
+
+  //total en letras
+  await SunmiPrinter.printText('${encabezado[0].totalLetas}',
+  style: SunmiStyle(
+    bold: true,
+    align: SunmiPrintAlign.CENTER,
+  ));
+
+  //frases
+  for (int rl = 0; rl < encabezado[0].frases.length; rl++) {
+    await SunmiPrinter.printText('${encabezado[0].frases[rl]}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.CENTER,
+    ));
+  }
+  
+  //datos certificador
+  if(encabezado[0].dte!=''){
+    await SunmiPrinter.lineWrap(1);
+    await SunmiPrinter.printText('Certificador: ${encabezado[0].certificador}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.LEFT,
+    ));
+    await SunmiPrinter.printText('NIT: ${encabezado[0].nitCert}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.LEFT,
+    ));
+    await SunmiPrinter.printText('Fecha: ${encabezado[0].fechaCert}',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.LEFT,
+    ));
+  }
+  
+  await SunmiPrinter.lineWrap(1);
+  await SunmiPrinter.printText('Realizado en www.gozeri.com',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.CENTER,
+  ));
+
+  /*await SunmiPrinter.printQRCode('https://github.com/brasizza/sunmi_printer');
+  await SunmiPrinter.printText('Normal font',
+      style: SunmiStyle(fontSize: SunmiFontSize.MD));*/
+  await SunmiPrinter.lineWrap(2);
+  await SunmiPrinter.exitTransactionPrint(true);
 }

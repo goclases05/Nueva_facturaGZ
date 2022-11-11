@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
@@ -15,11 +16,21 @@ import 'global/globals.dart';
 import 'screens/screens.dart';
 import 'services/services.dart';
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //await Preferences.init();
   WidgetsFlutterBinding.ensureInitialized();
   await Preferencias.init();
+  HttpOverrides.global = new MyHttpOverrides();
   runApp(const AppState());
 }
 
