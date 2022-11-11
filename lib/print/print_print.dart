@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:edge_alerts/edge_alerts.dart';
 import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:factura_gozeri/global/globals.dart';
@@ -101,7 +102,7 @@ class _PrintScreenState extends State<PrintScreen> {
     initialActivity();
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
-    
+
     if (Preferencias.sunmi_preferencia) {
       _bindingPrinter().then((bool? isBind) async {
         SunmiPrinter.paperSize().then((int size) {
@@ -127,10 +128,9 @@ class _PrintScreenState extends State<PrintScreen> {
         });
       });
     } else {
-    _printerManager.startScan(Duration(seconds: 2));
+      _printerManager.startScan(Duration(seconds: 2));
     }
 
-    
     super.initState();
   }
 
@@ -139,7 +139,7 @@ class _PrintScreenState extends State<PrintScreen> {
     final bool? result = await SunmiPrinter.bindingPrinter();
     return result;
   }
-  
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -237,7 +237,7 @@ class _PrintScreenState extends State<PrintScreen> {
                                 widget.id_tmp, 'add', newValue!);
                             if (cambio != '1') {
                               //Preferencias.serie = newValue!;
-                              SnackBar snackBar = SnackBar(
+                              /*SnackBar snackBar = SnackBar(
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(24),
@@ -253,7 +253,11 @@ class _PrintScreenState extends State<PrintScreen> {
                                     Color.fromARGB(255, 224, 96, 113),
                               );
                               ScaffoldMessenger.of(context)
-                                  .showSnackBar(snackBar);
+                                  .showSnackBar(snackBar);*/
+                              edgeAlert(context,
+                                  description: '${cambio}',
+                                  gravity: Gravity.top,
+                                  backgroundColor: Colors.redAccent);
                             } else {
                               facturaService.initialSerie = newValue;
                               setState(() {});
@@ -476,7 +480,7 @@ class _PrintScreenState extends State<PrintScreen> {
                       //PrinterBluetooth device = await Preferencias.impresora as dynamic;
                       if (facturaService.list_det.length < 1) {
                         //no tiene articulos agregados
-                        SnackBar snackBar = SnackBar(
+                        /*SnackBar snackBar = SnackBar(
                           margin: EdgeInsets.only(
                               bottom:
                                   (MediaQuery.of(context).size.height * 0.95),
@@ -490,10 +494,14 @@ class _PrintScreenState extends State<PrintScreen> {
                           ),
                           backgroundColor: Color.fromARGB(255, 208, 96, 88),
                         );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                        edgeAlert(context,
+                            description: 'Error: Agrega articulos a la factura',
+                            gravity: Gravity.top,
+                            backgroundColor: Colors.redAccent);
                       } else if (facturaService.initialSerie == '0') {
                         //no tiene seleccionada una serie
-                        SnackBar snackBar = SnackBar(
+                        /*SnackBar snackBar = SnackBar(
                           behavior: SnackBarBehavior.floating,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(24),
@@ -507,9 +515,13 @@ class _PrintScreenState extends State<PrintScreen> {
                           ),
                           backgroundColor: Color.fromARGB(255, 208, 96, 88),
                         );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                        edgeAlert(context,
+                            description: 'Error: Seleccióna una serie',
+                            gravity: Gravity.top,
+                            backgroundColor: Colors.redAccent);
                       } else if (facturaService.id == '') {
-                        SnackBar snackBar = SnackBar(
+                        /*SnackBar snackBar = SnackBar(
                           behavior: SnackBarBehavior.floating,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(24),
@@ -523,11 +535,15 @@ class _PrintScreenState extends State<PrintScreen> {
                           ),
                           backgroundColor: Color.fromARGB(255, 208, 96, 88),
                         );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                        edgeAlert(context,
+                            description: 'Error: Seleccióne un cliente',
+                            gravity: Gravity.top,
+                            backgroundColor: Colors.redAccent);
                       } else if (double.parse(facturaService.saldo) >=
                           double.parse(facturaService.total_fac)) {
                         //no aplico pagos a la factura
-                        SnackBar snackBar = const SnackBar(
+                        /*SnackBar snackBar = const SnackBar(
                           dismissDirection: DismissDirection.up,
                           padding: EdgeInsets.all(20),
                           content: Text(
@@ -536,7 +552,11 @@ class _PrintScreenState extends State<PrintScreen> {
                           ),
                           backgroundColor: Color.fromARGB(255, 208, 96, 88),
                         );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                        edgeAlert(context,
+                            description: 'Error: Aplicar pago',
+                            gravity: Gravity.top,
+                            backgroundColor: Colors.redAccent);
                       } else {
                         //FACTURANDO
                         var facturar =
@@ -544,7 +564,7 @@ class _PrintScreenState extends State<PrintScreen> {
                         var js = json.decode(facturar);
 
                         if (js['MENSAJE'] == 'OK') {
-                          SnackBar snackBar = const SnackBar(
+                          /*SnackBar snackBar = const SnackBar(
                             padding: EdgeInsets.all(20),
                             content: Text(
                               'Facturacion Completada',
@@ -552,25 +572,40 @@ class _PrintScreenState extends State<PrintScreen> {
                             ),
                             backgroundColor: Colors.green,
                           );
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                          if(Preferencias.printfactura == false){
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+
+                          edgeAlert(context,
+                              description: 'Factura Realizada',
+                              gravity: Gravity.top,
+                              backgroundColor:
+                                  Color.fromARGB(255, 81, 131, 83));
+
+                          if (Preferencias.printfactura == false) {
                             showDialog(
                               context: context,
                               builder: (_) => AlertDialog(
-                                backgroundColor:Color.fromARGB(255, 109, 224, 186),
-                                content: Text('Listo...',
+                                backgroundColor:
+                                    Color.fromARGB(255, 109, 224, 186),
+                                content: Text(
+                                  'Listo...',
                                   style: const TextStyle(color: Colors.white),
                                 ),
                               ),
                             );
                             Navigator.of(context, rootNavigator: true).pop();
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => const EscritorioScreen()));
-                          }else{
-                            
-                            if(Preferencias.sunmi_preferencia){
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const EscritorioScreen()));
+                          } else {
+                            if (Preferencias.sunmi_preferencia) {
                               await print_sunmi(context, js['ID']);
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => const EscritorioScreen()));
-                            }else{
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) =>
+                                          const EscritorioScreen()));
+                            } else {
                               print('entro');
                               _printerManager.stopScan();
                               await _printerManager.scanResults
@@ -583,18 +618,19 @@ class _PrintScreenState extends State<PrintScreen> {
                                       builder: ((context) {
                                         if (devices.length == 0) {
                                           return const AlertDialog(
-                                            backgroundColor:
-                                                Color.fromARGB(255, 236, 133, 115),
+                                            backgroundColor: Color.fromARGB(
+                                                255, 236, 133, 115),
                                             content: Text(
                                               'No se encontraron impresoras disponibles.',
-                                              style: TextStyle(color: Colors.white),
+                                              style: TextStyle(
+                                                  color: Colors.white),
                                             ),
                                           );
                                         }
 
                                         return AlertDialog(
-                                          title:
-                                              const Text('Impresoras Disponibles'),
+                                          title: const Text(
+                                              'Impresoras Disponibles'),
                                           content: Container(
                                             height:
                                                 300.0, // Change as per your requirement
@@ -604,36 +640,41 @@ class _PrintScreenState extends State<PrintScreen> {
                                               shrinkWrap: true,
                                               itemCount: devices.length,
                                               itemBuilder:
-                                                  (BuildContext context, int i) {
+                                                  (BuildContext context,
+                                                      int i) {
                                                 return ListTile(
-                                                  title: Text("${devices[i].name}"),
-                                                  subtitle:
-                                                      Text("${devices[i].address}"),
+                                                  title: Text(
+                                                      "${devices[i].name}"),
+                                                  subtitle: Text(
+                                                      "${devices[i].address}"),
                                                   trailing: Row(
-                                                    mainAxisSize: MainAxisSize.min,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
                                                     children: [
                                                       GestureDetector(
                                                         onTap: () {
                                                           _printerManager
                                                               .stopScan();
                                                           _startPrint(
-                                                              devices[i], js['ID']);
+                                                              devices[i],
+                                                              js['ID']);
                                                         },
                                                         child: Container(
                                                           margin:
-                                                              const EdgeInsets.all(
-                                                                  5),
+                                                              const EdgeInsets
+                                                                  .all(5),
                                                           padding:
-                                                              const EdgeInsets.all(
-                                                                  10),
-                                                          decoration: BoxDecoration(
-                                                              //color: Theme.of(context).primaryColor,
-                                                              color: widget
-                                                                  .colorPrimary,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          15)),
+                                                              const EdgeInsets
+                                                                  .all(10),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  //color: Theme.of(context).primaryColor,
+                                                                  color: widget
+                                                                      .colorPrimary,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              15)),
                                                           child: const Icon(
                                                             Icons.print,
                                                             color: Colors.white,
@@ -669,7 +710,7 @@ class _PrintScreenState extends State<PrintScreen> {
                           // ignore: use_build_context_synchronously
 
                         } else {
-                          SnackBar snackBar = SnackBar(
+                          /*SnackBar snackBar = SnackBar(
                             padding: const EdgeInsets.all(20),
                             dismissDirection: DismissDirection.up,
                             content: Text(
@@ -679,7 +720,11 @@ class _PrintScreenState extends State<PrintScreen> {
                             backgroundColor:
                                 const Color.fromARGB(255, 224, 96, 113),
                           );
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                          edgeAlert(context,
+                              title: '${facturar}',
+                              gravity: Gravity.top,
+                              backgroundColor: Colors.redAccent);
                           print(facturar);
                         }
                       }
@@ -728,10 +773,9 @@ class _PrintScreenState extends State<PrintScreen> {
       ),
     );
     Navigator.of(context, rootNavigator: true).pop(result);
-    
-      Navigator.push(
-          context, MaterialPageRoute(builder: (_) => const EscritorioScreen()));
-    
+
+    Navigator.push(
+        context, MaterialPageRoute(builder: (_) => const EscritorioScreen()));
   }
 
   Future<List<int>> testTicket(String id_factura) async {
@@ -1099,7 +1143,6 @@ class _PrintScreenState extends State<PrintScreen> {
 }
 
 print_sunmi(BuildContext context, String id_factura) async {
-
   final print_data = Provider.of<PrintProvider>(context, listen: false);
   await print_data.dataFac(id_factura);
   List<Encabezado> encabezado = print_data.list;
@@ -1236,129 +1279,124 @@ print_sunmi(BuildContext context, String id_factura) async {
 
   //FECHA EN LETRAS
   await SunmiPrinter.printText('${encabezado[0].fecha_letras}',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.RIGHT,
-  ));
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.RIGHT,
+      ));
 
   await SunmiPrinter.lineWrap(1);
 
   if (encabezado[0].dte != '') {
     await SunmiPrinter.printText('Número de Autorización:',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.CENTER,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+        ));
     await SunmiPrinter.printText('${encabezado[0].dte}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.CENTER,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+        ));
     await SunmiPrinter.printText('Serie: ${encabezado[0].serieDte}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.CENTER,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+        ));
     await SunmiPrinter.printText('Número de DTE: ${encabezado[0].noDte}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.CENTER,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+        ));
   }
 
   await SunmiPrinter.lineWrap(1);
 
   //No
   await SunmiPrinter.printText('No: ${encabezado[0].no}',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.RIGHT,
-  ));
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.RIGHT,
+      ));
 
   await SunmiPrinter.lineWrap(1);
 
   //serie
   await SunmiPrinter.printText('Serie: ${encabezado[0].serie}',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.LEFT,
-  ));
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.LEFT,
+      ));
 
   //vendedor
-  await SunmiPrinter.printText('Vendedor : ${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.LEFT,
-  ));
+  await SunmiPrinter.printText(
+      'Vendedor : ${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.LEFT,
+      ));
   //cliente
-  await SunmiPrinter.printText('Cliente: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.LEFT,
-  ));
-   //nit cliente
+  await SunmiPrinter.printText(
+      'Cliente: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.LEFT,
+      ));
+  //nit cliente
   await SunmiPrinter.printText('NIT: ${encabezado[0].nit}',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.LEFT,
-  ));
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.LEFT,
+      ));
 
   //direccion cliente
   if (encabezado[0].direccionCli != '') {
     await SunmiPrinter.printText('Dirección: ${encabezado[0].direccionCli}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.LEFT,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
   }
 
   await SunmiPrinter.lineWrap(1);
 
-   //condiciones de pago
+  //condiciones de pago
   await SunmiPrinter.printText('Condiciones de pago:',
-  style: SunmiStyle(
-    bold: true,
-    align: SunmiPrintAlign.CENTER,
-  ));
+      style: SunmiStyle(
+        bold: true,
+        align: SunmiPrintAlign.CENTER,
+      ));
   //forma
   await SunmiPrinter.printText('${encabezado[0].forma}',
-  style: SunmiStyle(
-    bold: true,
-    align: SunmiPrintAlign.CENTER,
-  ));
+      style: SunmiStyle(
+        bold: true,
+        align: SunmiPrintAlign.CENTER,
+      ));
 
   await SunmiPrinter.lineWrap(1);
 
   await SunmiPrinter.line();
   await SunmiPrinter.printRow(cols: [
-    ColumnMaker(
-        text: 'Descripción',
-        width: 20,
-        align: SunmiPrintAlign.LEFT),
-    ColumnMaker(
-        text: 'Subtotal',
-        width: 10,
-        align: SunmiPrintAlign.CENTER),
+    ColumnMaker(text: 'Descripción', width: 20, align: SunmiPrintAlign.LEFT),
+    ColumnMaker(text: 'Subtotal', width: 10, align: SunmiPrintAlign.CENTER),
   ]);
   await SunmiPrinter.line();
 
   //DETALLES
   for (int al = 0; al < detalle.length; al++) {
-    double tota =double.parse(detalle[al].cantidad) * double.parse(detalle[al].precio);
+    double tota =
+        double.parse(detalle[al].cantidad) * double.parse(detalle[al].precio);
     await SunmiPrinter.printRow(cols: [
       ColumnMaker(
           text: '${detalle[al].producto}',
           width: 24,
           align: SunmiPrintAlign.LEFT),
-      ColumnMaker(
-          text: '',
-          width: 6,
-          align: SunmiPrintAlign.CENTER),
+      ColumnMaker(text: '', width: 6, align: SunmiPrintAlign.CENTER),
     ]);
 
     await SunmiPrinter.printRow(cols: [
       ColumnMaker(
-          text: '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
+          text:
+              '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
           width: 20,
           align: SunmiPrintAlign.LEFT),
       ColumnMaker(
@@ -1369,22 +1407,16 @@ print_sunmi(BuildContext context, String id_factura) async {
   }
   await SunmiPrinter.line();
   await SunmiPrinter.printRow(cols: [
-    ColumnMaker(
-        text:'Descuento(-):',
-        width: 20,
-        align: SunmiPrintAlign.RIGHT),
+    ColumnMaker(text: 'Descuento(-):', width: 20, align: SunmiPrintAlign.RIGHT),
     ColumnMaker(
         text: encabezado[0].contenido + encabezado[0].descuento,
         width: 10,
         align: SunmiPrintAlign.CENTER),
   ]);
   await SunmiPrinter.printRow(cols: [
+    ColumnMaker(text: 'Total:', width: 20, align: SunmiPrintAlign.RIGHT),
     ColumnMaker(
-        text:'Total:',
-        width: 20,
-        align: SunmiPrintAlign.RIGHT),
-    ColumnMaker(
-        text:  encabezado[0].contenido + encabezado[0].total,
+        text: encabezado[0].contenido + encabezado[0].total,
         width: 10,
         align: SunmiPrintAlign.CENTER),
   ]);
@@ -1392,46 +1424,46 @@ print_sunmi(BuildContext context, String id_factura) async {
 
   //total en letras
   await SunmiPrinter.printText('${encabezado[0].totalLetas}',
-  style: SunmiStyle(
-    bold: true,
-    align: SunmiPrintAlign.CENTER,
-  ));
+      style: SunmiStyle(
+        bold: true,
+        align: SunmiPrintAlign.CENTER,
+      ));
 
   //frases
   for (int rl = 0; rl < encabezado[0].frases.length; rl++) {
     await SunmiPrinter.printText('${encabezado[0].frases[rl]}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.CENTER,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+        ));
   }
-  
+
   //datos certificador
-  if(encabezado[0].dte!=''){
+  if (encabezado[0].dte != '') {
     await SunmiPrinter.lineWrap(1);
     await SunmiPrinter.printText('Certificador: ${encabezado[0].certificador}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.LEFT,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
     await SunmiPrinter.printText('NIT: ${encabezado[0].nitCert}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.LEFT,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
     await SunmiPrinter.printText('Fecha: ${encabezado[0].fechaCert}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.LEFT,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
   }
-  
+
   await SunmiPrinter.lineWrap(1);
   await SunmiPrinter.printText('Realizado en www.gozeri.com',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.CENTER,
-  ));
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.CENTER,
+      ));
 
   /*await SunmiPrinter.printQRCode('https://github.com/brasizza/sunmi_printer');
   await SunmiPrinter.printText('Normal font',

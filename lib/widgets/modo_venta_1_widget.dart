@@ -1,3 +1,4 @@
+import 'package:edge_alerts/edge_alerts.dart';
 import 'package:factura_gozeri/models/producto_x_departamento_models.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:flutter/material.dart';
@@ -330,14 +331,14 @@ class _ModoVenta1State extends State<ModoVenta1> {
                 return TextButton.icon(
                   onPressed: () {
                     if (widget.listProd.facturar == '1') {
-                      const snackBar = SnackBar(
+                      /*const snackBar = SnackBar(
                         padding: EdgeInsets.all(20),
                         content: Text(
                           'Item agregado al carrito!',
                           style: TextStyle(color: Colors.white),
                         ),
                         backgroundColor: Colors.green,
-                      );
+                      );*/
                       cart.add(
                           1,
                           widget.listProd.idProd,
@@ -348,25 +349,33 @@ class _ModoVenta1State extends State<ModoVenta1> {
                               : _precio_field.toString());
                       // Find the ScaffoldMessenger in the widget tree
                       // and use it to show a SnackBar.
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      //ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      edgeAlert(context,
+                          description: 'Item agregado al carrito!',
+                          gravity: Gravity.top,
+                          backgroundColor: Color.fromARGB(255, 81, 131, 83));
 
                       Navigator.pop(context);
                     } else {
                       if (_counterValue > double.parse(widget.listProd.stock)) {
-                        const snackBar = SnackBar(
+                        edgeAlert(context,
+                            description: 'Articulo sin Stock!',
+                            gravity: Gravity.top,
+                            backgroundColor: Colors.redAccent);
+                        /*const snackBar = SnackBar(
                           padding: EdgeInsets.all(20),
                           content: Text(
                             'Articulo sin Stock!',
                             style: TextStyle(color: Colors.white),
                           ),
                           backgroundColor: Colors.red,
-                        );
+                        );*/
 
                         // Find the ScaffoldMessenger in the widget tree
                         // and use it to show a SnackBar.
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        //ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       } else {
-                        const snackBar = SnackBar(
+                        /*const snackBar = SnackBar(
                           padding: EdgeInsets.all(20),
                           content: Text(
                             'Item agregado al carrito!',
@@ -377,9 +386,16 @@ class _ModoVenta1State extends State<ModoVenta1> {
 
                         // Find the ScaffoldMessenger in the widget tree
                         // and use it to show a SnackBar.
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+
                         cart.add(1, widget.listProd.idProd, widget.id_tmp,
                             _counterValue.toString(), _precio_field.toString());
+
+                        edgeAlert(context,
+                            description: 'Item agregado al carrito!',
+                            gravity: Gravity.top,
+                            backgroundColor: Color.fromARGB(255, 81, 131, 83));
+
                         Navigator.pop(context);
                       }
                     }

@@ -1,3 +1,4 @@
+import 'package:edge_alerts/edge_alerts.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +32,7 @@ class _RegistroMetodoPagoState extends State<RegistroMetodoPago> {
   Widget build(BuildContext context) {
     final Metodo = Provider.of<Facturacion>(context);
 
-    _controlPago.text=Metodo.total_fac;
+    _controlPago.text = Metodo.total_fac;
 
     List<DropdownMenuItem<String>> menuItems = [];
     List<DropdownMenuItem<String>> bancosItems = [];
@@ -145,7 +146,7 @@ class _RegistroMetodoPagoState extends State<RegistroMetodoPago> {
                       child: Text("Aplicar Pago")),
                   onPressed: () async {
                     if (_controlPago.text == '') {
-                      SnackBar snackBar = const SnackBar(
+                      /*SnackBar snackBar = const SnackBar(
                         padding: EdgeInsets.all(20),
                         content: Text(
                           'Inserta cantidad a pagar',
@@ -153,7 +154,11 @@ class _RegistroMetodoPagoState extends State<RegistroMetodoPago> {
                         ),
                         backgroundColor: Color.fromARGB(255, 224, 96, 113),
                       );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                      edgeAlert(context,
+                          description: 'Inserta cantidad a pagar',
+                          gravity: Gravity.top,
+                          backgroundColor: Colors.redAccent);
                     } else {
                       var insert = await Metodo.accionesMetodoPAgo(
                           'add',
@@ -170,7 +175,7 @@ class _RegistroMetodoPagoState extends State<RegistroMetodoPago> {
                         Metodo.transacciones(widget.id_tmp);
                         setState(() {});
                       } else {
-                        SnackBar snackBar = SnackBar(
+                        /*SnackBar snackBar = SnackBar(
                           padding: const EdgeInsets.all(20),
                           content: Text(
                             '${insert}',
@@ -179,7 +184,11 @@ class _RegistroMetodoPagoState extends State<RegistroMetodoPago> {
                           backgroundColor:
                               const Color.fromARGB(255, 224, 96, 113),
                         );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                        edgeAlert(context,
+                            description: '${insert}',
+                            gravity: Gravity.top,
+                            backgroundColor: Colors.redAccent);
                       }
                     }
 

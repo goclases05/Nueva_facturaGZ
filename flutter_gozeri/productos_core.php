@@ -40,6 +40,29 @@ $matriz_productos=array();
 		$i=0;
 		foreach($array_productos as $key){
 
+			$id_prod = $key['ID_PROD'];
+			$impuestos = $conexion->query("SELECT tblimpuestos_tipos.CODIGO AS CODIGO_G, tblimpuestos.NOMBRE_CORTO, tblimpuestos.SUMAR_MONTO, tblimpuestos_tipos.ID_IMPUESTO, tblimpuestos_tipos.CODIGO, tblproductos_impuestos.ID, tblimpuestos.NOMBRE, tblimpuestos.SIGLA, tblimpuestos_tipos.NOMBRE AS TIPO, tblimpuestos_tipos.ISO, tblimpuestos_tipos.MONTO FROM bgzeri_empresa.tblproductos_impuestos INNER JOIN bgzeri_empresa.tblimpuestos_tipos ON tblimpuestos_tipos.ID_IMP_TIPO = tblproductos_impuestos.ID_IMP_TIPO INNER JOIN bgzeri_empresa.tblimpuestos ON tblimpuestos.ID_IMPUESTO = tblimpuestos_tipos.ID_IMPUESTO WHERE tblproductos_impuestos.ID_PROD = '$id_prod'");
+			$monto = 0;
+			while ($value = $impuestos->fetch(PDO::FETCH_ASSOC)) {
+				if ($value["ID_IMPUESTO"] == 1 && $value["CODIGO"] == 2) {
+
+				}else{
+					if ($value["SUMAR_MONTO"] == 1) {
+						if ($value["ISO"] == 'GTQ') {
+							$monto += $value["MONTO"];
+						}else if ($value["ISO"] == 'USD') {
+							$monto += $value["MONTO"]*7.72;
+						}else if ($value["ISO"] == '%') {
+							$monto += round((((($precio)/"1.".$value["MONTO"])*$value["MONTO"])/100), 2);
+						}
+					}
+				}
+			}
+			$p1=$key['PRECIO']+$monto;
+			$p2=$key['PRECIO_2']+$monto;
+			$p3=$key['PRECIO_3']+$monto;
+			$p4=$key['PRECIO_4']+$monto;
+
 			$matriz_productos[$i]['ID_PROD'] = "{$key['ID_PROD']}";
 			$matriz_productos[$i]['PRODUCTO'] = "".strip_tags(html_entity_decode($key['PRODUCTO']))."";
 			$matriz_productos[$i]['CODIGO'] = "{$key['CODIGO']}";
@@ -47,10 +70,10 @@ $matriz_productos=array();
 			$matriz_productos[$i]['DESC_COMP'] = "".strip_tags(html_entity_decode($key['DESC_COMP']))."";
 			$matriz_productos[$i]['MODO_VENTA'] = "{$key['UNIDAD_MEDIDA']}";
 			$matriz_productos[$i]['FACTURAR'] = "{$key['FACTURAR']}";
-			$matriz_productos[$i]['PRECIO'] = "{$key['PRECIO']}";
-			$matriz_productos[$i]['PRECIO_2'] = "{$key['PRECIO_2']}";
-			$matriz_productos[$i]['PRECIO_3'] = "{$key['PRECIO_3']}";
-			$matriz_productos[$i]['PRECIO_4'] = "{$key['PRECIO_4']}";
+			$matriz_productos[$i]['PRECIO'] = "{$p1}";
+			$matriz_productos[$i]['PRECIO_2'] = "{$p2}";
+			$matriz_productos[$i]['PRECIO_3'] = "{$p3}";
+			$matriz_productos[$i]['PRECIO_4'] = "{$p4}";
 			$matriz_productos[$i]['STOCK'] = "{$key['STOCK']}";
 			$matriz_productos[$i]['FOTO'] = "{$key['FOTO']}";
 			$matriz_productos[$i]['URL'] = "{$key['URL']}";

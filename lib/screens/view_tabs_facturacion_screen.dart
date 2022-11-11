@@ -1,4 +1,4 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:edge_alerts/edge_alerts.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/screens/screens.dart';
@@ -69,18 +69,25 @@ class TabsFacturacion extends StatelessWidget {
           backgroundColor: colorPrimary,
           elevation: 5,
           onPressed: () async {
-            final _depa =Provider.of<DepartamentoService>(context, listen: false);
+            final _depa =
+                Provider.of<DepartamentoService>(context, listen: false);
             _depa.isLoading = true;
             _depa.LoadDepa();
 
             final _cart = Provider.of<Cart>(context, listen: false);
             _cart.cantidad = 0;
 
-            final _facturacion =Provider.of<Facturacion>(context, listen: false);
+            final _facturacion =
+                Provider.of<Facturacion>(context, listen: false);
             final factuProv = await _facturacion.new_tmpFactura();
-            
+
             if (_facturacion.tmp_creada == '') {
-              var snackBar = SnackBar(
+              edgeAlert(context,
+                  title: 'Error!',
+                  description: 'Fallo al crear la factura temporal.',
+                  gravity: Gravity.top,
+                  backgroundColor: Colors.redAccent);
+              /*var snackBar = SnackBar(
                 /// need to set following properties for best effect of awesome_snackbar_content
                 duration: const Duration(seconds: 1),
                 elevation: 0,
@@ -94,7 +101,7 @@ class TabsFacturacion extends StatelessWidget {
                   contentType: ContentType.failure,
                 ),
               );
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
             } else {
               // ignore: use_build_context_synchronously
               Navigator.push(

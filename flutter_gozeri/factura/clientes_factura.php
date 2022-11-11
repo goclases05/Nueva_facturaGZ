@@ -26,6 +26,9 @@
     while ($row = $select->fetch(PDO::FETCH_ASSOC)) {
         $clients[$i]["label"] = $row["NOMBRE"].' '.$row["APELLIDOS"].' ('.$row['NIT'].')';
         $clients[$i]["id"] = $row["ID_USUARIO"];
+        if (empty($row['NIT'])) {
+            $row['NIT'] = 'CF';
+        }
         $clients[$i]['nit']=$row['NIT'];
         $i++;
     }

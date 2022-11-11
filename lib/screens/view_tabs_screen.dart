@@ -104,7 +104,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
             text: departamentoService.depa[i].departamento,
           ),
         );
-
+        print('la tmp tab: ' + widget.id_tmp);
         _views.add(ViewProductoTab(
             id_departamento: departamentoService.depa[i].id,
             id_tmp: widget.id_tmp,

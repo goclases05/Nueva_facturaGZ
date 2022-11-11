@@ -1,4 +1,5 @@
 <?php 
+	date_default_timezone_set("America/Guatemala");
 	header('Content-type: application/json; charset=utf-8');
 	
 	if ($_SERVER['SERVER_NAME']=='localhost') {

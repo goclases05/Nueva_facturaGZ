@@ -32,7 +32,7 @@ class Facturacion extends ChangeNotifier {
   List<Transacciones> list_transaccion = [];
   String total_fac = '0';
   String saldo = '0';
-  String abonosi2='0';
+  String abonosi2 = '0';
 
   //variables para cliente
   String cliente = '';
@@ -127,7 +127,7 @@ class Facturacion extends ChangeNotifier {
     notifyListeners();
     var result;
     double abonosi = 0;
-    this.abonosi2='0';
+    this.abonosi2 = '0';
     for (int o = 0; o < len; o++) {
       result = Transacciones.fromJson(js['TRANSACCIONES'][o]);
       /*list_det.addAll(result);*/
@@ -138,7 +138,7 @@ class Facturacion extends ChangeNotifier {
     double y = double.parse(js['TOTAL']);
     total_fac = y.toString();
     saldo = (double.parse(js['TOTAL']) - abonosi).toString();
-    abonosi2=abonosi2.toString();
+    abonosi2 = abonosi2.toString();
     loadTransaccion = false;
     return notifyListeners();
   }
@@ -336,8 +336,37 @@ class Facturacion extends ChangeNotifier {
         return notifyListeners();
       }
     }
-
     return true;
+  }
+
+  Future<dynamic> create_cliente(
+      String nombre, String apellidos, String nit, String tmp) async {
+    final empresa = Preferencias.data_empresa;
+    final id_usuario = Preferencias.data_id;
+
+    print(
+        "https://app.gozeri.com/flutter_gozeri/factura/create_cliente.php?tmp=${tmp}&nombre=${nombre}&apellidos=${apellidos}&nit=${nit}&idempresa=${empresa}&idusuario=${id_usuario}");
+    final Uri uri = Uri.parse(
+        "https://app.gozeri.com/flutter_gozeri/factura/create_cliente.php?tmp=${tmp}&nombre=${nombre}&apellidos=${apellidos}&nit=${nit}&idempresa=${empresa}&idusuario=${id_usuario}");
+
+    final resp = await http.get(uri);
+    Map<String, dynamic> rhh = await json.decode(resp.body);
+
+    if (rhh["MENSAJE"] == 'OK') {
+      return await read_cliente('read', rhh['ID'], tmp);
+    }
+    return notifyListeners();
+  }
+
+  Future<String> delete_tmp(String tmp) async {
+    print(
+        "https://app.gozeri.com/flutter_gozeri/factura/eliminar_factura.php?id=${tmp}");
+    final Uri uri = Uri.parse(
+        "https://app.gozeri.com/flutter_gozeri/factura/eliminar_factura.php?id=${tmp}");
+
+    final resp = await http.get(uri);
+    print('se elimino: ' + resp.body);
+    return resp.body;
   }
 
   Future<dynamic> get_Sat(String tmp, String nit) async {

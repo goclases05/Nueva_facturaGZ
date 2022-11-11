@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:edge_alerts/edge_alerts.dart';
 import 'package:factura_gozeri/global/preferencias_global.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/widgets/widgets.dart';
@@ -19,7 +20,6 @@ class ItemCliente extends StatefulWidget {
 }
 
 class _ItemCliente extends State<ItemCliente> {
-  
   Future<List> fetchData() async {
     await Future.delayed(Duration(milliseconds: 0));
     final String _baseUrl = "app.gozeri.com";
@@ -97,7 +97,10 @@ class _ItemCliente extends State<ItemCliente> {
                           ),*/
                                 SingleChildScrollView(
                                     controller: controller,
-                                    child: CreateClienteWidget(colorPrimary: widget.colorPrimary))),
+                                    child: CreateClienteWidget(
+                                      colorPrimary: widget.colorPrimary,
+                                      tmp: widget.tmp,
+                                    ))),
                       ],
                     ),
                   );
@@ -179,7 +182,7 @@ class _ItemCliente extends State<ItemCliente> {
                 alignment: Alignment.center,
                 child: IconButton(
                     onPressed: () async {
-                      const snackBar = SnackBar(
+                      /*const snackBar = SnackBar(
                         padding: EdgeInsets.all(20),
                         content: Text(
                           'Buscando NIT en SAT ...',
@@ -187,10 +190,15 @@ class _ItemCliente extends State<ItemCliente> {
                         ),
                         backgroundColor: Color.fromARGB(255, 19, 126, 164),
                       );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                      edgeAlert(context,
+                          description: 'Buscando NIT en SAT ...',
+                          gravity: Gravity.top,
+                          backgroundColor: Color.fromARGB(255, 19, 126, 164));
+
                       await FacturaProvider.get_Sat(widget.tmp, searchC.text);
                       if (FacturaProvider.cambio_c != '0') {
-                        SnackBar snackBar = SnackBar(
+                        /*SnackBar snackBar = SnackBar(
                           padding: EdgeInsets.all(20),
                           content: Text(
                             FacturaProvider.cambio_c,
@@ -198,9 +206,13 @@ class _ItemCliente extends State<ItemCliente> {
                           ),
                           backgroundColor: Color.fromARGB(255, 210, 92, 83),
                         );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                        edgeAlert(context,
+                            description: '${FacturaProvider.cambio_c}',
+                            gravity: Gravity.top,
+                            backgroundColor: Colors.redAccent);
                       } else {
-                        const snackBar = SnackBar(
+                        /* const snackBar = SnackBar(
                           padding: EdgeInsets.all(20),
                           content: Text(
                             'Cliente Agregado',
@@ -208,7 +220,11 @@ class _ItemCliente extends State<ItemCliente> {
                           ),
                           backgroundColor: Color.fromARGB(255, 93, 202, 164),
                         );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                        edgeAlert(context,
+                            description: 'Cliente Agregado',
+                            gravity: Gravity.top,
+                            backgroundColor: Color.fromARGB(255, 81, 131, 83));
                       }
                       FocusScope.of(context).requestFocus(FocusNode());
                       setState(() {});
@@ -236,6 +252,9 @@ class _ItemCliente extends State<ItemCliente> {
                 alignment: Alignment.center,
                 child: IconButton(
                     onPressed: () {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      searchC.text = '';
+                      setState(() {});
                       customBottomSheet(context);
                     },
                     icon: const Icon(

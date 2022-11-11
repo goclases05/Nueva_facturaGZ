@@ -1,8 +1,7 @@
 import 'dart:async';
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:factura_gozeri/global/globals.dart';
+import 'package:edge_alerts/edge_alerts.dart';
 import 'package:factura_gozeri/print/impresoras_print.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
@@ -222,7 +221,12 @@ Widget menuItem(int id, String title, IconData icon, bool selected,
 
           if (_facturacion.tmp_creada == '') {
             print('tap tap 5');
-            var snackBar = SnackBar(
+            edgeAlert(context,
+                title: 'Error!',
+                description: 'Fallo al crear la factura temporal.',
+                gravity: Gravity.top,
+                backgroundColor: Colors.redAccent);
+            /*var snackBar = SnackBar(
               /// need to set following properties for best effect of awesome_snackbar_content
               duration: const Duration(seconds: 1),
               elevation: 0,
@@ -236,7 +240,7 @@ Widget menuItem(int id, String title, IconData icon, bool selected,
                 contentType: ContentType.failure,
               ),
             );
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
           } else {
             // ignore: use_build_context_synchronously
             Navigator.push(

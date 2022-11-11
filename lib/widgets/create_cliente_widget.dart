@@ -1,8 +1,14 @@
+import 'package:edge_alerts/edge_alerts.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/factura_provider.dart';
 
 class CreateClienteWidget extends StatefulWidget {
-  CreateClienteWidget({Key? key, required this.colorPrimary}) : super(key: key);
+  CreateClienteWidget({Key? key, required this.colorPrimary, required this.tmp})
+      : super(key: key);
   Color colorPrimary;
+  String tmp;
 
   @override
   State<CreateClienteWidget> createState() => _CreateClienteWidgetState();
@@ -11,7 +17,7 @@ class CreateClienteWidget extends StatefulWidget {
 class _CreateClienteWidgetState extends State<CreateClienteWidget> {
   final nombre_controller = TextEditingController();
   final apellido_controller = TextEditingController();
-  final nit_controller=TextEditingController(text: 'CF');
+  final nit_controller = TextEditingController(text: 'CF');
 
   @override
   void initState() {
@@ -29,15 +35,15 @@ class _CreateClienteWidgetState extends State<CreateClienteWidget> {
 
   @override
   Widget build(BuildContext context) {
-    
+    final facturaService = Provider.of<Facturacion>(context, listen: false);
     nombre_controller.selection = TextSelection.fromPosition(
         TextPosition(offset: nombre_controller.text.length));
 
     apellido_controller.selection = TextSelection.fromPosition(
-    TextPosition(offset: apellido_controller.text.length));
+        TextPosition(offset: apellido_controller.text.length));
 
     nit_controller.selection = TextSelection.fromPosition(
-    TextPosition(offset: nit_controller.text.length));
+        TextPosition(offset: nit_controller.text.length));
 
     return Container(
       width: MediaQuery.of(context).size.width * 1,
@@ -60,25 +66,25 @@ class _CreateClienteWidgetState extends State<CreateClienteWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Nombre',
+                    'Nombre *',
                     style: TextStyle(
                         color: Color.fromARGB(255, 162, 174, 194),
                         fontSize: 18,
                         fontWeight: FontWeight.bold),
                   ),
                   TextField(
-                  controller: nombre_controller,
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    setState(() {
-                      nombre_controller.text=value;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'escribir nombre del cliente',
-                    //icon: Text(Preferencias.moneda,style:const TextStyle(fontSize: 20,color: Colors.blueGrey))
-                  )),
+                      controller: nombre_controller,
+                      keyboardType: TextInputType.text,
+                      onChanged: (value) {
+                        setState(() {
+                          nombre_controller.text = value;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'escribir nombre del cliente',
+                        //icon: Text(Preferencias.moneda,style:const TextStyle(fontSize: 20,color: Colors.blueGrey))
+                      )),
                   const Text(
                     'Apellido',
                     style: TextStyle(
@@ -87,18 +93,18 @@ class _CreateClienteWidgetState extends State<CreateClienteWidget> {
                         fontWeight: FontWeight.bold),
                   ),
                   TextField(
-                  controller: apellido_controller,
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    setState(() {
-                      apellido_controller.text=value;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'escribir apellido del cliente',
-                    //icon: Text(Preferencias.moneda,style:const TextStyle(fontSize: 20,color: Colors.blueGrey))
-                  )),
+                      controller: apellido_controller,
+                      keyboardType: TextInputType.text,
+                      onChanged: (value) {
+                        setState(() {
+                          apellido_controller.text = value;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'escribir apellido del cliente',
+                        //icon: Text(Preferencias.moneda,style:const TextStyle(fontSize: 20,color: Colors.blueGrey))
+                      )),
                   const Text(
                     'NIT',
                     style: TextStyle(
@@ -107,32 +113,48 @@ class _CreateClienteWidgetState extends State<CreateClienteWidget> {
                         fontWeight: FontWeight.bold),
                   ),
                   TextField(
-                  controller: nit_controller,
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    setState(() {
-                      nit_controller.text=value;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'escribir NIT del cliente',
-                    //icon: Text(Preferencias.moneda,style:const TextStyle(fontSize: 20,color: Colors.blueGrey))
-                  )),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    child: TextButton.icon(
-                      onPressed: () {
-                        
+                      controller: nit_controller,
+                      keyboardType: TextInputType.text,
+                      onChanged: (value) {
+                        setState(() {
+                          nit_controller.text = value;
+                        });
                       },
-                      icon: const Icon(Icons.person),
-                      label: const Text('Agregar cliente'),
-                      style: TextButton.styleFrom(
-                        primary: Colors.white,
-                        backgroundColor: widget.colorPrimary,
-                      ),
-                    )),
-                    SizedBox(height: 200,)
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'escribir NIT del cliente',
+                        //icon: Text(Preferencias.moneda,style:const TextStyle(fontSize: 20,color: Colors.blueGrey))
+                      )),
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      child: TextButton.icon(
+                        onPressed: () async {
+                          if (nombre_controller.text == '') {
+                            edgeAlert(context,
+                                description: 'Error: Nombre Requerido',
+                                gravity: Gravity.top,
+                                backgroundColor: Colors.redAccent);
+                          } else {
+                            await facturaService.create_cliente(
+                                nombre_controller.text,
+                                apellido_controller.text,
+                                nit_controller.text,
+                                widget.tmp);
+                            Navigator.of(context, rootNavigator: true).pop();
+                            FocusScope.of(context).requestFocus(FocusNode());
+                            setState(() {});
+                          }
+                        },
+                        icon: const Icon(Icons.person),
+                        label: const Text('Agregar cliente'),
+                        style: TextButton.styleFrom(
+                          primary: Colors.white,
+                          backgroundColor: widget.colorPrimary,
+                        ),
+                      )),
+                  SizedBox(
+                    height: 200,
+                  )
                 ],
               ),
             )

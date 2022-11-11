@@ -1,4 +1,4 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:edge_alerts/edge_alerts.dart';
 import 'package:factura_gozeri/services/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -211,7 +211,7 @@ class _LoginForm extends StatelessWidget {
                           loginForm.user_mail, loginForm.password);
                       if (errorMessage == null) {
                         //puede ingresar a   la vista de inicio
-                        var snackBar = SnackBar(
+                        /*var snackBar = SnackBar(
                           /// need to set following properties for best effect of awesome_snackbar_content
                           duration: const Duration(seconds: 1),
                           elevation: 0,
@@ -226,13 +226,18 @@ class _LoginForm extends StatelessWidget {
                           ),
                         );
 
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                        edgeAlert(context,
+                            title: 'Bienvenido!',
+                            description: 'Inicio de sesión correcto.',
+                            gravity: Gravity.top,
+                            backgroundColor: Color.fromARGB(255, 81, 131, 83));
 
                         Future.delayed(const Duration(seconds: 2), () {
                           Navigator.pushReplacementNamed(context, 'checking');
                         });
                       } else {
-                        var snackBar = SnackBar(
+                        /*var snackBar = SnackBar(
                           /// need to set following properties for best effect of awesome_snackbar_content
                           duration: const Duration(seconds: 1),
                           elevation: 0,
@@ -247,7 +252,13 @@ class _LoginForm extends StatelessWidget {
                           ),
                         );
 
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                        edgeAlert(context,
+                            title: 'Error!',
+                            description: '${errorMessage}',
+                            gravity: Gravity.top,
+                            backgroundColor: Colors.redAccent);
+
                         loginForm.isLoading = false;
                       }
                     },

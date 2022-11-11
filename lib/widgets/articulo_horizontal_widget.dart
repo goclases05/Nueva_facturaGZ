@@ -1,5 +1,6 @@
 import 'package:count_stepper/count_stepper.dart';
 import 'package:custom_bottom_sheet/custom_bottom_sheet.dart';
+import 'package:edge_alerts/edge_alerts.dart';
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/models/producto_x_departamento_models.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
@@ -490,7 +491,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                         return GestureDetector(
                           onTap: () {
                             if (widget.listProd.facturar == '1') {
-                              final snackBar = SnackBar(
+                              /*final snackBar = SnackBar(
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(24),
@@ -503,7 +504,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 backgroundColor: Colors.green,
-                              );
+                              );*/
                               cart.add(
                                   _counterValue,
                                   widget.listProd.idProd,
@@ -514,12 +515,17 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                       : _dropdownValue.toString());
                               // Find the ScaffoldMessenger in the widget tree
                               // and use it to show a SnackBar.
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(snackBar);
+                              /*ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);*/
+                              edgeAlert(context,
+                                  description: 'Item agregado al carrito!',
+                                  gravity: Gravity.top,
+                                  backgroundColor:
+                                      Color.fromARGB(255, 81, 131, 83));
                             } else {
                               if (_counterValue >
                                   int.parse(widget.listProd.stock)) {
-                                final snackBar = SnackBar(
+                                /*final snackBar = SnackBar(
                                   behavior: SnackBarBehavior.floating,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(24),
@@ -532,14 +538,18 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                     style: TextStyle(color: Colors.white),
                                   ),
                                   backgroundColor: Colors.red,
-                                );
+                                );*/
 
                                 // Find the ScaffoldMessenger in the widget tree
                                 // and use it to show a SnackBar.
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
+                                /*ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);*/
+                                edgeAlert(context,
+                                    title: 'Articulo sin Stock!',
+                                    gravity: Gravity.top,
+                                    backgroundColor: Colors.redAccent);
                               } else {
-                                final snackBar = SnackBar(
+                                /*final snackBar = SnackBar(
                                   behavior: SnackBarBehavior.floating,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(24),
@@ -557,7 +567,12 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                 // Find the ScaffoldMessenger in the widget tree
                                 // and use it to show a SnackBar.
                                 ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
+                                    .showSnackBar(snackBar);*/
+                                edgeAlert(context,
+                                    description: 'Item agregado al carrito!',
+                                    gravity: Gravity.top,
+                                    backgroundColor:
+                                        Color.fromARGB(255, 81, 131, 83));
                                 cart.add(
                                     _counterValue,
                                     widget.listProd.idProd,

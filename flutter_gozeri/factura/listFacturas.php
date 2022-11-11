@@ -7,7 +7,7 @@ include('../conex.php');
 
 if($accion=='Pendientes'){
     
-    $select=$conexion->query("SELECT tblfacturas_list_temp.ID_FACT_TMP, tblfacturas_list_temp.FECHA, tblfacturas_list_temp.ID_CLIENTE, tblusuarios.NOMBRE, tblusuarios.APELLIDOS, tblusuarios_perfil.NIT FROM bgzeri_empresa.tblfacturas_list_temp LEFT JOIN tblusuarios ON tblusuarios.ID_USUARIO=tblfacturas_list_temp.ID_CLIENTE INNER JOIN tblusuarios_perfil ON tblusuarios_perfil.ID_USUARIO=tblusuarios.ID_USUARIO WHERE tblfacturas_list_temp.ID_EMPRESA='$empresa' AND tblfacturas_list_temp.ID_USUARIO='$idusuario' ORDER BY ID_FACT_TMP DESC LIMIT $limit,10");
+    $select=$conexion->query("SELECT tblfacturas_list_temp.ID_FACT_TMP, tblfacturas_list_temp.FECHA, tblfacturas_list_temp.ID_CLIENTE, tblusuarios.NOMBRE, tblusuarios.APELLIDOS, tblusuarios_perfil.NIT FROM bgzeri_empresa.tblfacturas_list_temp LEFT JOIN tblusuarios ON tblusuarios.ID_USUARIO=tblfacturas_list_temp.ID_CLIENTE INNER JOIN tblusuarios_perfil ON tblusuarios_perfil.ID_USUARIO=tblusuarios.ID_USUARIO WHERE tblfacturas_list_temp.ID_EMPRESA='$empresa' AND tblfacturas_list_temp.ID_USUARIO='$idusuario' AND tblfacturas_list_temp.ID_SUCURSAL = '$sucu' AND tblfacturas_list_temp.ID_SUCURSAL='$sucu' ORDER BY ID_FACT_TMP DESC LIMIT $limit,10");
     $matriz_fac=array();
     $row=$select->fetchAll();
 
@@ -30,7 +30,7 @@ if($accion=='Pendientes'){
 
 }else if($accion=='Emitidas'){
 
-    $select=$conexion->query("SELECT tblfacturas.ID_FACT, tblfacturas.FECHA, tblfacturas.ID_USUARIO, tblusuarios.NOMBRE, tblusuarios.APELLIDOS, tblusuarios_perfil.NIT, tblfacturas.NO, tblfacturas.ESTADO FROM bgzeri_empresa.tblfacturas INNER JOIN tblusuarios ON tblusuarios.ID_USUARIO=tblfacturas.ID_USUARIO INNER JOIN tblusuarios_perfil ON tblusuarios_perfil.ID_USUARIO=tblusuarios.ID_USUARIO WHERE tblfacturas.ID_EMPRESA='$empresa' AND tblfacturas.ESTADO IN (0,2) ORDER BY ID_FACT DESC LIMIT $limit,10");
+    $select=$conexion->query("SELECT tblfacturas.ID_FACT, tblfacturas.FECHA, tblfacturas.ID_USUARIO, tblusuarios.NOMBRE, tblusuarios.APELLIDOS, tblusuarios_perfil.NIT, tblfacturas.NO, tblfacturas.ESTADO FROM bgzeri_empresa.tblfacturas INNER JOIN tblusuarios ON tblusuarios.ID_USUARIO=tblfacturas.ID_USUARIO INNER JOIN tblusuarios_perfil ON tblusuarios_perfil.ID_USUARIO=tblusuarios.ID_USUARIO WHERE tblfacturas.ID_EMPRESA='$empresa' AND tblfacturas.ID_SUCURSAL = '$sucu' AND tblfacturas.ESTADO IN (0,2) ORDER BY ID_FACT DESC LIMIT $limit,10");
 
     $matriz_fac=array();
     $row=$select->fetchAll();
