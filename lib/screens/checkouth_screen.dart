@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:factura_gozeri/controllers/mantenimiento_screen.dart';
 import 'package:factura_gozeri/controllers/membresia_screen.dart';
+import 'package:factura_gozeri/controllers/permiss_controller.dart';
+import 'package:factura_gozeri/controllers/permission_screen.dart';
 import 'package:factura_gozeri/controllers/version_screen.dart';
 import 'package:factura_gozeri/screens/escritorio_screen.dart';
 import 'package:factura_gozeri/screens/home2_screen.dart';
@@ -10,6 +12,7 @@ import 'package:factura_gozeri/screens/no_internet_screen.dart';
 import 'package:factura_gozeri/screens/sunmi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'package:factura_gozeri/services/services.dart';
@@ -53,6 +56,7 @@ class _CheckOuthScreenState extends State<CheckOuthScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     initialActivity();
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
@@ -61,8 +65,8 @@ class _CheckOuthScreenState extends State<CheckOuthScreen> {
   @override
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
     _connectivitySubscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -73,6 +77,19 @@ class _CheckOuthScreenState extends State<CheckOuthScreen> {
       return NoInternet();
     }
     final authService = Provider.of<AuthService>(context, listen: false);
+
+    Future.delayed(Duration.zero, () {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      if (1 == 1) {
+        Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                    pageBuilder: (_, __, ___) => PermissionScream(),
+                    transitionDuration: Duration(seconds: 0)))
+            .then((value) => Navigator.of(context).pop());
+      }
+    });
+
     return Scaffold(
       body: Stack(children: [
         Container(
