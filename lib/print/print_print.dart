@@ -593,18 +593,20 @@ class _PrintScreenState extends State<PrintScreen> {
                               ),
                             );
                             Navigator.of(context, rootNavigator: true).pop();
-                            Navigator.push(
+
+                            Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => const EscritorioScreen()));
+                                    builder: (_) => const EscritorioScreen()),
+                                (Route<dynamic> route) => false);
                           } else {
                             if (Preferencias.sunmi_preferencia) {
                               await print_sunmi(context, js['ID']);
-                              Navigator.push(
+                              Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) =>
-                                          const EscritorioScreen()));
+                                      builder: (_) => const EscritorioScreen()),
+                                  (Route<dynamic> route) => false);
                             } else {
                               print('entro');
                               _printerManager.stopScan();
@@ -773,9 +775,10 @@ class _PrintScreenState extends State<PrintScreen> {
       ),
     );
     Navigator.of(context, rootNavigator: true).pop(result);
-
-    Navigator.push(
-        context, MaterialPageRoute(builder: (_) => const EscritorioScreen()));
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const EscritorioScreen()),
+        (Route<dynamic> route) => false);
   }
 
   Future<List<int>> testTicket(String id_factura) async {
