@@ -1,12 +1,62 @@
+import 'package:edge_alerts/edge_alerts.dart';
 import 'package:factura_gozeri/screens/checkouth_screen.dart';
 import 'package:factura_gozeri/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
-class PermissionScream extends StatelessWidget {
+class PermissionScream extends StatefulWidget {
   const PermissionScream({Key? key}) : super(key: key);
+
+  @override
+  State<PermissionScream> createState() => _PermissionScreamState();
+}
+
+class _PermissionScreamState extends State<PermissionScream> {
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    permission = await Geolocator.requestPermission();
+    // Test if location services are enabled.
+    
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the 
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+    }
+    
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately. 
+      return Future.error(
+        'Location permissions are permanently denied, we cannot request permissions.');
+    } 
+
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    return await Geolocator.getCurrentPosition();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +157,7 @@ class PermissionScream extends StatelessWidget {
                     child: Container(
                         padding: EdgeInsets.all(5),
                         child: Icon(
-                          Icons.refresh,
+                          Icons.location_on,
                           color: Colors.cyan,
                           size: 120,
                         ))),
@@ -136,18 +186,39 @@ class PermissionScream extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 10),
                 child: TextButton.icon(
                   onPressed: () async {
-                    final authService =
-                        Provider.of<AuthService>(context, listen: false);
-                    await authService.askAccess();
-                    print('entro');
-                    Navigator.pushReplacement(
-                            context,
-                            PageRouteBuilder(
-                                pageBuilder: (_, __, ___) => CheckOuthScreen(),
-                                transitionDuration: Duration(seconds: 0)))
-                        .then((value) => Navigator.of(context).pop());
-                    print('salio');
-                    //Navigator.pushReplacementNamed(context, 'checking');
+                    bool isLocationServiceEnabled  = await Geolocator.isLocationServiceEnabled();
+                    if(!isLocationServiceEnabled){
+                       edgeAlert(context,
+                            description: 'GPS deshabilitado',
+                            gravity: Gravity.top,
+                            backgroundColor: Colors.redAccent);
+
+                      await Geolocator.openLocationSettings();
+
+                    }else{
+                      //await _determinePosition();
+                      LocationPermission permission;
+                      if(await Geolocator.checkPermission()==LocationPermission.deniedForever){
+                        print('esta forever');
+                        await Geolocator.openAppSettings();
+                      }else{
+                        print('esta '+Geolocator.checkPermission().toString());
+                        permission = await Geolocator.requestPermission();
+                      }
+                      
+                      permission = await Geolocator.checkPermission();
+                      if(permission==LocationPermission.whileInUse || permission==LocationPermission.always){
+                          Navigator.pushReplacementNamed(context, 'checking');
+                      }else if(permission==LocationPermission.deniedForever){
+                        await Geolocator.openAppSettings();
+                      }else{
+                        setState(() {
+                          
+                        });
+                      }
+                    }
+                    
+                    //
                   },
                   icon: const Icon(Icons.refresh),
                   label: const Text('Solicitar Acceso'),

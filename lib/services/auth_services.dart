@@ -7,7 +7,6 @@ import 'package:factura_gozeri/models/sucursales_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:permission_handler/permission_handler.dart';
 //import 'package:package_info_plus/package_info_plus.dart';
 
 class AuthService extends ChangeNotifier {
@@ -64,7 +63,7 @@ class AuthService extends ChangeNotifier {
     await storage.deleteAll();
   }
 
-  Future<void> askAccess() async {
+  /*Future<void> askAccess() async {
     localisacion = false;
 
     final status = Permission.location.request();
@@ -75,7 +74,7 @@ class AuthService extends ChangeNotifier {
       localisacion = false;
     }
     notifyListeners();
-  }
+  }*/
 
   Future<String> readUsuario() async {
     //membresia

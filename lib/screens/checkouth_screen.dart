@@ -1,18 +1,14 @@
 import 'dart:async';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:factura_gozeri/controllers/mantenimiento_screen.dart';
 import 'package:factura_gozeri/controllers/membresia_screen.dart';
-import 'package:factura_gozeri/controllers/permiss_controller.dart';
 import 'package:factura_gozeri/controllers/permission_screen.dart';
 import 'package:factura_gozeri/controllers/version_screen.dart';
 import 'package:factura_gozeri/screens/escritorio_screen.dart';
-import 'package:factura_gozeri/screens/home2_screen.dart';
 import 'package:factura_gozeri/screens/no_internet_screen.dart';
-import 'package:factura_gozeri/screens/sunmi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
 import 'package:factura_gozeri/services/services.dart';
@@ -52,14 +48,33 @@ class _CheckOuthScreenState extends State<CheckOuthScreen> {
     });
   }
 
+  
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    Future.delayed(Duration.zero, () async{
+      bool serviceEnabled;
+      LocationPermission permission;
+      permission = await Geolocator.checkPermission();
+      if(permission==LocationPermission.whileInUse || permission==LocationPermission.always){
+        print('si hay localizacion');
+      }else{
+        print('no localizacion');
+        return Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+                pageBuilder: (_, __, ___) => PermissionScream(),
+                transitionDuration: Duration(seconds: 0)))
+        .then((value) => Navigator.of(context).pop());
+      }
+    });
     initialActivity();
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+
+    
   }
 
   @override
@@ -78,7 +93,14 @@ class _CheckOuthScreenState extends State<CheckOuthScreen> {
     }
     final authService = Provider.of<AuthService>(context, listen: false);
 
-    Future.delayed(Duration.zero, () {
+    
+
+
+    /*Future.delayed(Duration.zero, () {
+      Geolocator geolocator = 
+      Geolocator()..forceAndroidLocationManager = true;
+      GeolocationStatus geolocationStatus  = await 
+      geolocator.checkGeolocationPermissionStatus();
       final authService = Provider.of<AuthService>(context, listen: false);
       if (1 == 1) {
         Navigator.pushReplacement(
@@ -88,7 +110,9 @@ class _CheckOuthScreenState extends State<CheckOuthScreen> {
                     transitionDuration: Duration(seconds: 0)))
             .then((value) => Navigator.of(context).pop());
       }
-    });
+    });*/
+
+    
 
     return Scaffold(
       body: Stack(children: [
