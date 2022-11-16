@@ -20,26 +20,26 @@ class _PermissionScreamState extends State<PermissionScream> {
     LocationPermission permission;
     permission = await Geolocator.requestPermission();
     // Test if location services are enabled.
-    
+
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    
+
     if (!serviceEnabled) {
       // Location services are not enabled don't continue
-      // accessing the position and request users of the 
+      // accessing the position and request users of the
       // App to enable the location services.
       return Future.error('Location services are disabled.');
     }
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
+      return Future.error('Location permissions are denied');
     }
-    
+
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately. 
+      // Permissions are denied forever, handle appropriately.
       return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.');
-    } 
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
@@ -168,7 +168,7 @@ class _PermissionScreamState extends State<PermissionScream> {
                     style: TextStyle(color: Colors.cyan, fontSize: 25),
                     textAlign: TextAlign.center),
                 const Text(
-                  'Gozeri Facturación recoge datos de ubicación para habilitar las funciones de Impresión y busqueda de dispositivos locales (ESC POS) aunque la aplicación esté cerrada o no se esté usando',
+                  'Gozeri Facturación recoge datos de ubicación para habilitar las funciones de Impresión y búsqueda de dispositivos locales (ESC POS) aunque la aplicación esté cerrada o no se esté usando',
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(
@@ -186,38 +186,40 @@ class _PermissionScreamState extends State<PermissionScream> {
                 margin: const EdgeInsets.only(bottom: 10),
                 child: TextButton.icon(
                   onPressed: () async {
-                    bool isLocationServiceEnabled  = await Geolocator.isLocationServiceEnabled();
-                    if(!isLocationServiceEnabled){
-                       edgeAlert(context,
-                            description: 'GPS deshabilitado',
-                            gravity: Gravity.top,
-                            backgroundColor: Colors.redAccent);
+                    bool isLocationServiceEnabled =
+                        await Geolocator.isLocationServiceEnabled();
+                    if (!isLocationServiceEnabled) {
+                      edgeAlert(context,
+                          description: 'GPS deshabilitado',
+                          gravity: Gravity.top,
+                          backgroundColor: Colors.redAccent);
 
                       await Geolocator.openLocationSettings();
-
-                    }else{
+                    } else {
                       //await _determinePosition();
                       LocationPermission permission;
-                      if(await Geolocator.checkPermission()==LocationPermission.deniedForever){
+                      if (await Geolocator.checkPermission() ==
+                          LocationPermission.deniedForever) {
                         print('esta forever');
                         await Geolocator.openAppSettings();
-                      }else{
-                        print('esta '+Geolocator.checkPermission().toString());
+                      } else {
+                        print(
+                            'esta ' + Geolocator.checkPermission().toString());
                         permission = await Geolocator.requestPermission();
                       }
-                      
+
                       permission = await Geolocator.checkPermission();
-                      if(permission==LocationPermission.whileInUse || permission==LocationPermission.always){
-                          Navigator.pushReplacementNamed(context, 'checking');
-                      }else if(permission==LocationPermission.deniedForever){
+                      if (permission == LocationPermission.whileInUse ||
+                          permission == LocationPermission.always) {
+                        Navigator.pushReplacementNamed(context, 'checking');
+                      } else if (permission ==
+                          LocationPermission.deniedForever) {
                         await Geolocator.openAppSettings();
-                      }else{
-                        setState(() {
-                          
-                        });
+                      } else {
+                        setState(() {});
                       }
                     }
-                    
+
                     //
                   },
                   icon: const Icon(Icons.refresh),
