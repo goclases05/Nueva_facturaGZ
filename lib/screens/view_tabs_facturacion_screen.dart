@@ -23,7 +23,7 @@ class TabsFacturacion extends StatelessWidget {
         text: '  Emitidas  ',
       ),
       Tab(
-        text: '  Pendientes  ',
+        text: '  En Proceso  ',
       )
     ];
 

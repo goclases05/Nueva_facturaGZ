@@ -1120,7 +1120,7 @@ print_sunmi(BuildContext context, String id_factura) async {
     }
   }
 
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
 
   //nombre comercial
   if (sede == 1) {
@@ -1141,7 +1141,7 @@ print_sunmi(BuildContext context, String id_factura) async {
     }
   }
 
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
   //FEL
   if (encabezado[0].dte != '') {
     await SunmiPrinter.printText('Factura Electrónica Documento Tributario',
@@ -1151,7 +1151,7 @@ print_sunmi(BuildContext context, String id_factura) async {
         ));
   }
 
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
 
   //FECHA EN LETRAS
   await SunmiPrinter.printText('${encabezado[0].fecha_letras}',
@@ -1160,7 +1160,7 @@ print_sunmi(BuildContext context, String id_factura) async {
     align: SunmiPrintAlign.RIGHT,
   ));
 
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
 
   if (encabezado[0].dte != '') {
     await SunmiPrinter.printText('Número de Autorización:',
@@ -1185,7 +1185,7 @@ print_sunmi(BuildContext context, String id_factura) async {
     ));
   }
 
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
 
   //No
   await SunmiPrinter.printText('No: ${encabezado[0].no}',
@@ -1194,7 +1194,7 @@ print_sunmi(BuildContext context, String id_factura) async {
     align: SunmiPrintAlign.RIGHT,
   ));
 
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
 
   //serie
   await SunmiPrinter.printText('Serie: ${encabezado[0].serie}',
@@ -1246,7 +1246,7 @@ print_sunmi(BuildContext context, String id_factura) async {
     align: SunmiPrintAlign.CENTER,
   ));
 
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
 
   await SunmiPrinter.line();
   await SunmiPrinter.printRow(cols: [
@@ -1307,7 +1307,7 @@ print_sunmi(BuildContext context, String id_factura) async {
         width: 10,
         align: SunmiPrintAlign.CENTER),
   ]);
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
 
   //total en letras
   await SunmiPrinter.printText('${encabezado[0].totalLetas}',
@@ -1345,7 +1345,7 @@ print_sunmi(BuildContext context, String id_factura) async {
     ));
   }
   
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
   await SunmiPrinter.printText('Realizado en www.gozeri.com',
   style: SunmiStyle(
     bold: false,

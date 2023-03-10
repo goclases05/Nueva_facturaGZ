@@ -247,6 +247,25 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                     ),
                                   ),
                                   GestureDetector(
+                                    onTap: ()async {
+                                      await print_sunmi_comanda(context,'252');
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.only(left: 2),
+                                      padding: const EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                          //color: Theme.of(context).primaryColor,
+                                          color: Color.fromARGB(255, 226, 178, 49),
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: const Icon(
+                                        Icons.newspaper,
+                                        color: Colors.white,
+                                        size: 25,
+                                      ),
+                                    ),
+                                  ),
+                                  GestureDetector(
                                     onTap: () {
                                       final data = facturaService.delete_tmp(
                                           list_tmp[index].idFactTmp);
@@ -1002,6 +1021,7 @@ print_sunmi(BuildContext context, String id_factura) async {
       style: SunmiStyle(
         bold: true,
         align: SunmiPrintAlign.CENTER,
+        fontSize: SunmiFontSize.MD
       ));
 
   //Direccion de empresa
@@ -1012,6 +1032,7 @@ print_sunmi(BuildContext context, String id_factura) async {
       style: SunmiStyle(
         bold: true,
         align: SunmiPrintAlign.CENTER,
+        fontSize: SunmiFontSize.MD
       ));
 
   //nit emisor
@@ -1020,6 +1041,7 @@ print_sunmi(BuildContext context, String id_factura) async {
         style: SunmiStyle(
           bold: true,
           align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD
         ));
   }
 
@@ -1030,6 +1052,7 @@ print_sunmi(BuildContext context, String id_factura) async {
           style: SunmiStyle(
             bold: true,
             align: SunmiPrintAlign.CENTER,
+            fontSize: SunmiFontSize.MD
           ));
     }
   } else {
@@ -1038,11 +1061,12 @@ print_sunmi(BuildContext context, String id_factura) async {
           style: SunmiStyle(
             bold: true,
             align: SunmiPrintAlign.CENTER,
+            fontSize: SunmiFontSize.MD
           ));
     }
   }
 
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
 
   //nombre comercial
   if (sede == 1) {
@@ -1051,6 +1075,7 @@ print_sunmi(BuildContext context, String id_factura) async {
           style: SunmiStyle(
             bold: true,
             align: SunmiPrintAlign.CENTER,
+            fontSize: SunmiFontSize.MD
           ));
     }
   } else {
@@ -1059,70 +1084,79 @@ print_sunmi(BuildContext context, String id_factura) async {
           style: SunmiStyle(
             bold: true,
             align: SunmiPrintAlign.CENTER,
+            fontSize: SunmiFontSize.MD
           ));
     }
   }
 
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
   //FEL
   if (encabezado[0].dte != '') {
     await SunmiPrinter.printText('Factura Electrónica Documento Tributario',
         style: SunmiStyle(
           bold: true,
           align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD
         ));
   }
 
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
 
   //FECHA EN LETRAS
   await SunmiPrinter.printText('${encabezado[0].fecha_letras}',
       style: SunmiStyle(
         bold: false,
         align: SunmiPrintAlign.RIGHT,
+        fontSize: SunmiFontSize.MD
       ));
 
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
 
   if (encabezado[0].dte != '') {
     await SunmiPrinter.printText('Número de Autorización:',
         style: SunmiStyle(
           bold: false,
           align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD
         ));
     await SunmiPrinter.printText('${encabezado[0].dte}',
         style: SunmiStyle(
           bold: false,
           align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD
         ));
     await SunmiPrinter.printText('Serie: ${encabezado[0].serieDte}',
         style: SunmiStyle(
           bold: false,
           align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD
         ));
     await SunmiPrinter.printText('Número de DTE: ${encabezado[0].noDte}',
         style: SunmiStyle(
           bold: false,
           align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD
         ));
   }
 
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
 
   //No
   await SunmiPrinter.printText('No: ${encabezado[0].no}',
       style: SunmiStyle(
         bold: false,
         align: SunmiPrintAlign.RIGHT,
+        fontSize: SunmiFontSize.MD
       ));
 
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
 
   //serie
   await SunmiPrinter.printText('Serie: ${encabezado[0].serie}',
       style: SunmiStyle(
         bold: false,
         align: SunmiPrintAlign.LEFT,
+        fontSize: SunmiFontSize.MD
       ));
 
   //vendedor
@@ -1131,6 +1165,7 @@ print_sunmi(BuildContext context, String id_factura) async {
       style: SunmiStyle(
         bold: false,
         align: SunmiPrintAlign.LEFT,
+        fontSize: SunmiFontSize.MD
       ));
   //cliente
   await SunmiPrinter.printText(
@@ -1138,12 +1173,14 @@ print_sunmi(BuildContext context, String id_factura) async {
       style: SunmiStyle(
         bold: false,
         align: SunmiPrintAlign.LEFT,
+        fontSize: SunmiFontSize.MD
       ));
   //nit cliente
   await SunmiPrinter.printText('NIT: ${encabezado[0].nit}',
       style: SunmiStyle(
         bold: false,
         align: SunmiPrintAlign.LEFT,
+        fontSize: SunmiFontSize.MD
       ));
 
   //direccion cliente
@@ -1152,6 +1189,7 @@ print_sunmi(BuildContext context, String id_factura) async {
         style: SunmiStyle(
           bold: false,
           align: SunmiPrintAlign.LEFT,
+          fontSize: SunmiFontSize.MD
         ));
   }
 
@@ -1162,15 +1200,17 @@ print_sunmi(BuildContext context, String id_factura) async {
       style: SunmiStyle(
         bold: true,
         align: SunmiPrintAlign.CENTER,
+        fontSize: SunmiFontSize.MD
       ));
   //forma
   await SunmiPrinter.printText('${encabezado[0].forma}',
       style: SunmiStyle(
         bold: true,
         align: SunmiPrintAlign.CENTER,
+        fontSize: SunmiFontSize.MD
       ));
 
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
 
   await SunmiPrinter.line();
   await SunmiPrinter.printRow(cols: [
@@ -1218,13 +1258,14 @@ print_sunmi(BuildContext context, String id_factura) async {
         width: 10,
         align: SunmiPrintAlign.CENTER),
   ]);
-  await SunmiPrinter.lineWrap(1);
+  //await SunmiPrinter.lineWrap(1);
 
   //total en letras
   await SunmiPrinter.printText('${encabezado[0].totalLetas}',
       style: SunmiStyle(
         bold: true,
         align: SunmiPrintAlign.CENTER,
+        fontSize: SunmiFontSize.MD
       ));
 
   //frases
@@ -1233,6 +1274,7 @@ print_sunmi(BuildContext context, String id_factura) async {
         style: SunmiStyle(
           bold: false,
           align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD
         ));
   }
 
@@ -1243,26 +1285,129 @@ print_sunmi(BuildContext context, String id_factura) async {
         style: SunmiStyle(
           bold: false,
           align: SunmiPrintAlign.LEFT,
+          fontSize: SunmiFontSize.MD
         ));
     await SunmiPrinter.printText('NIT: ${encabezado[0].nitCert}',
         style: SunmiStyle(
           bold: false,
           align: SunmiPrintAlign.LEFT,
+          fontSize: SunmiFontSize.MD
         ));
     await SunmiPrinter.printText('Fecha: ${encabezado[0].fechaCert}',
         style: SunmiStyle(
           bold: false,
           align: SunmiPrintAlign.LEFT,
+          fontSize: SunmiFontSize.MD
         ));
   }
 
+  //await SunmiPrinter.lineWrap(1);
+  await SunmiPrinter.printText('Realizado en www.gozeri.com',
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.CENTER,
+        fontSize: SunmiFontSize.MD
+      ));
+
+  /*await SunmiPrinter.printQRCode('https://github.com/brasizza/sunmi_printer');
+  await SunmiPrinter.printText('Normal font',
+      style: SunmiStyle(fontSize: SunmiFontSize.MD));*/
+  await SunmiPrinter.lineWrap(2);
+  await SunmiPrinter.exitTransactionPrint(true);
+}
+
+print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
+  /*final print_data = Provider.of<PrintProvider>(context, listen: false);
+  await print_data.dataFac(id_factura);
+  List<Encabezado> encabezado = print_data.list;
+  List<Detalle> detalle = print_data.list_detalle;*/
+  showDialog(
+    context: context,
+    builder: (_) => const AlertDialog(
+      backgroundColor: Color.fromARGB(255, 226, 178, 49),
+      content: Text(
+        'Imprimiendo comanda...',
+        style: TextStyle(color: Colors.white),
+      ),
+    ),
+  );
+
+  await SunmiPrinter.initPrinter();
+  await SunmiPrinter.startTransactionPrint(true);
+  await SunmiPrinter.lineWrap(1);
+  await SunmiPrinter.lineWrap(1);
+  await SunmiPrinter.printText('Mesa No.1',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.CENTER,
+    fontSize: SunmiFontSize.XL
+  ));
+  await SunmiPrinter.printText('Factura No.125',
+  style: SunmiStyle(
+    bold: false,
+    align: SunmiPrintAlign.CENTER,
+    fontSize: SunmiFontSize.XL
+  ));
+
+  //DETALLES
+  /*for (int al = 0; al < detalle.length; al++) {
+    double tota =
+        double.parse(detalle[al].cantidad) * double.parse(detalle[al].precio);
+    await SunmiPrinter.printRow(cols: [
+      ColumnMaker(
+          text: '${detalle[al].producto}',
+          width: 24,
+          align: SunmiPrintAlign.LEFT),
+      ColumnMaker(text: '', width: 6, align: SunmiPrintAlign.CENTER),
+    ]);
+
+    await SunmiPrinter.printRow(cols: [
+      ColumnMaker(
+          text:
+              '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
+          width: 20,
+          align: SunmiPrintAlign.LEFT),
+      ColumnMaker(
+          text: '${detalle[al].contenido}${tota}',
+          width: 10,
+          align: SunmiPrintAlign.RIGHT),
+    ]);
+  }*/
+  //DETALLES
+  //for (int al = 0; al < detalle.length; al++) {
+  await SunmiPrinter.line();
+  await SunmiPrinter.printRow(cols: [
+    ColumnMaker(text: 'Cantidad', width: 15, align: SunmiPrintAlign.LEFT),
+    ColumnMaker(text: 'Producto', width: 20, align: SunmiPrintAlign.LEFT),
+  ]);
+  await SunmiPrinter.line();
+    await SunmiPrinter.printRow(cols: [
+      ColumnMaker(text: '20', width: 6, align: SunmiPrintAlign.CENTER),
+      ColumnMaker(
+          text: 'Hamburguesa',
+          width: 24,
+          align: SunmiPrintAlign.LEFT),
+      
+    ]);
+    await SunmiPrinter.printRow(cols: [
+      ColumnMaker(text: '5', width: 6, align: SunmiPrintAlign.CENTER),
+      ColumnMaker(
+          text: 'Helados de fresa',
+          width: 24,
+          align: SunmiPrintAlign.LEFT),
+      
+    ]);
+  //}
+  
+  await SunmiPrinter.lineWrap(1);
   await SunmiPrinter.lineWrap(1);
   await SunmiPrinter.printText('Realizado en www.gozeri.com',
       style: SunmiStyle(
         bold: false,
         align: SunmiPrintAlign.CENTER,
       ));
-
+  await SunmiPrinter.lineWrap(1);
+  await SunmiPrinter.line();
   /*await SunmiPrinter.printQRCode('https://github.com/brasizza/sunmi_printer');
   await SunmiPrinter.printText('Normal font',
       style: SunmiStyle(fontSize: SunmiFontSize.MD));*/

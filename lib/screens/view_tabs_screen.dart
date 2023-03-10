@@ -8,7 +8,7 @@ import 'package:factura_gozeri/search/items_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/screens/screens.dart';
 import 'package:factura_gozeri/services/services.dart';
@@ -151,7 +151,8 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                 CircleAvatar(
                   backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
                   child: Consumer<Cart>(builder: (context, cart, child) {
-                    return Badge(
+
+                    return badges.Badge(
                       showBadge: (cart.count == 0) ? false : true,
                       badgeContent: Text(
                         '${cart.count}',
