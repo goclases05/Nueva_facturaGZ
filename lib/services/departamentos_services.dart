@@ -17,12 +17,12 @@ class DepartamentoService extends ChangeNotifier {
   Future LoadDepa() async {
     this.isLoading = true;
     notifyListeners();
-   
-    final empresa =Preferencias.data_empresa;
+
+    final empresa = Preferencias.data_empresa;
     print(
-        "https://${_baseUrl}/flutter_gozeri/departamentos.php?empresa=${empresa}");
+        "https://${_baseUrl}/desarrollo_flutter/departamentos.php?empresa=${empresa}");
     final Uri uri = Uri.parse(
-        "https://${_baseUrl}/flutter_gozeri/departamentos.php?empresa=${empresa}");
+        "https://${_baseUrl}/desarrollo_flutter/departamentos.php?empresa=${empresa}");
 
     final resp = await http.get(uri);
 

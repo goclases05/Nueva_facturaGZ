@@ -21,7 +21,7 @@ class AuthService extends ChangeNotifier {
   Future<String?> login(String user, String pass) async {
     final Map<String, dynamic> authData = {'usuario': user, 'pass': pass};
 
-    final url = Uri.https(_baseUrl, '/flutter_gozeri/login.php');
+    final url = Uri.https(_baseUrl, '/desarrollo_flutter/login.php');
     final resp = await http.post(url, body: authData);
 
     final Map<String, dynamic> decodeResp = json.decode(resp.body);
@@ -83,10 +83,10 @@ class AuthService extends ChangeNotifier {
     String version = '1.0.0'; // packageInfo.version;
 
     print(
-        "https://app.gozeri.com/flutter_gozeri/membresia.php?empresa=${empresa}&version=" +
+        "https://app.gozeri.com/desarrollo_flutter/membresia.php?empresa=${empresa}&version=" +
             version);
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/flutter_gozeri/membresia.php?empresa=${empresa}&version=" +
+        "https://app.gozeri.com/desarrollo_flutter/membresia.php?empresa=${empresa}&version=" +
             version);
 
     final resp = await http.get(uri);
@@ -110,9 +110,9 @@ class AuthService extends ChangeNotifier {
     final empresa = Preferencias.data_empresa;
 
     print(
-        "https://app.gozeri.com/flutter_gozeri/sucursales.php?empresa=${empresa}");
+        "https://app.gozeri.com/desarrollo_flutter/sucursales.php?empresa=${empresa}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/flutter_gozeri/sucursales.php?empresa=${empresa}");
+        "https://app.gozeri.com/desarrollo_flutter/sucursales.php?empresa=${empresa}");
 
     final resp = await http.get(uri);
     var js = json.decode(resp.body);
@@ -134,9 +134,9 @@ class AuthService extends ChangeNotifier {
     final sucursal = Preferencias.sucursal;
 
     print(
-        "https://app.gozeri.com/flutter_gozeri/series.php?sucursal=${sucursal}");
+        "https://app.gozeri.com/desarrollo_flutter/series.php?sucursal=${sucursal}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/flutter_gozeri/series.php?sucursal=${sucursal}");
+        "https://app.gozeri.com/desarrollo_flutter/series.php?sucursal=${sucursal}");
 
     final resp = await http.get(uri);
     var js = json.decode(resp.body);

@@ -21,9 +21,9 @@ class PrintProvider extends ChangeNotifier {
     final empresa = Preferencias.data_empresa;
 
     print(
-        "https://app.gozeri.com/flutter_gozeri/factura/view_print.php?id=${factura}&empresa=${empresa}");
+        "https://app.gozeri.com/desarrollo_flutter/factura/view_print.php?id=${factura}&empresa=${empresa}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/flutter_gozeri/factura/view_print.php?id=${factura}&empresa=${empresa}");
+        "https://app.gozeri.com/desarrollo_flutter/factura/view_print.php?id=${factura}&empresa=${empresa}");
 
     final resp = await http.get(uri);
     //print(resp.body);

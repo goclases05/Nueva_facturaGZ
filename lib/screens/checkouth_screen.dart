@@ -48,33 +48,30 @@ class _CheckOuthScreenState extends State<CheckOuthScreen> {
     });
   }
 
-  
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future.delayed(Duration.zero, () async{
+    Future.delayed(Duration.zero, () async {
       bool serviceEnabled;
       LocationPermission permission;
       permission = await Geolocator.checkPermission();
-      if(permission==LocationPermission.whileInUse || permission==LocationPermission.always){
+      if (permission == LocationPermission.whileInUse ||
+          permission == LocationPermission.always) {
         print('si hay localizacion');
-      }else{
+      } else {
         print('no localizacion');
         return Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-                pageBuilder: (_, __, ___) => PermissionScream(),
-                transitionDuration: Duration(seconds: 0)))
-        .then((value) => Navigator.of(context).pop());
+                context,
+                PageRouteBuilder(
+                    pageBuilder: (_, __, ___) => PermissionScream(),
+                    transitionDuration: Duration(seconds: 0)))
+            .then((value) => Navigator.of(context).pop());
       }
     });
     initialActivity();
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
-
-    
   }
 
   @override
@@ -93,9 +90,6 @@ class _CheckOuthScreenState extends State<CheckOuthScreen> {
     }
     final authService = Provider.of<AuthService>(context, listen: false);
 
-    
-
-
     /*Future.delayed(Duration.zero, () {
       Geolocator geolocator = 
       Geolocator()..forceAndroidLocationManager = true;
@@ -111,8 +105,6 @@ class _CheckOuthScreenState extends State<CheckOuthScreen> {
             .then((value) => Navigator.of(context).pop());
       }
     });*/
-
-    
 
     return Scaffold(
       body: Stack(children: [

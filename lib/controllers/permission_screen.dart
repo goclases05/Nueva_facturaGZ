@@ -188,6 +188,7 @@ class _PermissionScreamState extends State<PermissionScream> {
                   onPressed: () async {
                     bool isLocationServiceEnabled =
                         await Geolocator.isLocationServiceEnabled();
+
                     if (!isLocationServiceEnabled) {
                       edgeAlert(context,
                           description: 'GPS deshabilitado',

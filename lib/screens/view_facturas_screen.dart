@@ -62,9 +62,9 @@ class _ViewFacturasState extends State<ViewFacturas> {
       list_tmp.clear();
     }
     print(
-        "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
+        "https://app.gozeri.com/desarrollo_flutter/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/flutter_gozeri/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
+        "https://app.gozeri.com/desarrollo_flutter/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
 
     final resp = await http.get(uri);
     final o = json.decode(resp.body);
@@ -247,15 +247,16 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                     ),
                                   ),
                                   GestureDetector(
-                                    onTap: ()async {
-                                      await print_sunmi_comanda(context,'252');
+                                    onTap: () async {
+                                      await print_sunmi_comanda(context, '252');
                                     },
                                     child: Container(
                                       margin: const EdgeInsets.only(left: 2),
                                       padding: const EdgeInsets.all(5),
                                       decoration: BoxDecoration(
                                           //color: Theme.of(context).primaryColor,
-                                          color: Color.fromARGB(255, 226, 178, 49),
+                                          color:
+                                              Color.fromARGB(255, 226, 178, 49),
                                           borderRadius:
                                               BorderRadius.circular(10)),
                                       child: const Icon(
@@ -334,60 +335,29 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                   leading: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          //_printerManager.stopScan();
-                                          final printProvider =
-                                              Provider.of<PrintProvider>(
-                                                  context,
-                                                  listen: false);
-                                          printProvider.dataFac(
-                                              list_emi[index].idFactTmp);
-                                          /*await printProvider.dataFac(
-                                              list_emi[index].idFactTmp);
-
-                                          final _facturacion =
-                                              Provider.of<Facturacion>(context,
-                                                  listen: false);
-                                          await _facturacion.list_cart(
-                                              list_emi[index].idFactTmp);
-                                          await _facturacion.read_cliente(
-                                              'read',
-                                              '0',
-                                              list_emi[index].idFactTmp);
-                                          await _facturacion.serie(
-                                              list_emi[index].idFactTmp,
-                                              'read',
-                                              '');
-                                          await _facturacion.transacciones(
-                                              list_emi[index].idFactTmp);*/
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (_) => ViewTicket(
-                                                        colorPrimary:
-                                                            widget.colorPrimary,
-                                                        estado: list_emi[index]
-                                                            .estado,
-                                                        factura: list_emi[index]
-                                                            .idFactTmp,
-                                                      )));
-                                        },
-                                        child: Container(
-                                          padding: const EdgeInsets.all(5),
-                                          decoration: BoxDecoration(
-                                              //color: Theme.of(context).primaryColor,
-                                              color: widget.colorPrimary,
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                          child: const Icon(
-                                            Icons.visibility,
-                                            color: Colors.white,
-                                            size: 25,
-                                          ),
-                                        ),
-                                      ),
+                                      (list_emi[index].estado == '1')
+                                          ? GestureDetector(
+                                              onTap: () {
+                                                //_printerManager.stopScan();
+                                              },
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(5),
+                                                decoration: BoxDecoration(
+                                                    //color: Theme.of(context).primaryColor,
+                                                    color: Color.fromARGB(
+                                                        255, 233, 195, 72),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10)),
+                                                child: const Icon(
+                                                  Icons.payments,
+                                                  color: Colors.white,
+                                                  size: 25,
+                                                ),
+                                              ),
+                                            )
+                                          : Text(''),
                                       GestureDetector(
                                         onTap: () async {
                                           // ignore: await_only_futures
@@ -543,19 +513,40 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black38),
                                   ),
-                                  onTap: () {},
+                                  onTap: () {
+                                    final printProvider =
+                                        Provider.of<PrintProvider>(context,
+                                            listen: false);
+                                    printProvider
+                                        .dataFac(list_emi[index].idFactTmp);
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => ViewTicket(
+                                                  colorPrimary:
+                                                      widget.colorPrimary,
+                                                  estado:
+                                                      list_emi[index].estado,
+                                                  factura:
+                                                      list_emi[index].idFactTmp,
+                                                )));
+                                  },
                                   trailing: Chip(
                                       padding: const EdgeInsets.all(1),
                                       backgroundColor:
                                           (list_emi[index].estado == '2')
-                                              ? const Color.fromARGB(255, 169,
-                                                  189, 105)
-                                              : const Color.fromARGB(
-                                                  255, 232, 116, 107),
+                                              ? Color.fromARGB(255, 28, 192, 28)
+                                              : (list_emi[index].estado == '1')
+                                                  ? Color.fromARGB(
+                                                      255, 233, 195, 72)
+                                                  : const Color.fromARGB(
+                                                      255, 232, 116, 107),
                                       label: Text(
                                         (list_emi[index].estado == '2')
                                             ? 'Pagada'
-                                            : 'Anulada',
+                                            : (list_emi[index].estado == '1')
+                                                ? 'Pendiente de Pago'
+                                                : 'Anulada',
                                         style: const TextStyle(
                                             fontSize: 10, color: Colors.white),
                                       )),
@@ -1019,10 +1010,9 @@ print_sunmi(BuildContext context, String id_factura) async {
           ? '${encabezado[0].nombreEmpresaSucu}'
           : '${encabezado[0].nombreEmpresa}',
       style: SunmiStyle(
-        bold: true,
-        align: SunmiPrintAlign.CENTER,
-        fontSize: SunmiFontSize.MD
-      ));
+          bold: true,
+          align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD));
 
   //Direccion de empresa
   await SunmiPrinter.printText(
@@ -1030,19 +1020,17 @@ print_sunmi(BuildContext context, String id_factura) async {
           ? '${encabezado[0].direccionSucu}'
           : '${encabezado[0].direccion}',
       style: SunmiStyle(
-        bold: true,
-        align: SunmiPrintAlign.CENTER,
-        fontSize: SunmiFontSize.MD
-      ));
+          bold: true,
+          align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD));
 
   //nit emisor
   if (encabezado[0].nit_emisor != '') {
     await SunmiPrinter.printText('NIT: ${encabezado[0].nit_emisor}',
         style: SunmiStyle(
-          bold: true,
-          align: SunmiPrintAlign.CENTER,
-          fontSize: SunmiFontSize.MD
-        ));
+            bold: true,
+            align: SunmiPrintAlign.CENTER,
+            fontSize: SunmiFontSize.MD));
   }
 
   //telefono emisor
@@ -1050,19 +1038,17 @@ print_sunmi(BuildContext context, String id_factura) async {
     if (encabezado[0].teleSucu != '') {
       await SunmiPrinter.printText('Tel: ${encabezado[0].teleSucu}',
           style: SunmiStyle(
-            bold: true,
-            align: SunmiPrintAlign.CENTER,
-            fontSize: SunmiFontSize.MD
-          ));
+              bold: true,
+              align: SunmiPrintAlign.CENTER,
+              fontSize: SunmiFontSize.MD));
     }
   } else {
     if (encabezado[0].telefono != '') {
       await SunmiPrinter.printText('Tel: ${encabezado[0].telefono}',
           style: SunmiStyle(
-            bold: true,
-            align: SunmiPrintAlign.CENTER,
-            fontSize: SunmiFontSize.MD
-          ));
+              bold: true,
+              align: SunmiPrintAlign.CENTER,
+              fontSize: SunmiFontSize.MD));
     }
   }
 
@@ -1073,19 +1059,17 @@ print_sunmi(BuildContext context, String id_factura) async {
     if (encabezado[0].nombre_comercial_sucu != '') {
       await SunmiPrinter.printText('${encabezado[0].nombre_comercial_sucu}',
           style: SunmiStyle(
-            bold: true,
-            align: SunmiPrintAlign.CENTER,
-            fontSize: SunmiFontSize.MD
-          ));
+              bold: true,
+              align: SunmiPrintAlign.CENTER,
+              fontSize: SunmiFontSize.MD));
     }
   } else {
     if (encabezado[0].nombre_comercial_emp != '') {
       await SunmiPrinter.printText('${encabezado[0].nombre_comercial_emp}',
           style: SunmiStyle(
-            bold: true,
-            align: SunmiPrintAlign.CENTER,
-            fontSize: SunmiFontSize.MD
-          ));
+              bold: true,
+              align: SunmiPrintAlign.CENTER,
+              fontSize: SunmiFontSize.MD));
     }
   }
 
@@ -1094,10 +1078,9 @@ print_sunmi(BuildContext context, String id_factura) async {
   if (encabezado[0].dte != '') {
     await SunmiPrinter.printText('Factura Electrónica Documento Tributario',
         style: SunmiStyle(
-          bold: true,
-          align: SunmiPrintAlign.CENTER,
-          fontSize: SunmiFontSize.MD
-        ));
+            bold: true,
+            align: SunmiPrintAlign.CENTER,
+            fontSize: SunmiFontSize.MD));
   }
 
   //await SunmiPrinter.lineWrap(1);
@@ -1105,38 +1088,33 @@ print_sunmi(BuildContext context, String id_factura) async {
   //FECHA EN LETRAS
   await SunmiPrinter.printText('${encabezado[0].fecha_letras}',
       style: SunmiStyle(
-        bold: false,
-        align: SunmiPrintAlign.RIGHT,
-        fontSize: SunmiFontSize.MD
-      ));
+          bold: false,
+          align: SunmiPrintAlign.RIGHT,
+          fontSize: SunmiFontSize.MD));
 
   //await SunmiPrinter.lineWrap(1);
 
   if (encabezado[0].dte != '') {
     await SunmiPrinter.printText('Número de Autorización:',
         style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.CENTER,
-          fontSize: SunmiFontSize.MD
-        ));
+            bold: false,
+            align: SunmiPrintAlign.CENTER,
+            fontSize: SunmiFontSize.MD));
     await SunmiPrinter.printText('${encabezado[0].dte}',
         style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.CENTER,
-          fontSize: SunmiFontSize.MD
-        ));
+            bold: false,
+            align: SunmiPrintAlign.CENTER,
+            fontSize: SunmiFontSize.MD));
     await SunmiPrinter.printText('Serie: ${encabezado[0].serieDte}',
         style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.CENTER,
-          fontSize: SunmiFontSize.MD
-        ));
+            bold: false,
+            align: SunmiPrintAlign.CENTER,
+            fontSize: SunmiFontSize.MD));
     await SunmiPrinter.printText('Número de DTE: ${encabezado[0].noDte}',
         style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.CENTER,
-          fontSize: SunmiFontSize.MD
-        ));
+            bold: false,
+            align: SunmiPrintAlign.CENTER,
+            fontSize: SunmiFontSize.MD));
   }
 
   //await SunmiPrinter.lineWrap(1);
@@ -1144,53 +1122,47 @@ print_sunmi(BuildContext context, String id_factura) async {
   //No
   await SunmiPrinter.printText('No: ${encabezado[0].no}',
       style: SunmiStyle(
-        bold: false,
-        align: SunmiPrintAlign.RIGHT,
-        fontSize: SunmiFontSize.MD
-      ));
+          bold: false,
+          align: SunmiPrintAlign.RIGHT,
+          fontSize: SunmiFontSize.MD));
 
   //await SunmiPrinter.lineWrap(1);
 
   //serie
   await SunmiPrinter.printText('Serie: ${encabezado[0].serie}',
       style: SunmiStyle(
-        bold: false,
-        align: SunmiPrintAlign.LEFT,
-        fontSize: SunmiFontSize.MD
-      ));
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+          fontSize: SunmiFontSize.MD));
 
   //vendedor
   await SunmiPrinter.printText(
       'Vendedor : ${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
       style: SunmiStyle(
-        bold: false,
-        align: SunmiPrintAlign.LEFT,
-        fontSize: SunmiFontSize.MD
-      ));
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+          fontSize: SunmiFontSize.MD));
   //cliente
   await SunmiPrinter.printText(
       'Cliente: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
       style: SunmiStyle(
-        bold: false,
-        align: SunmiPrintAlign.LEFT,
-        fontSize: SunmiFontSize.MD
-      ));
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+          fontSize: SunmiFontSize.MD));
   //nit cliente
   await SunmiPrinter.printText('NIT: ${encabezado[0].nit}',
       style: SunmiStyle(
-        bold: false,
-        align: SunmiPrintAlign.LEFT,
-        fontSize: SunmiFontSize.MD
-      ));
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+          fontSize: SunmiFontSize.MD));
 
   //direccion cliente
   if (encabezado[0].direccionCli != '') {
     await SunmiPrinter.printText('Dirección: ${encabezado[0].direccionCli}',
         style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.LEFT,
-          fontSize: SunmiFontSize.MD
-        ));
+            bold: false,
+            align: SunmiPrintAlign.LEFT,
+            fontSize: SunmiFontSize.MD));
   }
 
   await SunmiPrinter.lineWrap(1);
@@ -1198,17 +1170,15 @@ print_sunmi(BuildContext context, String id_factura) async {
   //condiciones de pago
   await SunmiPrinter.printText('Condiciones de pago:',
       style: SunmiStyle(
-        bold: true,
-        align: SunmiPrintAlign.CENTER,
-        fontSize: SunmiFontSize.MD
-      ));
+          bold: true,
+          align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD));
   //forma
   await SunmiPrinter.printText('${encabezado[0].forma}',
       style: SunmiStyle(
-        bold: true,
-        align: SunmiPrintAlign.CENTER,
-        fontSize: SunmiFontSize.MD
-      ));
+          bold: true,
+          align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD));
 
   //await SunmiPrinter.lineWrap(1);
 
@@ -1263,19 +1233,17 @@ print_sunmi(BuildContext context, String id_factura) async {
   //total en letras
   await SunmiPrinter.printText('${encabezado[0].totalLetas}',
       style: SunmiStyle(
-        bold: true,
-        align: SunmiPrintAlign.CENTER,
-        fontSize: SunmiFontSize.MD
-      ));
+          bold: true,
+          align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD));
 
   //frases
   for (int rl = 0; rl < encabezado[0].frases.length; rl++) {
     await SunmiPrinter.printText('${encabezado[0].frases[rl]}',
         style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.CENTER,
-          fontSize: SunmiFontSize.MD
-        ));
+            bold: false,
+            align: SunmiPrintAlign.CENTER,
+            fontSize: SunmiFontSize.MD));
   }
 
   //datos certificador
@@ -1283,31 +1251,27 @@ print_sunmi(BuildContext context, String id_factura) async {
     await SunmiPrinter.lineWrap(1);
     await SunmiPrinter.printText('Certificador: ${encabezado[0].certificador}',
         style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.LEFT,
-          fontSize: SunmiFontSize.MD
-        ));
+            bold: false,
+            align: SunmiPrintAlign.LEFT,
+            fontSize: SunmiFontSize.MD));
     await SunmiPrinter.printText('NIT: ${encabezado[0].nitCert}',
         style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.LEFT,
-          fontSize: SunmiFontSize.MD
-        ));
+            bold: false,
+            align: SunmiPrintAlign.LEFT,
+            fontSize: SunmiFontSize.MD));
     await SunmiPrinter.printText('Fecha: ${encabezado[0].fechaCert}',
         style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.LEFT,
-          fontSize: SunmiFontSize.MD
-        ));
+            bold: false,
+            align: SunmiPrintAlign.LEFT,
+            fontSize: SunmiFontSize.MD));
   }
 
   //await SunmiPrinter.lineWrap(1);
   await SunmiPrinter.printText('Realizado en www.gozeri.com',
       style: SunmiStyle(
-        bold: false,
-        align: SunmiPrintAlign.CENTER,
-        fontSize: SunmiFontSize.MD
-      ));
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD));
 
   /*await SunmiPrinter.printQRCode('https://github.com/brasizza/sunmi_printer');
   await SunmiPrinter.printText('Normal font',
@@ -1337,17 +1301,15 @@ print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
   await SunmiPrinter.lineWrap(1);
   await SunmiPrinter.lineWrap(1);
   await SunmiPrinter.printText('Mesa No.1',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.CENTER,
-    fontSize: SunmiFontSize.XL
-  ));
+      style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.XL));
   await SunmiPrinter.printText('Factura No.125',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.CENTER,
-    fontSize: SunmiFontSize.XL
-  ));
+      style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.XL));
 
   //DETALLES
   /*for (int al = 0; al < detalle.length; al++) {
@@ -1381,24 +1343,17 @@ print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
     ColumnMaker(text: 'Producto', width: 20, align: SunmiPrintAlign.LEFT),
   ]);
   await SunmiPrinter.line();
-    await SunmiPrinter.printRow(cols: [
-      ColumnMaker(text: '20', width: 6, align: SunmiPrintAlign.CENTER),
-      ColumnMaker(
-          text: 'Hamburguesa',
-          width: 24,
-          align: SunmiPrintAlign.LEFT),
-      
-    ]);
-    await SunmiPrinter.printRow(cols: [
-      ColumnMaker(text: '5', width: 6, align: SunmiPrintAlign.CENTER),
-      ColumnMaker(
-          text: 'Helados de fresa',
-          width: 24,
-          align: SunmiPrintAlign.LEFT),
-      
-    ]);
+  await SunmiPrinter.printRow(cols: [
+    ColumnMaker(text: '20', width: 6, align: SunmiPrintAlign.CENTER),
+    ColumnMaker(text: 'Hamburguesa', width: 24, align: SunmiPrintAlign.LEFT),
+  ]);
+  await SunmiPrinter.printRow(cols: [
+    ColumnMaker(text: '5', width: 6, align: SunmiPrintAlign.CENTER),
+    ColumnMaker(
+        text: 'Helados de fresa', width: 24, align: SunmiPrintAlign.LEFT),
+  ]);
   //}
-  
+
   await SunmiPrinter.lineWrap(1);
   await SunmiPrinter.lineWrap(1);
   await SunmiPrinter.printText('Realizado en www.gozeri.com',

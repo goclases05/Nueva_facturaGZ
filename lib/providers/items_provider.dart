@@ -20,9 +20,9 @@ class ItemProvider extends ChangeNotifier {
     final id_usuario = Preferencias.data_id;
 
     print(
-        "https://${_baseUrl}/flutter_gozeri/search_items.php?id_empresa=${empresa}&data=${query}");
+        "https://${_baseUrl}/desarrollo_flutter/search_items.php?id_empresa=${empresa}&data=${query}");
     final Uri uri = Uri.parse(
-        "https://${_baseUrl}/flutter_gozeri/search_items.php?id_empresa=${empresa}&data=${query}");
+        "https://${_baseUrl}/desarrollo_flutter/search_items.php?id_empresa=${empresa}&data=${query}");
 
     final resp = await http.get(uri);
     final search = ProductosDepartamento.fromJson(resp.body);
