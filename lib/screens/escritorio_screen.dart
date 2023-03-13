@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:edge_alerts/edge_alerts.dart';
+import 'package:factura_gozeri/global/preferencias_global.dart';
 import 'package:factura_gozeri/print/impresoras_print.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
@@ -11,6 +12,7 @@ import 'package:factura_gozeri/screens/screens.dart';
 import 'package:factura_gozeri/services/auth_services.dart';
 import 'package:factura_gozeri/services/departamentos_services.dart';
 import 'package:factura_gozeri/widgets/drawer_header.dart';
+import 'package:factura_gozeri/widgets/reporte_ventas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -183,17 +185,34 @@ Widget MyDrawerList(BuildContext context, Color colo) {
   return Container(
     padding: const EdgeInsets.only(top: 15, left: 8, right: 8),
     child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        menuItem(1, "Historial de Facturas", Icons.app_registration, true,
-            context, colo),
-        const SizedBox(
-          height: 5,
-        ),
-        menuItem(0, "Facturar", Icons.receipt_long, false, context, colo),
-      ],
-    ),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          menuItem(1, "Historial de Facturas", Icons.app_registration, true,
+              context, colo),
+          const SizedBox(
+            height: 5,
+          ),
+          menuItem(0, "Facturar", Icons.receipt_long, false, context, colo),
+          SizedBox(
+            height: 5,
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Text(
+              'Reportes',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Divider(),
+          SizedBox(
+            height: 2,
+          ),
+          Reporte_Ventas(
+            colo: colo,
+            context: context,
+          )
+        ]),
   );
 }
 

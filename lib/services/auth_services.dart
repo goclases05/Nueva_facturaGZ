@@ -15,6 +15,7 @@ class AuthService extends ChangeNotifier {
   List<SucursalesData> list_sucu = [];
   List<SeriesData> list_serie = [];
   bool localisacion = false;
+  String id_sucu_reportes = '';
 
   final storage = new FlutterSecureStorage();
 
@@ -128,6 +129,11 @@ class AuthService extends ChangeNotifier {
       list_sucu.add(result);
     }
     return notifyListeners();
+  }
+
+  Future id_suc_reporte(String valor) async {
+    id_sucu_reportes = valor;
+    notifyListeners();
   }
 
   Future Series() async {

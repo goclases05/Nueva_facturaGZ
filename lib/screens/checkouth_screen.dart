@@ -4,6 +4,7 @@ import 'package:factura_gozeri/controllers/mantenimiento_screen.dart';
 import 'package:factura_gozeri/controllers/membresia_screen.dart';
 import 'package:factura_gozeri/controllers/permission_screen.dart';
 import 'package:factura_gozeri/controllers/version_screen.dart';
+import 'package:factura_gozeri/global/preferencias_global.dart';
 import 'package:factura_gozeri/screens/escritorio_screen.dart';
 import 'package:factura_gozeri/screens/no_internet_screen.dart';
 import 'package:flutter/material.dart';
@@ -89,7 +90,7 @@ class _CheckOuthScreenState extends State<CheckOuthScreen> {
       return NoInternet();
     }
     final authService = Provider.of<AuthService>(context, listen: false);
-
+    authService.id_suc_reporte("${Preferencias.sucursal}");
     /*Future.delayed(Duration.zero, () {
       Geolocator geolocator = 
       Geolocator()..forceAndroidLocationManager = true;

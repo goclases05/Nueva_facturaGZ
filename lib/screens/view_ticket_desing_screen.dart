@@ -98,21 +98,27 @@ class _ViewTicketState extends State<ViewTicket> {
                 Chip(
                     padding: const EdgeInsets.all(1),
                     backgroundColor: (widget.estado == '2')
-                        ? Color.fromARGB(255, 169, 189, 105)
-                        : Color.fromARGB(255, 232, 116, 107),
+                        ? Color.fromARGB(255, 28, 192, 28)
+                        : (widget.estado == '1')
+                            ? Color.fromARGB(255, 233, 195, 72)
+                            : const Color.fromARGB(255, 232, 116, 107),
                     label: Text(
-                      (widget.estado == '2') ? 'Pagada' : 'Anulada',
+                      (widget.estado == '2')
+                          ? 'Pagada'
+                          : (widget.estado == '1')
+                              ? 'Pendiente de Pago'
+                              : 'Anulada',
                       style: const TextStyle(fontSize: 15, color: Colors.white),
                     )),
               ],
             ),
             actions: [
               CircleAvatar(
-                backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
+                backgroundColor: Colors.red,
                 child: IconButton(
                   onPressed: () {},
-                  icon: Icon(Icons.print),
-                  color: widget.colorPrimary,
+                  icon: Icon(Icons.close),
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(
@@ -459,12 +465,11 @@ class _ViewTicketState extends State<ViewTicket> {
       child: TextButton.icon(
         onPressed: () {
           //codigo de impresion
-          if(Preferencias.sunmi_preferencia){
+          if (Preferencias.sunmi_preferencia) {
             print_sunmi(context, widget.factura);
-          }else{
-            
-             _printerManager.scanResults.listen((devices) async {
-            print(devices);
+          } else {
+            _printerManager.scanResults.listen((devices) async {
+              print(devices);
 
               if (Preferencias.mac == '') {
                 showDialog(
@@ -536,7 +541,6 @@ class _ViewTicketState extends State<ViewTicket> {
                   }
                 });
               }
-              
             });
           }
           //codigo de impresion
@@ -1018,11 +1022,11 @@ class _ViewTicketState extends State<ViewTicket> {
     return bytess;
   }
 }
-print_sunmi(BuildContext context, String id_factura) async {
 
+print_sunmi(BuildContext context, String id_factura) async {
   final print_data = Provider.of<PrintProvider>(context, listen: false);
-    List<Encabezado> encabezado = print_data.list;
-    List<Detalle> detalle = print_data.list_detalle;
+  List<Encabezado> encabezado = print_data.list;
+  List<Detalle> detalle = print_data.list_detalle;
 
   int sede = 0;
   //0= empresa
@@ -1155,129 +1159,124 @@ print_sunmi(BuildContext context, String id_factura) async {
 
   //FECHA EN LETRAS
   await SunmiPrinter.printText('${encabezado[0].fecha_letras}',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.RIGHT,
-  ));
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.RIGHT,
+      ));
 
   //await SunmiPrinter.lineWrap(1);
 
   if (encabezado[0].dte != '') {
     await SunmiPrinter.printText('Número de Autorización:',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.CENTER,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+        ));
     await SunmiPrinter.printText('${encabezado[0].dte}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.CENTER,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+        ));
     await SunmiPrinter.printText('Serie: ${encabezado[0].serieDte}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.CENTER,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+        ));
     await SunmiPrinter.printText('Número de DTE: ${encabezado[0].noDte}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.CENTER,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+        ));
   }
 
   //await SunmiPrinter.lineWrap(1);
 
   //No
   await SunmiPrinter.printText('No: ${encabezado[0].no}',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.RIGHT,
-  ));
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.RIGHT,
+      ));
 
   //await SunmiPrinter.lineWrap(1);
 
   //serie
   await SunmiPrinter.printText('Serie: ${encabezado[0].serie}',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.LEFT,
-  ));
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.LEFT,
+      ));
 
   //vendedor
-  await SunmiPrinter.printText('Vendedor : ${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.LEFT,
-  ));
+  await SunmiPrinter.printText(
+      'Vendedor : ${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.LEFT,
+      ));
   //cliente
-  await SunmiPrinter.printText('Cliente: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.LEFT,
-  ));
-   //nit cliente
+  await SunmiPrinter.printText(
+      'Cliente: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.LEFT,
+      ));
+  //nit cliente
   await SunmiPrinter.printText('NIT: ${encabezado[0].nit}',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.LEFT,
-  ));
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.LEFT,
+      ));
 
   //direccion cliente
   if (encabezado[0].direccionCli != '') {
     await SunmiPrinter.printText('Dirección: ${encabezado[0].direccionCli}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.LEFT,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
   }
 
   await SunmiPrinter.lineWrap(1);
 
-   //condiciones de pago
+  //condiciones de pago
   await SunmiPrinter.printText('Condiciones de pago:',
-  style: SunmiStyle(
-    bold: true,
-    align: SunmiPrintAlign.CENTER,
-  ));
+      style: SunmiStyle(
+        bold: true,
+        align: SunmiPrintAlign.CENTER,
+      ));
   //forma
   await SunmiPrinter.printText('${encabezado[0].forma}',
-  style: SunmiStyle(
-    bold: true,
-    align: SunmiPrintAlign.CENTER,
-  ));
+      style: SunmiStyle(
+        bold: true,
+        align: SunmiPrintAlign.CENTER,
+      ));
 
   //await SunmiPrinter.lineWrap(1);
 
   await SunmiPrinter.line();
   await SunmiPrinter.printRow(cols: [
-    ColumnMaker(
-        text: 'Descripción',
-        width: 20,
-        align: SunmiPrintAlign.LEFT),
-    ColumnMaker(
-        text: 'Subtotal',
-        width: 10,
-        align: SunmiPrintAlign.CENTER),
+    ColumnMaker(text: 'Descripción', width: 20, align: SunmiPrintAlign.LEFT),
+    ColumnMaker(text: 'Subtotal', width: 10, align: SunmiPrintAlign.CENTER),
   ]);
   await SunmiPrinter.line();
 
   //DETALLES
   for (int al = 0; al < detalle.length; al++) {
-    double tota =double.parse(detalle[al].cantidad) * double.parse(detalle[al].precio);
+    double tota =
+        double.parse(detalle[al].cantidad) * double.parse(detalle[al].precio);
     await SunmiPrinter.printRow(cols: [
       ColumnMaker(
           text: '${detalle[al].producto}',
           width: 24,
           align: SunmiPrintAlign.LEFT),
-      ColumnMaker(
-          text: '',
-          width: 6,
-          align: SunmiPrintAlign.CENTER),
+      ColumnMaker(text: '', width: 6, align: SunmiPrintAlign.CENTER),
     ]);
 
     await SunmiPrinter.printRow(cols: [
       ColumnMaker(
-          text: '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
+          text:
+              '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
           width: 20,
           align: SunmiPrintAlign.LEFT),
       ColumnMaker(
@@ -1288,22 +1287,16 @@ print_sunmi(BuildContext context, String id_factura) async {
   }
   await SunmiPrinter.line();
   await SunmiPrinter.printRow(cols: [
-    ColumnMaker(
-        text:'Descuento(-):',
-        width: 20,
-        align: SunmiPrintAlign.RIGHT),
+    ColumnMaker(text: 'Descuento(-):', width: 20, align: SunmiPrintAlign.RIGHT),
     ColumnMaker(
         text: encabezado[0].contenido + encabezado[0].descuento,
         width: 10,
         align: SunmiPrintAlign.CENTER),
   ]);
   await SunmiPrinter.printRow(cols: [
+    ColumnMaker(text: 'Total:', width: 20, align: SunmiPrintAlign.RIGHT),
     ColumnMaker(
-        text:'Total:',
-        width: 20,
-        align: SunmiPrintAlign.RIGHT),
-    ColumnMaker(
-        text:  encabezado[0].contenido + encabezado[0].total,
+        text: encabezado[0].contenido + encabezado[0].total,
         width: 10,
         align: SunmiPrintAlign.CENTER),
   ]);
@@ -1311,46 +1304,46 @@ print_sunmi(BuildContext context, String id_factura) async {
 
   //total en letras
   await SunmiPrinter.printText('${encabezado[0].totalLetas}',
-  style: SunmiStyle(
-    bold: true,
-    align: SunmiPrintAlign.CENTER,
-  ));
+      style: SunmiStyle(
+        bold: true,
+        align: SunmiPrintAlign.CENTER,
+      ));
 
   //frases
   for (int rl = 0; rl < encabezado[0].frases.length; rl++) {
     await SunmiPrinter.printText('${encabezado[0].frases[rl]}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.CENTER,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+        ));
   }
-  
+
   //datos certificador
-  if(encabezado[0].dte!=''){
+  if (encabezado[0].dte != '') {
     await SunmiPrinter.lineWrap(1);
     await SunmiPrinter.printText('Certificador: ${encabezado[0].certificador}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.LEFT,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
     await SunmiPrinter.printText('NIT: ${encabezado[0].nitCert}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.LEFT,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
     await SunmiPrinter.printText('Fecha: ${encabezado[0].fechaCert}',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.LEFT,
-    ));
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
   }
-  
+
   //await SunmiPrinter.lineWrap(1);
   await SunmiPrinter.printText('Realizado en www.gozeri.com',
-  style: SunmiStyle(
-    bold: false,
-    align: SunmiPrintAlign.CENTER,
-  ));
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.CENTER,
+      ));
 
   /*await SunmiPrinter.printQRCode('https://github.com/brasizza/sunmi_printer');
   await SunmiPrinter.printText('Normal font',

@@ -335,29 +335,6 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                   leading: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      (list_emi[index].estado == '1')
-                                          ? GestureDetector(
-                                              onTap: () {
-                                                //_printerManager.stopScan();
-                                              },
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(5),
-                                                decoration: BoxDecoration(
-                                                    //color: Theme.of(context).primaryColor,
-                                                    color: Color.fromARGB(
-                                                        255, 233, 195, 72),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10)),
-                                                child: const Icon(
-                                                  Icons.payments,
-                                                  color: Colors.white,
-                                                  size: 25,
-                                                ),
-                                              ),
-                                            )
-                                          : Text(''),
                                       GestureDetector(
                                         onTap: () async {
                                           // ignore: await_only_futures
@@ -497,6 +474,32 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                           ),
                                         ),
                                       ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      (list_emi[index].estado == '1')
+                                          ? GestureDetector(
+                                              onTap: () {
+                                                //_printerManager.stopScan();
+                                              },
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(5),
+                                                decoration: BoxDecoration(
+                                                    //color: Theme.of(context).primaryColor,
+                                                    color: Color.fromARGB(
+                                                        255, 6, 158, 125),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10)),
+                                                child: const Icon(
+                                                  Icons.payments,
+                                                  color: Colors.white,
+                                                  size: 25,
+                                                ),
+                                              ),
+                                            )
+                                          : Text('')
                                     ],
                                   ),
                                   title: Text(
@@ -552,7 +555,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                       )),
                                 );
                               })
-                          : const Center(child: Text('Sin data'))
+                          : const Center(child: Text('Cargando resultados..'))
                       : const Center(child: Text('Sin acciones'))),
         ));
   }
