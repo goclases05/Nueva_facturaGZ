@@ -3,19 +3,19 @@ import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class RegistroMetodoPago extends StatefulWidget {
-  RegistroMetodoPago(
-      {Key? key, required this.colorPrimary, required this.id_tmp, required this.estado})
+class RegistroMetodoPagoListas extends StatefulWidget {
+  RegistroMetodoPagoListas(
+      {Key? key, required this.colorPrimary, required this.id_f, required this.estado})
       : super(key: key);
   Color colorPrimary;
-  String id_tmp;
+  String id_f;
   String estado;
 
   @override
-  State<RegistroMetodoPago> createState() => _RegistroMetodoPagoState();
+  State<RegistroMetodoPagoListas> createState() => _RegistroMetodoPagoListasState();
 }
 
-class _RegistroMetodoPagoState extends State<RegistroMetodoPago> {
+class _RegistroMetodoPagoListasState extends State<RegistroMetodoPagoListas> {
   String initialSerie = '1';
   String initialBanco = '0';
   late TextEditingController _controlPago;
@@ -80,49 +80,53 @@ class _RegistroMetodoPagoState extends State<RegistroMetodoPago> {
     }
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Container(
+        width: double.infinity,
+        alignment: Alignment.center,
+        padding: EdgeInsets.all(10),
+        child: Text(
+          'Realizar Pago ',
+          style: TextStyle(color: widget.colorPrimary,fontWeight: FontWeight.bold,fontSize: 18),
+        )),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: EdgeInsets.only(left: 10),
-              width: MediaQuery.of(context).size.width * 0.9,
-              decoration: BoxDecoration(
-                border: Border.all(
-                    color: Colors.grey, style: BorderStyle.solid, width: 1),
-                borderRadius: BorderRadius.circular(5),
-              ),
+            Expanded(child: Container(
+              padding: EdgeInsets.all(3),
+              decoration: BoxDecoration(border: Border.all(color: widget.colorPrimary),borderRadius:BorderRadius.circular(10)),
               child: DropdownButton(
-                itemHeight: null,
-                value: initialSerie,
-                isExpanded: true,
-                dropdownColor: Color.fromARGB(255, 241, 238, 241),
-                onChanged: (String? newValue) async {
-                  if (newValue != '1' && newValue != '6' && newValue != '15') {
-                    Metodo.bancos();
-                  }
-                  setState(() {
-                    initialSerie = newValue!;
-                    initialBanco = '0';
-                    _controlPago.text = '';
-                    _controlReferencia.text = '';
-                  });
-                },
-                items: menuItems,
-                elevation: 0,
-                style: const TextStyle(
-                    color: Colors.black54,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
-                //icon: Icon(Icons.arrow_drop_down),
-                iconDisabledColor: Colors.red,
-                iconEnabledColor: widget.colorPrimary,
-                underline: SizedBox(),
-              ),
-            ),
+                  itemHeight: null,
+                  value: initialSerie,
+                  isExpanded: true,
+                  dropdownColor: Color.fromARGB(255, 241, 238, 241),
+                  onChanged: (String? newValue) async {
+                    if (newValue != '1' && newValue != '6' && newValue != '15') {
+                      Metodo.bancos();
+                    }
+                    setState(() {
+                      initialSerie = newValue!;
+                      initialBanco = '0';
+                      _controlPago.text = '';
+                      _controlReferencia.text = '';
+                    });
+                  },
+                  items: menuItems,
+                  elevation: 0,
+                  style: const TextStyle(
+                      color: Colors.black54,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
+                  //icon: Icon(Icons.arrow_drop_down),
+                  iconDisabledColor: Colors.red,
+                  iconEnabledColor: widget.colorPrimary,
+                  underline: SizedBox(),
+                ),
+            ),)
           ],
         ),
         const SizedBox(
@@ -133,6 +137,7 @@ class _RegistroMetodoPagoState extends State<RegistroMetodoPago> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
+              flex: 1,
                 child: TextField(
               controller: _controlPago,
               keyboardType: TextInputType.number,
@@ -144,78 +149,17 @@ class _RegistroMetodoPagoState extends State<RegistroMetodoPago> {
                 labelText: 'Pago',
               ),
             )),
-            Container(
-              margin: EdgeInsets.only(left: 10),
-              child: ElevatedButton.icon(
-                  label: const Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 20, horizontal: 5),
-                      child: Text("Aplicar Pago")),
-                  onPressed: () async {
-                    if (_controlPago.text == '') {
-                      /*SnackBar snackBar = const SnackBar(
-                        padding: EdgeInsets.all(20),
-                        content: Text(
-                          'Inserta cantidad a pagar',
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        backgroundColor: Color.fromARGB(255, 224, 96, 113),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
-                      edgeAlert(context,
-                          description: 'Inserta cantidad a pagar',
-                          gravity: Gravity.top,
-                          backgroundColor: Colors.redAccent);
-                    } else {
-                      var insert = await Metodo.accionesMetodoPAgo(
-                          'add',
-                          widget.id_tmp,
-                          _controlPago.text,
-                          initialSerie,
-                          initialBanco,
-                          _controlReferencia.text);
-                      if (insert == '1') {
-                        _controlPago.text = '';
-                        _controlReferencia.text = '';
-                        initialSerie = '1';
-                        initialBanco = '0';
-                        Metodo.transacciones(widget.id_tmp);
-                        setState(() {});
-                      } else {
-                        /*SnackBar snackBar = SnackBar(
-                          padding: const EdgeInsets.all(20),
-                          content: Text(
-                            '${insert}',
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          backgroundColor:
-                              const Color.fromARGB(255, 224, 96, 113),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
-                        edgeAlert(context,
-                            description: '${insert}',
-                            gravity: Gravity.top,
-                            backgroundColor: Colors.redAccent);
-                      }
-                    }
-
-                    FocusScope.of(context).requestFocus(FocusNode());
-                  },
-                  style: TextButton.styleFrom(
-                      primary: Colors.white,
-                      backgroundColor: widget.colorPrimary),
-                  icon: const Text("")),
-            ),
           ],
-        ),
-        const SizedBox(
-          height: 20,
         ),
         (initialSerie != '1' && initialSerie != '6' && initialSerie != '15')
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  
+                  const SizedBox(
+                    height: 20,
+                  ),
                   Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -284,10 +228,73 @@ class _RegistroMetodoPagoState extends State<RegistroMetodoPago> {
                             hintText: 'Insertar No. referencia'),
                       )),
                     ],
-                  )
+                  ),
+                  SizedBox(height: 15,)
                 ],
               )
-            : const Text('')
+            : const Text(''),
+        Container(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                  label: const Padding(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 20, horizontal: 5),
+                      child: Text("Aplicar Pago")),
+                  onPressed: () async {
+                    if (_controlPago.text == '') {
+                      /*SnackBar snackBar = const SnackBar(
+                        padding: EdgeInsets.all(20),
+                        content: Text(
+                          'Inserta cantidad a pagar',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        backgroundColor: Color.fromARGB(255, 224, 96, 113),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                      edgeAlert(context,
+                          description: 'Inserta cantidad a pagar',
+                          gravity: Gravity.top,
+                          backgroundColor: Colors.redAccent);
+                    } else {
+                      /*var insert = await Metodo.accionesMetodoPAgo(
+                          'add',
+                          widget.id_f,
+                          _controlPago.text,
+                          initialSerie,
+                          initialBanco,
+                          _controlReferencia.text);
+                      if (insert == '1') {
+                        _controlPago.text = '';
+                        _controlReferencia.text = '';
+                        initialSerie = '1';
+                        initialBanco = '0';
+                        Metodo.transacciones(widget.id_f);
+                        setState(() {});
+                      } else {
+                        /*SnackBar snackBar = SnackBar(
+                          padding: const EdgeInsets.all(20),
+                          content: Text(
+                            '${insert}',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor:
+                              const Color.fromARGB(255, 224, 96, 113),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                        edgeAlert(context,
+                            description: '${insert}',
+                            gravity: Gravity.top,
+                            backgroundColor: Colors.redAccent);
+                      }*/
+                    }
+
+                    FocusScope.of(context).requestFocus(FocusNode());
+                  },
+                  style: TextButton.styleFrom(
+                      primary: Colors.white,
+                      backgroundColor: widget.colorPrimary),
+                  icon: const Text("")),
+            ),
       ],
     );
   }

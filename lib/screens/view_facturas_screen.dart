@@ -12,6 +12,8 @@ import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/screens/view_ticket_desing_screen.dart';
 import 'package:factura_gozeri/services/departamentos_services.dart';
+import 'package:factura_gozeri/widgets/registro_metodoPago_listas_widget.dart';
+import 'package:factura_gozeri/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -481,6 +483,12 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                           ? GestureDetector(
                                               onTap: () {
                                                 //_printerManager.stopScan();
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (_) => AlertDialog(
+                                                    content: RegistroMetodoPagoListas(colorPrimary: widget.colorPrimary, id_f: list_emi[index].idFactTmp, estado: '1'),
+                                                  ),
+                                                );
                                               },
                                               child: Container(
                                                 padding:

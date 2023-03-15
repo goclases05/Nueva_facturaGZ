@@ -424,7 +424,7 @@ class _PrintScreenState extends State<PrintScreen> {
                                       : (index == 2)
                                           ? RegistroMetodoPago(
                                               colorPrimary: widget.colorPrimary,
-                                              id_tmp: widget.id_tmp)
+                                              id_tmp: widget.id_tmp, estado: 'tmp',)
                                           : const Text(''),
                               Container(
                                 alignment: Alignment.centerRight,
