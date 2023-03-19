@@ -5,11 +5,13 @@ import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/items_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
+import 'package:factura_gozeri/providers/reportes_provider.dart';
 import 'package:factura_gozeri/providers/seattings_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:factura_gozeri/screens/no_internet_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:provider/provider.dart';
 
 import 'global/globals.dart';
@@ -30,6 +32,7 @@ void main() async {
   //await Preferences.init();
   WidgetsFlutterBinding.ensureInitialized();
   await Preferencias.init();
+  
   HttpOverrides.global = new MyHttpOverrides();
   runApp(const AppState());
 }
@@ -47,6 +50,7 @@ class AppState extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ItemProvider()),
         ChangeNotifierProvider(create: (_) => settingsProvider()),
         ChangeNotifierProvider(create: (_) => PrintProvider()),
+        ChangeNotifierProvider(create: (_) => ReporteProvider()),
         ChangeNotifierProvider(
           create: (context) => Facturacion(),
         )

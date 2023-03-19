@@ -1,10 +1,22 @@
+import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
+
+import 'package:al_downloader/al_downloader.dart';
 import 'package:factura_gozeri/global/preferencias_global.dart';
+import 'package:factura_gozeri/providers/reportes_provider.dart';
 import 'package:factura_gozeri/services/auth_services.dart';
+import 'package:factura_gozeri/widgets/screen_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Reporte_Ventas extends StatefulWidget {
   Reporte_Ventas({super.key, required this.colo, required this.context});
@@ -18,11 +30,24 @@ class Reporte_Ventas extends StatefulWidget {
 
 class _Reporte_VentasState extends State<Reporte_Ventas> {
   //String selectedValue1 = "${Preferencias.sucursal}";
-
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    ALDownloader.initialize();
+  }
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
     List<DropdownMenuItem<String>> menuItems = [];
+    menuItems.add(DropdownMenuItem(
+          child: Text(
+            'Todas las sucursales',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.black),
+          ),
+          value: 'all'));
+      ;
     for (var i = 0; i < authService.list_sucu.length; i++) {
       menuItems.add(DropdownMenuItem(
           child: Text(
@@ -56,8 +81,8 @@ class _Reporte_VentasState extends State<Reporte_Ventas> {
                         minChildSize: 0.2,
                         maxChildSize: 1,
                         builder: (_, controller) {
-                          return Consumer<AuthService>(
-                            builder: (context, authservice, child) {
+                          return Consumer<ReporteProvider>(
+                            builder: (context, reporteservices, child) {
                           //empieza sheet
 
                           return Container(
@@ -109,11 +134,11 @@ class _Reporte_VentasState extends State<Reporte_Ventas> {
                                                   //key: keysucursal,
                                                   isExpanded: true,
                                                   itemHeight: null,
-                                                  value: authservice.id_sucu_reportes,
+                                                  value: reporteservices.id_sucu_reportes,
                                                   dropdownColor: Colors.white,
                                                   onChanged: (String? newValue) {
                                                     // check whether the state object is in tree
-                                                    authservice.id_suc_reporte(newValue!);
+                                                    reporteservices.id_suc_reporte(newValue!);
                           
                                                     //Preferencias.sucursal = selectedValue;*/
                                                   },
@@ -169,8 +194,106 @@ class _Reporte_VentasState extends State<Reporte_Ventas> {
                                                     color: Colors.white
                                                   ))
                                                 ),
-                                                onPressed: (){
-                                            
+                                                onPressed: ()async{
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (_) => const AlertDialog(
+                                                      backgroundColor: Color.fromARGB(255, 115, 160, 236),
+                                                      content: ListTile(
+                                                        leading: CircularProgressIndicator(color:Colors.white),
+                                                        title: Text(
+                                                          'Generando reporte...',
+                                                          style: TextStyle(color: Colors.white),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                  print('entro');
+                                                  var data=await reporteservices.ventas_excel();
+                                                  print('fuera');
+                                                  print('fuera'+data.toString());
+                                                  if(data['message']=='Ok'){
+                                                    Navigator.of(context, rootNavigator: true).pop();
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (_) => AlertDialog(
+                                                        backgroundColor: const Color.fromARGB(255, 109, 224, 186),
+                                                        content: Text(
+                                                         'Listo para exportar!',
+                                                          style: const TextStyle(color: Colors.white),
+                                                        ),
+                                                      ),
+                                                    );
+                                                    Navigator.of(context, rootNavigator: true).pop();
+
+                                                      ///descarga de archivos
+                                                      final status=await Permission.storage.request();
+                                                      if(status.isGranted){
+                                                        showDialog(
+                                                      context: context,
+                                                      builder: (_) => const AlertDialog(
+                                                        backgroundColor: Color.fromARGB(255, 225, 130, 28),
+                                                        content: ListTile(
+                                                          leading: CircularProgressIndicator(color:Colors.white),
+                                                          title: Text(
+                                                            'descargando...',
+                                                            style: TextStyle(color: Colors.white),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                      final basestorage=await getApplicationDocumentsDirectory();
+                                                      String url=data['link'];
+                                                      ALDownloader.configurePrint(enabled: true, frequentEnabled: false);
+                                                      ALDownloader.download(
+                                                        url,
+                                                      directoryPath: basestorage!.path,
+                                                      fileName: 'nuevo.xls',
+                                                      downloaderHandlerInterface:
+                                                          ALDownloaderHandlerInterface(progressHandler: (progress) {
+                                                        debugPrint(
+                                                            'ALDownloader | download progress = $progress, url = $url\n');
+                                                      }, succeededHandler: () async{
+                                                        debugPrint('ALDownloader | download succeeded, url = $url\n');
+                                                        Navigator.of(context, rootNavigator: true).pop();
+                                                        //print('la ruta: '+basestorage.path+'/nuevo.pdf');
+                                                        final String filePath = basestorage.path+'/nuevo.xls';
+
+                                                        OpenFilex.open(filePath);
+                                                         /*Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) => Screenfile(filePath: filePath),
+                                                          ));*/
+                                                        /*final Uri _url = Uri.parse(basestorage.path+'/nuevo.pdf');
+                                                        if (!await launchUrl(_url)) {
+                                                          throw 'Could not launch $_url';
+                                                        }*/
+                                                      }, failedHandler: () {
+                                                        Navigator.of(context, rootNavigator: true).pop();
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (_) => AlertDialog(
+                                                            backgroundColor: Color.fromARGB(255, 224, 211, 18),
+                                                            content: ListTile(
+                                                              leading: Icon(Icons.warning,color: Colors.white,),
+                                                              title: Text(
+                                                              'Fallo la descarga por favor intentalo de nuevo',
+                                                                style: const TextStyle(color: Colors.white),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }, pausedHandler: () {
+                                                        debugPrint('ALDownloader | download paused, url = $url\n');
+                                                      }));
+                                                      
+                                                    }else{
+                                                      print('no permision');
+                                                    }
+
+
+                                                  }
                                                 }, 
                                                 icon: Text('Generar Excel',style: TextStyle(color: Colors.white),), 
                                                 label: Icon(Icons.grid_on)),

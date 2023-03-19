@@ -90,7 +90,6 @@ class _CheckOuthScreenState extends State<CheckOuthScreen> {
       return NoInternet();
     }
     final authService = Provider.of<AuthService>(context, listen: false);
-    authService.id_suc_reporte("${Preferencias.sucursal}");
     /*Future.delayed(Duration.zero, () {
       Geolocator geolocator = 
       Geolocator()..forceAndroidLocationManager = true;

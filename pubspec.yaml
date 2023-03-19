@@ -62,7 +62,10 @@ dependencies:
   edge_alerts: ^0.0.1
   geolocator: ^9.0.2
   syncfusion_flutter_datepicker: ^20.4.53
-  #permission_handler: ^10.2.0
+  al_downloader: ^1.7.3
+  path_provider: ^2.0.13
+  permission_handler: ^10.2.0
+  open_filex: ^4.3.2
   
 dev_dependencies:
   flutter_test:
