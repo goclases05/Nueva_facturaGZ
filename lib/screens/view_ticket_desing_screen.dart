@@ -1,8 +1,11 @@
+import 'package:edge_alerts/edge_alerts.dart';
 import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/models/view_factura_print.dart';
+import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
+import 'package:factura_gozeri/widgets/registro_metodoPago_listas_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sunmi_printer_plus/column_maker.dart';
@@ -85,6 +88,7 @@ class _ViewTicketState extends State<ViewTicket> {
 
   @override
   Widget build(BuildContext context) {
+    final facturaService = Provider.of<Facturacion>(context, listen: false);
     return Scaffold(
         backgroundColor: Color.fromRGBO(246, 243, 244, 1),
         appBar: AppBar(
@@ -116,7 +120,26 @@ class _ViewTicketState extends State<ViewTicket> {
               CircleAvatar(
                 backgroundColor: Colors.red,
                 child: IconButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    var data =
+                        await facturaService.anular_factura(widget.factura);
+                    if (data == '1') {
+                      edgeAlert(context,
+                          title: 'Listo!',
+                          description: 'Factura anulada.',
+                          gravity: Gravity.top,
+                          backgroundColor: Color.fromARGB(255, 81, 131, 83));
+                      setState(() {
+                        widget.estado = '2';
+                      });
+                    } else {
+                      edgeAlert(context,
+                          title: 'Error',
+                          description: '${data}',
+                          gravity: Gravity.top,
+                          backgroundColor: Color.fromARGB(255, 165, 65, 26));
+                    }
+                  },
                   icon: Icon(Icons.close),
                   color: Colors.white,
                 ),
@@ -459,103 +482,165 @@ class _ViewTicketState extends State<ViewTicket> {
 
   Container sheetButton(BuildContext context) {
     return Container(
-      color: const Color.fromRGBO(246, 243, 244, 1),
-      padding: const EdgeInsets.all(20),
-      width: MediaQuery.of(context).size.width * 1,
-      child: TextButton.icon(
-        onPressed: () {
-          //codigo de impresion
-          if (Preferencias.sunmi_preferencia) {
-            print_sunmi(context, widget.factura);
-          } else {
-            _printerManager.scanResults.listen((devices) async {
-              print(devices);
-
-              if (Preferencias.mac == '') {
-                showDialog(
-                    context: context,
-                    builder: ((context) {
-                      if (devices.length == 0) {
-                        return const AlertDialog(
-                          backgroundColor: Color.fromARGB(255, 236, 133, 115),
-                          content: Text(
-                            'No se encontraron impresoras disponibles.',
+      padding: EdgeInsets.all(13),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              (widget.estado == '1')
+                  ? Expanded(
+                      flex: 2,
+                      child: TextButton.icon(
+                          style: TextButton.styleFrom(
+                              backgroundColor:
+                                  Color.fromARGB(255, 65, 153, 94)),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                content: RegistroMetodoPagoListas(
+                                    colorPrimary: widget.colorPrimary,
+                                    id_f: widget.factura,
+                                    estado: '1'),
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            Icons.payment_rounded,
+                            color: Colors.white,
+                          ),
+                          label: Text(
+                            'Efectuar Pago',
                             style: TextStyle(color: Colors.white),
-                          ),
-                        );
-                      }
+                          )),
+                    )
+                  : Text(''),
+              SizedBox(
+                width: 2,
+              ),
+              Expanded(
+                child: TextButton.icon(
+                    style: TextButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 221, 115, 108)),
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.picture_as_pdf,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      'Generar',
+                      style: TextStyle(color: Colors.white),
+                    )),
+              )
+            ],
+          ),
+          SizedBox(
+            height: 2,
+          ),
+          Container(
+            color: const Color.fromRGBO(246, 243, 244, 1),
+            width: MediaQuery.of(context).size.width * 1,
+            child: TextButton.icon(
+              onPressed: () {
+                //codigo de impresion
+                if (Preferencias.sunmi_preferencia) {
+                  print_sunmi(context, widget.factura);
+                } else {
+                  _printerManager.scanResults.listen((devices) async {
+                    print(devices);
 
-                      return AlertDialog(
-                        title: const Text('Impresoras Disponibles'),
-                        content: Container(
-                          height: 300.0, // Change as per your requirement
-                          width: 300.0, // Change as per your requirement
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: devices.length,
-                            itemBuilder: (BuildContext context, int i) {
-                              return ListTile(
-                                title: Text("${devices[i].name}"),
-                                subtitle: Text("${devices[i].address}"),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        _printerManager.stopScan();
-                                        _startPrint(devices[i], widget.factura);
-                                      },
-                                      child: Container(
-                                        margin: const EdgeInsets.all(5),
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                            //color: Theme.of(context).primaryColor,
-                                            color: widget.colorPrimary,
-                                            borderRadius:
-                                                BorderRadius.circular(15)),
-                                        child: const Icon(
-                                          Icons.print,
-                                          color: Colors.white,
-                                          size: 25,
-                                        ),
-                                      ),
-                                    )
-                                  ],
+                    if (Preferencias.mac == '') {
+                      showDialog(
+                          context: context,
+                          builder: ((context) {
+                            if (devices.length == 0) {
+                              return const AlertDialog(
+                                backgroundColor:
+                                    Color.fromARGB(255, 236, 133, 115),
+                                content: Text(
+                                  'No se encontraron impresoras disponibles.',
+                                  style: TextStyle(color: Colors.white),
                                 ),
-                                onTap: () {},
                               );
-                            },
-                          ),
-                        ),
-                      );
-                    }));
-              } else {
-                //impresion en predeterminada
+                            }
 
-                devices.forEach((printer) async {
-                  print(printer);
-                  //get saved printer
-                  if (printer.address == Preferencias.mac) {
-                    //store the element.
-                    await _startPrint(printer, widget.factura);
-                  }
-                });
-              }
-            });
-          }
-          //codigo de impresion
-        },
-        style: TextButton.styleFrom(
-          backgroundColor: widget.colorPrimary,
-        ),
-        label: const Text(
-          'Imprimir Factura',
-          style: TextStyle(color: Colors.white),
-        ),
-        icon: const Icon(
-          Icons.print,
-          color: Colors.white,
-        ),
+                            return AlertDialog(
+                              title: const Text('Impresoras Disponibles'),
+                              content: Container(
+                                height: 300.0, // Change as per your requirement
+                                width: 300.0, // Change as per your requirement
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: devices.length,
+                                  itemBuilder: (BuildContext context, int i) {
+                                    return ListTile(
+                                      title: Text("${devices[i].name}"),
+                                      subtitle: Text("${devices[i].address}"),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              _printerManager.stopScan();
+                                              _startPrint(
+                                                  devices[i], widget.factura);
+                                            },
+                                            child: Container(
+                                              margin: const EdgeInsets.all(5),
+                                              padding: const EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                  //color: Theme.of(context).primaryColor,
+                                                  color: widget.colorPrimary,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15)),
+                                              child: const Icon(
+                                                Icons.print,
+                                                color: Colors.white,
+                                                size: 25,
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      onTap: () {},
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          }));
+                    } else {
+                      //impresion en predeterminada
+
+                      devices.forEach((printer) async {
+                        print(printer);
+                        //get saved printer
+                        if (printer.address == Preferencias.mac) {
+                          //store the element.
+                          await _startPrint(printer, widget.factura);
+                        }
+                      });
+                    }
+                  });
+                }
+                //codigo de impresion
+              },
+              style: TextButton.styleFrom(
+                backgroundColor: widget.colorPrimary,
+              ),
+              label: const Text(
+                'Imprimir Factura',
+                style: TextStyle(color: Colors.white),
+              ),
+              icon: const Icon(
+                Icons.print,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

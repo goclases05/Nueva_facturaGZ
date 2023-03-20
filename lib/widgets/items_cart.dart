@@ -128,7 +128,7 @@ class _ItemsCart extends State<ItemsCart> {
           ));
     if (ListDet.contenido == false) {
       // ignore: curly_braces_in_flow_control_structures
-      return Container(
+      /*return Container(
         alignment: Alignment.center,
         margin: EdgeInsets.symmetric(vertical: 15),
         child: ElevatedButton.icon(
@@ -151,7 +151,7 @@ class _ItemsCart extends State<ItemsCart> {
             style: TextButton.styleFrom(
                 primary: Colors.white, backgroundColor: Colors.green),
             icon: const Text("Agregar Articulos")),
-      );
+      );*/
     }
 
     return ListView.builder(

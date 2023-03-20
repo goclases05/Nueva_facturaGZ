@@ -238,7 +238,8 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                       padding: const EdgeInsets.all(5),
                                       decoration: BoxDecoration(
                                           //color: Theme.of(context).primaryColor,
-                                          color: widget.colorPrimary,
+                                          color:
+                                              Color.fromARGB(255, 167, 197, 34),
                                           borderRadius:
                                               BorderRadius.circular(10)),
                                       child: const Icon(
@@ -257,8 +258,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                       padding: const EdgeInsets.all(5),
                                       decoration: BoxDecoration(
                                           //color: Theme.of(context).primaryColor,
-                                          color:
-                                              Color.fromARGB(255, 226, 178, 49),
+                                          color: Colors.blue,
                                           borderRadius:
                                               BorderRadius.circular(10)),
                                       child: const Icon(
@@ -479,35 +479,6 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                       SizedBox(
                                         width: 5,
                                       ),
-                                      (list_emi[index].estado == '1')
-                                          ? GestureDetector(
-                                              onTap: () {
-                                                //_printerManager.stopScan();
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (_) => AlertDialog(
-                                                    content: RegistroMetodoPagoListas(colorPrimary: widget.colorPrimary, id_f: list_emi[index].idFactTmp, estado: '1'),
-                                                  ),
-                                                );
-                                              },
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(5),
-                                                decoration: BoxDecoration(
-                                                    //color: Theme.of(context).primaryColor,
-                                                    color: Color.fromARGB(
-                                                        255, 6, 158, 125),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10)),
-                                                child: const Icon(
-                                                  Icons.payments,
-                                                  color: Colors.white,
-                                                  size: 25,
-                                                ),
-                                              ),
-                                            )
-                                          : Text('')
                                     ],
                                   ),
                                   title: Text(

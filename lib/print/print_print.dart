@@ -13,6 +13,7 @@ import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/screens/escritorio_screen.dart';
 import 'package:factura_gozeri/screens/no_internet_screen.dart';
 import 'package:factura_gozeri/screens/view_tabs_facturacion_screen.dart';
+import 'package:factura_gozeri/screens/view_tabs_screen.dart';
 import 'package:factura_gozeri/services/auth_services.dart';
 import 'package:factura_gozeri/widgets/item_dataCliente.dart';
 import 'package:factura_gozeri/widgets/items_cart.dart';
@@ -169,11 +170,32 @@ class _PrintScreenState extends State<PrintScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-            elevation: 2,
-            foregroundColor: widget.colorPrimary,
-            backgroundColor: Colors.white,
-            title: Text('Facturación',
-                style: TextStyle(color: widget.colorPrimary))),
+          elevation: 2,
+          foregroundColor: widget.colorPrimary,
+          backgroundColor: Colors.white,
+          title:
+              Text('Facturación', style: TextStyle(color: widget.colorPrimary)),
+          actions: [
+            CircleAvatar(
+              backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
+              child: IconButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => EscritorioScreen(),
+                              transitionDuration: Duration(seconds: 0)))
+                      .then((value) => Navigator.of(context).pop());
+                },
+                icon: Icon(Icons.home),
+                color: widget.colorPrimary,
+              ),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+          ],
+        ),
         body: Column(
           children: [
             Container(
@@ -424,35 +446,77 @@ class _PrintScreenState extends State<PrintScreen> {
                                       : (index == 2)
                                           ? RegistroMetodoPago(
                                               colorPrimary: widget.colorPrimary,
-                                              id_tmp: widget.id_tmp, estado: 'tmp',)
+                                              id_tmp: widget.id_tmp,
+                                              estado: 'tmp',
+                                            )
                                           : const Text(''),
-                              Container(
-                                alignment: Alignment.centerRight,
-                                child: (index == 2)
-                                    ? const Text('')
-                                    : ElevatedButton.icon(
-                                        label: const Icon(
-                                          Icons.arrow_forward,
-                                          size: 20,
-                                          color: Colors.white,
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            if (index == 0) {
-                                              open = 1;
-                                            } else if (index == 1) {
-                                              open = 2;
-                                            } else {
-                                              //open = 0;
-                                            }
-                                          });
-                                          print(open);
-                                        },
-                                        style: TextButton.styleFrom(
-                                            primary: Colors.white,
-                                            backgroundColor:
-                                                widget.colorPrimary),
-                                        icon: const Text("Continuar")),
+                              Row(
+                                mainAxisAlignment: (index == 0)
+                                    ? MainAxisAlignment.spaceBetween
+                                    : MainAxisAlignment.end,
+                                children: [
+                                  (index == 0)
+                                      ? Container(
+                                          alignment: Alignment.center,
+                                          margin: EdgeInsets.symmetric(
+                                              vertical: 15),
+                                          child: ElevatedButton.icon(
+                                              label: const Icon(
+                                                Icons.add,
+                                                size: 20,
+                                                color: Colors.white,
+                                              ),
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ViewTabsScreen(
+                                                            colorPrimary: widget
+                                                                .colorPrimary,
+                                                            id_tmp:
+                                                                widget.id_tmp,
+                                                            clave: '2321'),
+                                                  ),
+                                                );
+                                              },
+                                              style: TextButton.styleFrom(
+                                                  primary: Colors.white,
+                                                  backgroundColor:
+                                                      Colors.green),
+                                              icon: const Text(
+                                                  "Agregar Articulos")),
+                                        )
+                                      : Text(''),
+                                  Container(
+                                    alignment: Alignment.centerRight,
+                                    child: (index == 2)
+                                        ? const Text('')
+                                        : ElevatedButton.icon(
+                                            label: const Icon(
+                                              Icons.arrow_forward,
+                                              size: 20,
+                                              color: Colors.white,
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                if (index == 0) {
+                                                  open = 1;
+                                                } else if (index == 1) {
+                                                  open = 2;
+                                                } else {
+                                                  //open = 0;
+                                                }
+                                              });
+                                              print(open);
+                                            },
+                                            style: TextButton.styleFrom(
+                                                primary: Colors.white,
+                                                backgroundColor:
+                                                    widget.colorPrimary),
+                                            icon: const Text("Continuar")),
+                                  ),
+                                ],
                               )
                             ],
                           ),
@@ -470,17 +534,18 @@ class _PrintScreenState extends State<PrintScreen> {
                     width: 80,
                   ),*/
                   Expanded(
+                      flex: 2,
                       child: TextButton.icon(
-                    onPressed: () async {
-                      /*final storage = new FlutterSecureStorage();
+                        onPressed: () async {
+                          /*final storage = new FlutterSecureStorage();
                       SharedPreferences prefs =
                           await SharedPreferences.getInstance();*/
-                      //dynamic device_store=await storage.read(key: 'IMPRESORA');
-                      //final dynamic din = await Preferencias.impresora as dynamic;
-                      //PrinterBluetooth device = await Preferencias.impresora as dynamic;
-                      if (facturaService.list_det.length < 1) {
-                        //no tiene articulos agregados
-                        /*SnackBar snackBar = SnackBar(
+                          //dynamic device_store=await storage.read(key: 'IMPRESORA');
+                          //final dynamic din = await Preferencias.impresora as dynamic;
+                          //PrinterBluetooth device = await Preferencias.impresora as dynamic;
+                          if (facturaService.list_det.length < 1) {
+                            //no tiene articulos agregados
+                            /*SnackBar snackBar = SnackBar(
                           margin: EdgeInsets.only(
                               bottom:
                                   (MediaQuery.of(context).size.height * 0.95),
@@ -495,13 +560,14 @@ class _PrintScreenState extends State<PrintScreen> {
                           backgroundColor: Color.fromARGB(255, 208, 96, 88),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
-                        edgeAlert(context,
-                            description: 'Error: Agrega articulos a la factura',
-                            gravity: Gravity.top,
-                            backgroundColor: Colors.redAccent);
-                      } else if (facturaService.initialSerie == '0') {
-                        //no tiene seleccionada una serie
-                        /*SnackBar snackBar = SnackBar(
+                            edgeAlert(context,
+                                description:
+                                    'Error: Agrega articulos a la factura',
+                                gravity: Gravity.top,
+                                backgroundColor: Colors.redAccent);
+                          } else if (facturaService.initialSerie == '0') {
+                            //no tiene seleccionada una serie
+                            /*SnackBar snackBar = SnackBar(
                           behavior: SnackBarBehavior.floating,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(24),
@@ -516,12 +582,12 @@ class _PrintScreenState extends State<PrintScreen> {
                           backgroundColor: Color.fromARGB(255, 208, 96, 88),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
-                        edgeAlert(context,
-                            description: 'Error: Seleccióna una serie',
-                            gravity: Gravity.top,
-                            backgroundColor: Colors.redAccent);
-                      } else if (facturaService.id == '') {
-                        /*SnackBar snackBar = SnackBar(
+                            edgeAlert(context,
+                                description: 'Error: Seleccióna una serie',
+                                gravity: Gravity.top,
+                                backgroundColor: Colors.redAccent);
+                          } else if (facturaService.id == '') {
+                            /*SnackBar snackBar = SnackBar(
                           behavior: SnackBarBehavior.floating,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(24),
@@ -536,14 +602,14 @@ class _PrintScreenState extends State<PrintScreen> {
                           backgroundColor: Color.fromARGB(255, 208, 96, 88),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
-                        edgeAlert(context,
-                            description: 'Error: Seleccióne un cliente',
-                            gravity: Gravity.top,
-                            backgroundColor: Colors.redAccent);
-                      } else if (double.parse(facturaService.saldo) >=
-                          double.parse(facturaService.total_fac)) {
-                        //no aplico pagos a la factura
-                        /*SnackBar snackBar = const SnackBar(
+                            edgeAlert(context,
+                                description: 'Error: Seleccióne un cliente',
+                                gravity: Gravity.top,
+                                backgroundColor: Colors.redAccent);
+                          } else if (double.parse(facturaService.saldo) >=
+                              double.parse(facturaService.total_fac)) {
+                            //no aplico pagos a la factura
+                            /*SnackBar snackBar = const SnackBar(
                           dismissDirection: DismissDirection.up,
                           padding: EdgeInsets.all(20),
                           content: Text(
@@ -553,18 +619,18 @@ class _PrintScreenState extends State<PrintScreen> {
                           backgroundColor: Color.fromARGB(255, 208, 96, 88),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
-                        edgeAlert(context,
-                            description: 'Error: Aplicar pago',
-                            gravity: Gravity.top,
-                            backgroundColor: Colors.redAccent);
-                      } else {
-                        //FACTURANDO
-                        var facturar =
-                            await facturaService.facturar(widget.id_tmp);
-                        var js = json.decode(facturar);
+                            edgeAlert(context,
+                                description: 'Error: Aplicar pago',
+                                gravity: Gravity.top,
+                                backgroundColor: Colors.redAccent);
+                          } else {
+                            //FACTURANDO
+                            var facturar =
+                                await facturaService.facturar(widget.id_tmp);
+                            var js = json.decode(facturar);
 
-                        if (js['MENSAJE'] == 'OK') {
-                          /*SnackBar snackBar = const SnackBar(
+                            if (js['MENSAJE'] == 'OK') {
+                              /*SnackBar snackBar = const SnackBar(
                             padding: EdgeInsets.all(20),
                             content: Text(
                               'Facturacion Completada',
@@ -574,145 +640,149 @@ class _PrintScreenState extends State<PrintScreen> {
                           );
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
 
-                          edgeAlert(context,
-                              description: 'Factura Realizada',
-                              gravity: Gravity.top,
-                              backgroundColor:
-                                  Color.fromARGB(255, 81, 131, 83));
+                              edgeAlert(context,
+                                  description: 'Factura Realizada',
+                                  gravity: Gravity.top,
+                                  backgroundColor:
+                                      Color.fromARGB(255, 81, 131, 83));
 
-                          if (Preferencias.printfactura == false) {
-                            showDialog(
-                              context: context,
-                              builder: (_) => AlertDialog(
-                                backgroundColor:
-                                    Color.fromARGB(255, 109, 224, 186),
-                                content: Text(
-                                  'Listo...',
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            );
-                            Navigator.of(context, rootNavigator: true).pop();
+                              if (Preferencias.printfactura == false) {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    backgroundColor:
+                                        Color.fromARGB(255, 109, 224, 186),
+                                    content: Text(
+                                      'Listo...',
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                );
+                                Navigator.of(context, rootNavigator: true)
+                                    .pop();
 
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const EscritorioScreen()),
-                                (Route<dynamic> route) => false);
-                          } else {
-                            if (Preferencias.sunmi_preferencia) {
-                              await print_sunmi(context, js['ID']);
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const EscritorioScreen()),
-                                  (Route<dynamic> route) => false);
-                            } else {
-                              print('entro');
-                              _printerManager.stopScan();
-                              await _printerManager.scanResults
-                                  .listen((devices) async {
-                                print(devices);
-
-                                if (Preferencias.mac == '') {
-                                  showDialog(
-                                      context: context,
-                                      builder: ((context) {
-                                        if (devices.length == 0) {
-                                          return const AlertDialog(
-                                            backgroundColor: Color.fromARGB(
-                                                255, 236, 133, 115),
-                                            content: Text(
-                                              'No se encontraron impresoras disponibles.',
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                          );
-                                        }
-
-                                        return AlertDialog(
-                                          title: const Text(
-                                              'Impresoras Disponibles'),
-                                          content: Container(
-                                            height:
-                                                300.0, // Change as per your requirement
-                                            width:
-                                                300.0, // Change as per your requirement
-                                            child: ListView.builder(
-                                              shrinkWrap: true,
-                                              itemCount: devices.length,
-                                              itemBuilder:
-                                                  (BuildContext context,
-                                                      int i) {
-                                                return ListTile(
-                                                  title: Text(
-                                                      "${devices[i].name}"),
-                                                  subtitle: Text(
-                                                      "${devices[i].address}"),
-                                                  trailing: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      GestureDetector(
-                                                        onTap: () {
-                                                          _printerManager
-                                                              .stopScan();
-                                                          _startPrint(
-                                                              devices[i],
-                                                              js['ID']);
-                                                        },
-                                                        child: Container(
-                                                          margin:
-                                                              const EdgeInsets
-                                                                  .all(5),
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                                  //color: Theme.of(context).primaryColor,
-                                                                  color: widget
-                                                                      .colorPrimary,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              15)),
-                                                          child: const Icon(
-                                                            Icons.print,
-                                                            color: Colors.white,
-                                                            size: 25,
-                                                          ),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                  onTap: () {},
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        );
-                                      }));
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            const EscritorioScreen()),
+                                    (Route<dynamic> route) => false);
+                              } else {
+                                if (Preferencias.sunmi_preferencia) {
+                                  await print_sunmi(context, js['ID']);
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              const EscritorioScreen()),
+                                      (Route<dynamic> route) => false);
                                 } else {
-                                  //impresion en predeterminada
+                                  print('entro');
+                                  _printerManager.stopScan();
+                                  await _printerManager.scanResults
+                                      .listen((devices) async {
+                                    print(devices);
 
-                                  devices.forEach((printer) async {
-                                    print(printer);
-                                    //get saved printer
-                                    if (printer.address == Preferencias.mac) {
-                                      //store the element.
-                                      await _startPrint(printer, js['ID']);
+                                    if (Preferencias.mac == '') {
+                                      showDialog(
+                                          context: context,
+                                          builder: ((context) {
+                                            if (devices.length == 0) {
+                                              return const AlertDialog(
+                                                backgroundColor: Color.fromARGB(
+                                                    255, 236, 133, 115),
+                                                content: Text(
+                                                  'No se encontraron impresoras disponibles.',
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              );
+                                            }
+
+                                            return AlertDialog(
+                                              title: const Text(
+                                                  'Impresoras Disponibles'),
+                                              content: Container(
+                                                height:
+                                                    300.0, // Change as per your requirement
+                                                width:
+                                                    300.0, // Change as per your requirement
+                                                child: ListView.builder(
+                                                  shrinkWrap: true,
+                                                  itemCount: devices.length,
+                                                  itemBuilder:
+                                                      (BuildContext context,
+                                                          int i) {
+                                                    return ListTile(
+                                                      title: Text(
+                                                          "${devices[i].name}"),
+                                                      subtitle: Text(
+                                                          "${devices[i].address}"),
+                                                      trailing: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          GestureDetector(
+                                                            onTap: () {
+                                                              _printerManager
+                                                                  .stopScan();
+                                                              _startPrint(
+                                                                  devices[i],
+                                                                  js['ID']);
+                                                            },
+                                                            child: Container(
+                                                              margin:
+                                                                  const EdgeInsets
+                                                                      .all(5),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(10),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                      //color: Theme.of(context).primaryColor,
+                                                                      color: widget
+                                                                          .colorPrimary,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              15)),
+                                                              child: const Icon(
+                                                                Icons.print,
+                                                                color: Colors
+                                                                    .white,
+                                                                size: 25,
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                      onTap: () {},
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            );
+                                          }));
+                                    } else {
+                                      //impresion en predeterminada
+
+                                      devices.forEach((printer) async {
+                                        print(printer);
+                                        //get saved printer
+                                        if (printer.address ==
+                                            Preferencias.mac) {
+                                          //store the element.
+                                          await _startPrint(printer, js['ID']);
+                                        }
+                                      });
                                     }
                                   });
+                                  print('salio');
                                 }
-                              });
-                              print('salio');
-                            }
-                          }
-                          // ignore: use_build_context_synchronously
-
-                        } else {
-                          /*SnackBar snackBar = SnackBar(
+                              }
+                              // ignore: use_build_context_synchronously
+                            } else {
+                              /*SnackBar snackBar = SnackBar(
                             padding: const EdgeInsets.all(20),
                             dismissDirection: DismissDirection.up,
                             content: Text(
@@ -723,21 +793,43 @@ class _PrintScreenState extends State<PrintScreen> {
                                 const Color.fromARGB(255, 224, 96, 113),
                           );
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
-                          edgeAlert(context,
-                              title: '${facturar}',
-                              gravity: Gravity.top,
-                              backgroundColor: Colors.redAccent);
-                          print(facturar);
-                        }
-                      }
-                    },
-                    icon: const Icon(Icons.print),
-                    label: const Text('Facturar'),
-                    style: TextButton.styleFrom(
-                      primary: Colors.white,
-                      backgroundColor: Colors.green,
-                    ),
-                  ))
+                              edgeAlert(context,
+                                  title: '${facturar}',
+                                  gravity: Gravity.top,
+                                  backgroundColor: Colors.redAccent);
+                              print(facturar);
+                            }
+                          }
+                        },
+                        icon: const Icon(Icons.print),
+                        label: const Text('Facturar'),
+                        style: TextButton.styleFrom(
+                          primary: Colors.white,
+                          backgroundColor: Colors.green,
+                        ),
+                      )),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: TextButton.icon(
+                        style: TextButton.styleFrom(
+                          primary: Colors.white,
+                          backgroundColor: Color.fromARGB(255, 209, 179, 7),
+                        ),
+                        onPressed: () {
+                          return;
+                        },
+                        icon: Icon(
+                          Icons.newspaper,
+                          color: Colors.white,
+                        ),
+                        label: Text(
+                          'Comanda',
+                          style: TextStyle(color: Colors.white),
+                        )),
+                  )
                 ],
               ),
             )

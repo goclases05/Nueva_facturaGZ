@@ -180,6 +180,20 @@ class Facturacion extends ChangeNotifier {
     return resp.body;
   }
 
+  Future anular_factura(String id_f) async {
+    final empresa = Preferencias.data_empresa;
+    final id_usuario = Preferencias.data_id;
+    print(
+        "https://app.gozeri.com/desarrollo_flutter/factura/anulacion_factura.php?id=${id_f}&usuario=${id_usuario}&empresa=${empresa}");
+    final Uri uri = Uri.parse(
+        "https://app.gozeri.com/desarrollo_flutter/factura/anulacion_factura.php?id=${id_f}&usuario=${id_usuario}&empresa=${empresa}");
+
+    final resp = await http.get(uri);
+    print('el dato');
+    print(resp.body);
+    return resp.body;
+  }
+
   Future bancos() async {
     final empresa = Preferencias.data_empresa;
     loadBancos = true;
