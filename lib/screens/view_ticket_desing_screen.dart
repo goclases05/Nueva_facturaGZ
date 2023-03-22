@@ -7,11 +7,14 @@ import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/widgets/registro_metodoPago_listas_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:sunmi_printer_plus/column_maker.dart';
 import 'package:sunmi_printer_plus/enums.dart';
 import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
 import 'package:sunmi_printer_plus/sunmi_style.dart';
+
+import 'escritorio_screen.dart';
 
 class ViewTicket extends StatefulWidget {
   ViewTicket(
@@ -36,10 +39,13 @@ class _ViewTicketState extends State<ViewTicket> {
   int paperSize = 0;
   String serialNumber = "";
   String printerVersion = "";
+  String estado='';
   //SUNMIN
 
   @override
   void initState() {
+    super.initState();
+    estado=widget.estado;
     // TODO: implement initState
     if (Preferencias.sunmi_preferencia) {
       _bindingPrinter().then((bool? isBind) async {
@@ -68,7 +74,7 @@ class _ViewTicketState extends State<ViewTicket> {
     } else {
       _printerManager.startScan(const Duration(seconds: 2));
     }
-    super.initState();
+    
   }
 
   @override
@@ -85,399 +91,464 @@ class _ViewTicketState extends State<ViewTicket> {
     final bool? result = await SunmiPrinter.bindingPrinter();
     return result;
   }
-
+  
   @override
   Widget build(BuildContext context) {
+    
     final facturaService = Provider.of<Facturacion>(context, listen: false);
-    return Scaffold(
-        backgroundColor: Color.fromRGBO(246, 243, 244, 1),
-        appBar: AppBar(
-            backgroundColor: Colors.white,
-            foregroundColor: widget.colorPrimary,
-            elevation: 2,
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text('Factura: ', style: TextStyle(color: widget.colorPrimary)),
-                Chip(
-                    padding: const EdgeInsets.all(1),
-                    backgroundColor: (widget.estado == '2')
-                        ? Color.fromARGB(255, 28, 192, 28)
-                        : (widget.estado == '1')
-                            ? Color.fromARGB(255, 233, 195, 72)
-                            : const Color.fromARGB(255, 232, 116, 107),
-                    label: Text(
-                      (widget.estado == '2')
-                          ? 'Pagada'
-                          : (widget.estado == '1')
-                              ? 'Pendiente de Pago'
-                              : 'Anulada',
-                      style: const TextStyle(fontSize: 15, color: Colors.white),
-                    )),
-              ],
-            ),
-            actions: [
-              CircleAvatar(
-                backgroundColor: Colors.red,
-                child: IconButton(
-                  onPressed: () async {
-                    var data =
-                        await facturaService.anular_factura(widget.factura);
-                    if (data == '1') {
-                      edgeAlert(context,
-                          title: 'Listo!',
-                          description: 'Factura anulada.',
-                          gravity: Gravity.top,
-                          backgroundColor: Color.fromARGB(255, 81, 131, 83));
-                      setState(() {
-                        widget.estado = '2';
-                      });
-                    } else {
-                      edgeAlert(context,
-                          title: 'Error',
-                          description: '${data}',
-                          gravity: Gravity.top,
-                          backgroundColor: Color.fromARGB(255, 165, 65, 26));
-                    }
-                  },
-                  icon: Icon(Icons.close),
-                  color: Colors.white,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.of(context).pop();
+        Navigator.pushReplacement<void, void>(
+          context,
+          MaterialPageRoute<void>(
+            builder: (BuildContext context) => const EscritorioScreen(),
+          ),
+        ).then((value) => setState(() {}));
+        return false;
+      },
+      child: Scaffold(
+          backgroundColor: Color.fromRGBO(246, 243, 244, 1),
+          appBar: AppBar(
+              backgroundColor: Colors.white,
+              foregroundColor: widget.colorPrimary,
+              elevation: 2,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text('Factura: ', style: TextStyle(color: widget.colorPrimary)),
+                  Chip(
+                      padding: const EdgeInsets.all(1),
+                      backgroundColor: (estado == '2')
+                          ? Color.fromARGB(255, 28, 192, 28)
+                          : (estado == '1')
+                              ? Color.fromARGB(255, 233, 195, 72)
+                              : const Color.fromARGB(255, 232, 116, 107),
+                      label: Text(
+                        (estado == '2')
+                            ? 'Pagada'
+                            : (estado == '1')
+                                ? 'Pendiente de Pago'
+                                : 'Anulada',
+                        style: const TextStyle(fontSize: 15, color: Colors.white),
+                      )),
+                ],
+              ),
+              actions: [
+                (estado!='0')?
+                CircleAvatar(
+                  backgroundColor: Colors.red,
+                  child: IconButton(
+                    onPressed: ()async{
+                      await showDialog(
+                        context: context,
+                        builder: ((context) {
+                          return AlertDialog(
+                            title: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.red),
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  margin: EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                                  child: Text('Anular',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.red, fontSize: 25),),
+                                ),
+                                const Text('¿Estas Seguro?',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                    )),
+                                const Text('Estas a punto de anular esta factura',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                    )),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(false);
+                                  },
+                                  child: const Text('No')),
+                              TextButton(
+                                  onPressed: ()async {
+                                    
+                                    var data =await facturaService.anular_factura(widget.factura);
+                                    if (data == '1') {
+                                      edgeAlert(context,
+                                          title: 'Listo!',
+                                          description: 'Factura anulada.',
+                                          gravity: Gravity.top,
+                                          backgroundColor: Color.fromARGB(255, 81, 131, 83));
+                                      setState(() {
+                                        estado = '0';
+                                      });
+                                    } else {
+                                      edgeAlert(context,
+                                          title: 'Error',
+                                          description: '${data}',
+                                          gravity: Gravity.top,
+                                          backgroundColor: Color.fromARGB(255, 165, 65, 26));
+                                    } 
+                                    Navigator.of(context).pop(false);
+                                    
+                                  },
+                                  child: const Text('Si'))
+                            ],
+                          );
+                    
+                        }),
+                      );
+                    },
+                    icon: Icon(Icons.close),
+                    color: Colors.white,
+                  ),
+                ):SizedBox(width: 1,),
+                const SizedBox(
+                  width: 15,
                 ),
-              ),
-              const SizedBox(
-                width: 15,
-              ),
-            ]),
-        bottomSheet: sheetButton(context),
-        body: Consumer<PrintProvider>(
-          builder: (context, printProvider, child) {
-            if (printProvider.loading) {
-              return Container(
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width,
-                  child: Center(
-                      child: CircularProgressIndicator(
-                    color: widget.colorPrimary,
-                  )));
-            }
-
-            List<Encabezado> encabezado = printProvider.list;
-            List<Detalle> detalle = printProvider.list_detalle;
-
-            List<Widget> frases = [];
-            //frases del certificador
-            for (int i = 0; i < encabezado[0].frases.length; i++) {
-              frases.add(
-                  SimpleText(encabezado[0].frases[i], 13, TextAlign.center));
-            }
-
-            int sede = 0;
-            //0= empresa
-            //1= sucursal
-            if ((encabezado[0].fel == '0' && encabezado[0].felSucu == '1') ||
-                (encabezado[0].fel == '1' && encabezado[0].felSucu == '1')) {
-              sede = 1;
-            } else if (encabezado[0].fel == '1' &&
-                encabezado[0].felSucu == '0') {
-              sede = 0;
-            }
-
-            return SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              scrollDirection: Axis.vertical,
-              child: Column(children: [
-                Card(
-                  margin: EdgeInsets.all(15),
-                  elevation: 8,
-                  color: Colors.white,
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    width: MediaQuery.of(context).size.width * 1,
-                    child: Column(
-                      children: [
-                        (sede == 1)
-                            ?
-                            //sucursal
-                            FadeInImage(
-                                width: MediaQuery.of(context).size.width * 0.25,
-                                placeholder:
-                                    AssetImage('assets/productos_gz.jpg'),
-                                image: NetworkImage(encabezado[0].rutaSucu +
-                                    encabezado[0].foto))
-                            :
-                            //empresa
-                            FadeInImage(
-                                width: MediaQuery.of(context).size.width * 0.25,
-                                placeholder:
-                                    AssetImage('assets/productos_gz.jpg'),
-                                image: NetworkImage(encabezado[0].logoUrl +
-                                    encabezado[0].logoNom)),
-
-                        const SizedBox(
-                          height: 10,
-                        ),
-
-                        //Nombre de empresa
-                        (sede == 1)
-                            ? TitleText(encabezado[0].nombreEmpresaSucu, 18,
-                                TextAlign.center)
-                            : TitleText(encabezado[0].nombreEmpresa, 18,
-                                TextAlign.center),
-
-                        //Direccion de empresa
-                        (sede == 1)
-                            ? SimpleText(encabezado[0].direccionSucu, 15,
-                                TextAlign.center)
-                            : SimpleText(
-                                encabezado[0].direccion, 15, TextAlign.center),
-
-                        const SizedBox(
-                          height: 10,
-                        ),
-
-                        //NIT de la empresa
-                        (encabezado[0].nit_emisor != '')
-                            ? claveValor('NIT: ', encabezado[0].nit_emisor,
-                                MainAxisAlignment.center)
-                            : Container(),
-
-                        //Telefono de la empresa
-                        (sede == 1)
-                            ? (encabezado[0].teleSucu != '')
-                                ? claveValor(
-                                    'Teléfono: ',
-                                    encabezado[0].teleSucu,
-                                    MainAxisAlignment.center)
-                                : Container()
-                            : (encabezado[0].telefono != '')
-                                ? claveValor(
-                                    'Teléfono: ',
-                                    encabezado[0].telefono,
-                                    MainAxisAlignment.center)
-                                : Container(),
-
-                        const SizedBox(
-                          height: 10,
-                        ),
-
-                        //nombre comercial
-                        (sede == 1)
-                            ? (encabezado[0].nombre_comercial_sucu != '')
-                                ? SimpleText(
-                                    encabezado[0].nombre_comercial_sucu,
-                                    15,
-                                    TextAlign.center)
-                                : Container()
-                            : (encabezado[0].nombre_comercial_emp != '')
-                                ? SimpleText(encabezado[0].nombre_comercial_emp,
-                                    15, TextAlign.center)
-                                : Container(),
-
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        //facturada
-                        (encabezado[0].dte != '')
-                            ? TitleText(
-                                'Factura Electrónica Documento Tributario Electrónico',
-                                18,
-                                TextAlign.center)
-                            : Container(),
-
-                        //fecha
-                        const SizedBox(
-                          height: 15,
-                        ),
-
-                        Text(
-                          encabezado[0].fecha_letras,
-                          textAlign: TextAlign.end,
-                          style: const TextStyle(
-                            fontSize: 11,
+              ]),
+          bottomSheet: sheetButton(context),
+          body: Consumer<PrintProvider>(
+            builder: (context, printProvider, child) {
+              if (printProvider.loading) {
+                return Container(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    child: Center(
+                        child: CircularProgressIndicator(
+                      color: widget.colorPrimary,
+                    )));
+              }
+    
+              List<Encabezado> encabezado = printProvider.list;
+              List<Detalle> detalle = printProvider.list_detalle;
+    
+              List<Widget> frases = [];
+              //frases del certificador
+              for (int i = 0; i < encabezado[0].frases.length; i++) {
+                frases.add(
+                    SimpleText(encabezado[0].frases[i], 13, TextAlign.center));
+              }
+    
+              int sede = 0;
+              //0= empresa
+              //1= sucursal
+              if ((encabezado[0].fel == '0' && encabezado[0].felSucu == '1') ||
+                  (encabezado[0].fel == '1' && encabezado[0].felSucu == '1')) {
+                sede = 1;
+              } else if (encabezado[0].fel == '1' &&
+                  encabezado[0].felSucu == '0') {
+                sede = 0;
+              }
+    
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                child: Column(children: [
+                  Card(
+                    margin: EdgeInsets.all(15),
+                    elevation: 8,
+                    color: Colors.white,
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      width: MediaQuery.of(context).size.width * 1,
+                      child: Column(
+                        children: [
+                          (sede == 1)
+                              ?
+                              //sucursal
+                              FadeInImage(
+                                  width: MediaQuery.of(context).size.width * 0.25,
+                                  placeholder:
+                                      AssetImage('assets/productos_gz.jpg'),
+                                  image: NetworkImage(encabezado[0].rutaSucu +
+                                      encabezado[0].foto))
+                              :
+                              //empresa
+                              FadeInImage(
+                                  width: MediaQuery.of(context).size.width * 0.25,
+                                  placeholder:
+                                      AssetImage('assets/productos_gz.jpg'),
+                                  image: NetworkImage(encabezado[0].logoUrl +
+                                      encabezado[0].logoNom)),
+    
+                          const SizedBox(
+                            height: 10,
                           ),
-                        ),
-
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        //n autorizacion
-                        (encabezado[0].dte != '')
-                            ? Container(
-                                padding: const EdgeInsets.all(0),
-                                child: Column(
-                                  children: [
-                                    TitleText('Número de Autorización:', 13,
-                                        TextAlign.center),
-                                    SimpleText(encabezado[0].dte, 13,
-                                        TextAlign.center),
-                                    claveValor(
-                                        'Serie: ',
-                                        encabezado[0].serieDte,
-                                        MainAxisAlignment.center),
-                                    claveValor(
-                                        'Número de DTE: ',
-                                        encabezado[0].noDte,
-                                        MainAxisAlignment.center),
-                                  ],
-                                ))
-                            : Container(
-                                padding: const EdgeInsets.all(0),
-                              ),
-
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        //serie y no
-                        Row(
-                          children: [
-                            Expanded(
-                                child: claveValor(
-                                    'Serie: ',
-                                    encabezado[0].serie,
-                                    MainAxisAlignment.start)),
-                            Expanded(
-                                child: claveValor('No:  ', encabezado[0].no,
-                                    MainAxisAlignment.end))
-                          ],
-                        ),
-                        //vendedor
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Vendedor: ',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 15)),
-                            Expanded(
-                              child: Text(
-                                '${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
-                                style: TextStyle(fontSize: 15),
-                                maxLines: 3,
-                              ),
+    
+                          //Nombre de empresa
+                          (sede == 1)
+                              ? TitleText(encabezado[0].nombreEmpresaSucu, 18,
+                                  TextAlign.center)
+                              : TitleText(encabezado[0].nombreEmpresa, 18,
+                                  TextAlign.center),
+    
+                          //Direccion de empresa
+                          (sede == 1)
+                              ? SimpleText(encabezado[0].direccionSucu, 15,
+                                  TextAlign.center)
+                              : SimpleText(
+                                  encabezado[0].direccion, 15, TextAlign.center),
+    
+                          const SizedBox(
+                            height: 10,
+                          ),
+    
+                          //NIT de la empresa
+                          (encabezado[0].nit_emisor != '')
+                              ? claveValor('NIT: ', encabezado[0].nit_emisor,
+                                  MainAxisAlignment.center)
+                              : Container(),
+    
+                          //Telefono de la empresa
+                          (sede == 1)
+                              ? (encabezado[0].teleSucu != '')
+                                  ? claveValor(
+                                      'Teléfono: ',
+                                      encabezado[0].teleSucu,
+                                      MainAxisAlignment.center)
+                                  : Container()
+                              : (encabezado[0].telefono != '')
+                                  ? claveValor(
+                                      'Teléfono: ',
+                                      encabezado[0].telefono,
+                                      MainAxisAlignment.center)
+                                  : Container(),
+    
+                          const SizedBox(
+                            height: 10,
+                          ),
+    
+                          //nombre comercial
+                          (sede == 1)
+                              ? (encabezado[0].nombre_comercial_sucu != '')
+                                  ? SimpleText(
+                                      encabezado[0].nombre_comercial_sucu,
+                                      15,
+                                      TextAlign.center)
+                                  : Container()
+                              : (encabezado[0].nombre_comercial_emp != '')
+                                  ? SimpleText(encabezado[0].nombre_comercial_emp,
+                                      15, TextAlign.center)
+                                  : Container(),
+    
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          //facturada
+                          (encabezado[0].dte != '')
+                              ? TitleText(
+                                  'Factura Electrónica Documento Tributario Electrónico',
+                                  18,
+                                  TextAlign.center)
+                              : Container(),
+    
+                          //fecha
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          (estado!='2' && estado!='1')?
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.red),
                             ),
-                          ],
-                        ),
-                        //cliente
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Cliente: ',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 15)),
-                            Expanded(
-                              child: Text(
-                                '${encabezado[0].nombre} ${encabezado[0].apellidos}',
-                                style: const TextStyle(fontSize: 15),
-                                maxLines: 3,
-                              ),
+                            padding: EdgeInsets.all(10),
+                            margin: EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                            child: Text('Anulada',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.red, fontSize: 25),),
+                          ):Text(''),
+    
+                          Text(
+                            encabezado[0].fecha_letras,
+                            textAlign: TextAlign.end,
+                            style: const TextStyle(
+                              fontSize: 11,
                             ),
-                          ],
-                        ),
-                        claveValor('NIT: ', encabezado[0].nit,
-                            MainAxisAlignment.start),
-                        //direccion
-                        if (encabezado[0].direccionCli != '')
+                          ),
+    
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          //n autorizacion
+                          (encabezado[0].dte != '')
+                              ? Container(
+                                  padding: const EdgeInsets.all(0),
+                                  child: Column(
+                                    children: [
+                                      TitleText('Número de Autorización:', 13,
+                                          TextAlign.center),
+                                      SimpleText(encabezado[0].dte, 13,
+                                          TextAlign.center),
+                                      claveValor(
+                                          'Serie: ',
+                                          encabezado[0].serieDte,
+                                          MainAxisAlignment.center),
+                                      claveValor(
+                                          'Número de DTE: ',
+                                          encabezado[0].noDte,
+                                          MainAxisAlignment.center),
+                                    ],
+                                  ))
+                              : Container(
+                                  padding: const EdgeInsets.all(0),
+                                ),
+    
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          //serie y no
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: claveValor(
+                                      'Serie: ',
+                                      encabezado[0].serie,
+                                      MainAxisAlignment.start)),
+                              Expanded(
+                                  child: claveValor('No:  ', encabezado[0].no,
+                                      MainAxisAlignment.end))
+                            ],
+                          ),
+                          //vendedor
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Dirección: ',
+                              const Text('Vendedor: ',
                                   style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15)),
+                                      fontWeight: FontWeight.bold, fontSize: 15)),
                               Expanded(
                                 child: Text(
-                                  encabezado[0].direccionCli,
+                                  '${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
+                                  style: TextStyle(fontSize: 15),
+                                  maxLines: 3,
+                                ),
+                              ),
+                            ],
+                          ),
+                          //cliente
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Cliente: ',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 15)),
+                              Expanded(
+                                child: Text(
+                                  '${encabezado[0].nombre} ${encabezado[0].apellidos}',
                                   style: const TextStyle(fontSize: 15),
                                   maxLines: 3,
                                 ),
                               ),
                             ],
                           ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-
-                        //condicion de pago
-                        TitleText('Condiciones de pago:', 15, TextAlign.center),
-
-                        claveValor(
-                            encabezado[0].forma, '', MainAxisAlignment.center),
-
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        ListTile(
-                          title: TitleText('Descripción', 16, TextAlign.start),
-                          trailing: TitleText('Subtotal', 16, TextAlign.end),
-                        ),
-                        Listdata(encabezado[0].contenido, detalle),
-                        //descuento
-                        Container(
-                            margin: EdgeInsets.only(right: 20),
-                            child: claveValor(
-                                'Descuentos (-) :  ',
-                                encabezado[0].contenido +
-                                    encabezado[0].descuento,
-                                MainAxisAlignment.end)),
-                        //total
-                        Container(
-                            margin: EdgeInsets.only(right: 20),
-                            child: claveValor(
-                                'Total :  ',
-                                encabezado[0].contenido + encabezado[0].total,
-                                MainAxisAlignment.end)),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        //total letra
-                        claveValor(encabezado[0].totalLetas, '',
-                            MainAxisAlignment.start),
-                        //isr
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Column(
-                          children: frases,
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        (encabezado[0].dte != '')
-                            ? Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  claveValor(
-                                      'Certificador: ',
-                                      encabezado[0].certificador,
-                                      MainAxisAlignment.start),
-                                  claveValor('NIT: ', encabezado[0].nitCert,
-                                      MainAxisAlignment.start),
-                                  claveValor('Fecha: ', encabezado[0].fechaCert,
-                                      MainAxisAlignment.start),
-                                ],
-                              )
-                            : Container(),
-
-                        //creditos xd
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        SimpleText('Factura realizada en www.gozeri.com', 15,
-                            TextAlign.center)
-                      ],
+                          claveValor('NIT: ', encabezado[0].nit,
+                              MainAxisAlignment.start),
+                          //direccion
+                          if (encabezado[0].direccionCli != '')
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Dirección: ',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15)),
+                                Expanded(
+                                  child: Text(
+                                    encabezado[0].direccionCli,
+                                    style: const TextStyle(fontSize: 15),
+                                    maxLines: 3,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+    
+                          //condicion de pago
+                          TitleText('Condiciones de pago:', 15, TextAlign.center),
+    
+                          claveValor(
+                              encabezado[0].forma, '', MainAxisAlignment.center),
+    
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          ListTile(
+                            title: TitleText('Descripción', 16, TextAlign.start),
+                            trailing: TitleText('Subtotal', 16, TextAlign.end),
+                          ),
+                          Listdata(encabezado[0].contenido, detalle),
+                          //descuento
+                          Container(
+                              margin: EdgeInsets.only(right: 20),
+                              child: claveValor(
+                                  'Descuentos (-) :  ',
+                                  encabezado[0].contenido +
+                                      encabezado[0].descuento,
+                                  MainAxisAlignment.end)),
+                          //total
+                          Container(
+                              margin: EdgeInsets.only(right: 20),
+                              child: claveValor(
+                                  'Total :  ',
+                                  encabezado[0].contenido + encabezado[0].total,
+                                  MainAxisAlignment.end)),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          //total letra
+                          claveValor(encabezado[0].totalLetas, '',
+                              MainAxisAlignment.start),
+                          //isr
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Column(
+                            children: frases,
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          (encabezado[0].dte != '')
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    claveValor(
+                                        'Certificador: ',
+                                        encabezado[0].certificador,
+                                        MainAxisAlignment.start),
+                                    claveValor('NIT: ', encabezado[0].nitCert,
+                                        MainAxisAlignment.start),
+                                    claveValor('Fecha: ', encabezado[0].fechaCert,
+                                        MainAxisAlignment.start),
+                                  ],
+                                )
+                              : Container(),
+    
+                          //creditos xd
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          SimpleText('Factura realizada en www.gozeri.com', 15,
+                              TextAlign.center)
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 100,
-                ),
-              ]),
-            );
-          },
-        ));
+                  const SizedBox(
+                    height: 100,
+                  ),
+                ]),
+              );
+            },
+          )),
+    );
   }
 
   Container sheetButton(BuildContext context) {

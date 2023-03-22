@@ -251,7 +251,111 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                   ),
                                   GestureDetector(
                                     onTap: () async {
-                                      await print_sunmi_comanda(context, '252');
+                                      if (Preferencias.sunmi_preferencia) {
+                                        await print_sunmi_comanda(context, list_tmp[index]
+                                                        .idFactTmp);                     
+                                      } else {
+                                        print('entro');
+                                        _printerManager.stopScan();
+                                        await _printerManager.scanResults
+                                            .listen((devices) async {
+                                          print(devices);
+
+                                          if (Preferencias.mac == '') {
+                                            showDialog(
+                                                context: context,
+                                                builder: ((context) {
+                                                  if (devices.length == 0) {
+                                                    return const AlertDialog(
+                                                      backgroundColor: Color.fromARGB(
+                                                          255, 236, 133, 115),
+                                                      content: Text(
+                                                        'No se encontraron impresoras disponibles.',
+                                                        style: TextStyle(
+                                                            color: Colors.white),
+                                                      ),
+                                                    );
+                                                  }
+
+                                                  return AlertDialog(
+                                                    title: const Text(
+                                                        'Impresoras Disponibles'),
+                                                    content: Container(
+                                                      height:
+                                                          300.0, // Change as per your requirement
+                                                      width:
+                                                          300.0, // Change as per your requirement
+                                                      child: ListView.builder(
+                                                        shrinkWrap: true,
+                                                        itemCount: devices.length,
+                                                        itemBuilder:
+                                                            (BuildContext context,
+                                                                int i) {
+                                                          return ListTile(
+                                                            title: Text(
+                                                                "${devices[i].name}"),
+                                                            subtitle: Text(
+                                                                "${devices[i].address}"),
+                                                            trailing: Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize.min,
+                                                              children: [
+                                                                GestureDetector(
+                                                                  onTap: () {
+                                                                    _printerManager
+                                                                        .stopScan();
+                                                                    _startPrint(
+                                                                        devices[i],
+                                                                        list_tmp[index].idFactTmp,'comanda');
+                                                                  },
+                                                                  child: Container(
+                                                                    margin:
+                                                                        const EdgeInsets
+                                                                            .all(5),
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .all(10),
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                            //color: Theme.of(context).primaryColor,
+                                                                            color: widget
+                                                                                .colorPrimary,
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(
+                                                                                    15)),
+                                                                    child: const Icon(
+                                                                      Icons.print,
+                                                                      color: Colors
+                                                                          .white,
+                                                                      size: 25,
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                            onTap: () {},
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                  );
+                                                }));
+                                          } else {
+                                            //impresion en predeterminada
+                                            devices.forEach((printer) async {
+                                              print(printer);
+                                              //get saved printer
+                                              if (printer.address ==
+                                                  Preferencias.mac) {
+                                                //store the element.
+                                                await _startPrint(printer, list_tmp[index]
+                                                        .idFactTmp,'comanda');
+                                              }
+                                            });
+                                          }
+                                        });
+                                        print('salio');
+                                      }
                                     },
                                     child: Container(
                                       margin: const EdgeInsets.only(left: 2),
@@ -406,7 +510,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                                             .stopScan();
                                                                         await _startPrint(
                                                                             devices[i],
-                                                                            list_emi[index].idFactTmp);
+                                                                            list_emi[index].idFactTmp,'f');
                                                                       },
                                                                       child:
                                                                           Container(
@@ -451,7 +555,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                     await _startPrint(
                                                         printer,
                                                         list_emi[index]
-                                                            .idFactTmp);
+                                                            .idFactTmp,'f');
                                                   }
                                                 });
                                               }
@@ -539,7 +643,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
         ));
   }
 
-  Future<void> _startPrint(PrinterBluetooth printer, String id_factura) async {
+  Future<void> _startPrint(PrinterBluetooth printer, String id_factura, String accion) async {
     _printerManager.selectPrinter(printer);
     showDialog(
       context: context,
@@ -551,8 +655,14 @@ class _ViewFacturasState extends State<ViewFacturas> {
         ),
       ),
     );
-    final result =
+    final result;
+    if(accion=='f'){
+       result =
         await _printerManager.printTicket(await testTicket(id_factura));
+    }else{
+       result =
+        await _printerManager.printTicket(await comanda_bluetho(id_factura));
+    }
     Navigator.of(context, rootNavigator: true).pop(result);
     showDialog(
       context: context,
@@ -566,6 +676,92 @@ class _ViewFacturasState extends State<ViewFacturas> {
         ),
       ),
     );
+  }
+
+  Future<List<int>> comanda_bluetho(String id_factura) async {
+    showDialog(
+      context: context,
+      builder: (_) => const AlertDialog(
+        backgroundColor: Color.fromARGB(255, 226, 178, 49),
+        content: ListTile(
+          leading: CircularProgressIndicator(color: Colors.white,),
+          title: Text(
+            'Imprimiendo comanda...',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ),
+    );
+    // Using default profile
+    final profile = await CapabilityProfile.load();
+    final generatorr = Generator(PaperSize.mm58, profile);
+
+    List<int> bytess = [];
+    bytess += generatorr.setGlobalCodeTable('CP1252');
+    //cliente
+    bytess += generatorr.text('Mesa No. 1',
+            styles: const PosStyles(
+                codeTable: 'CP1252',
+                align: PosAlign.center,
+                bold: true,
+                width: PosTextSize.size3));
+    
+    //numero
+    bytess += generatorr.text('# 2132156',
+            styles: const PosStyles(
+                    width: PosTextSize.size2, bold: true, codeTable: 'CP1252')
+                .copyWith(align: PosAlign.center));
+
+    //espacio
+    bytess += generatorr.feed(1);
+
+    //TABLA PRODUCTOS
+    bytess += generatorr.row([
+      PosColumn(
+        text: 'Cantidad',
+        width: 3,
+        styles: const PosStyles(align: PosAlign.center, bold: true),
+      ),
+      PosColumn(
+        text: 'Producto',
+        width: 9,
+        styles: const PosStyles(align: PosAlign.center, bold: true),
+      ),
+    ]);
+
+    for (int al = 0; al < 4; al++) {
+      
+      bytess += generatorr.row([
+        PosColumn(
+          text: '1',
+          width: 3,
+          styles: const PosStyles(align: PosAlign.left),
+        ),
+        PosColumn(
+          text: 'combo campero',
+          width: 9,
+          styles: const PosStyles(align: PosAlign.left),
+        ),
+      ]);
+    }
+
+    //espacio
+    bytess += generatorr.feed(1);
+    bytess += generatorr.feed(1);
+
+    bytess += generatorr.text('nombre de la empresa',
+            styles: const PosStyles(
+                    width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+                .copyWith(align: PosAlign.center));
+
+    bytess += generatorr.text('realizado en www.gozeri.com',
+            styles: const PosStyles(
+                    width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+                .copyWith(align: PosAlign.center));
+
+    bytess += generatorr.cut();
+    return bytess;
+
   }
 
   Future<List<int>> testTicket(String id_factura) async {
@@ -1271,9 +1467,12 @@ print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
     context: context,
     builder: (_) => const AlertDialog(
       backgroundColor: Color.fromARGB(255, 226, 178, 49),
-      content: Text(
-        'Imprimiendo comanda...',
-        style: TextStyle(color: Colors.white),
+      content: ListTile(
+        leading: CircularProgressIndicator(color: Colors.white,),
+        title: Text(
+          'Imprimiendo comanda...',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
     ),
   );
@@ -1338,6 +1537,11 @@ print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
 
   await SunmiPrinter.lineWrap(1);
   await SunmiPrinter.lineWrap(1);
+  await SunmiPrinter.printText('nombre de la empresa',
+    style: SunmiStyle(
+      bold: false,
+      align: SunmiPrintAlign.CENTER,
+    ));
   await SunmiPrinter.printText('Realizado en www.gozeri.com',
       style: SunmiStyle(
         bold: false,
