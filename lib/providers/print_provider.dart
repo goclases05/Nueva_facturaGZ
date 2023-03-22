@@ -11,6 +11,36 @@ class PrintProvider extends ChangeNotifier {
 
   PrintProvider() {}
 
+  Future pdf_factura(String id_f) async {
+    final empresa = Preferencias.data_empresa;
+    final id_usuario = Preferencias.data_id;
+    print(
+        "https://admin.gozeri.com/app_facturacion/pdf_facturas.php?id_f=${id_f}");
+    final Uri uri = Uri.parse(
+        "https://admin.gozeri.com/app_facturacion/pdf_facturas.php?id_f=${id_f}");
+
+    final resp = await http.get(uri);
+    print('el dato');
+    print(resp.body);
+    final data = json.decode(resp.body);
+    return data;
+  }
+
+  Future generate_comanda(String id_tmp) async {
+    final empresa = Preferencias.data_empresa;
+    final id_usuario = Preferencias.data_id;
+    print(
+        "https://app.gozeri.com/versiones/v1.5.0/factura/view_print_comanda.php?empresa=${empresa}&id=${id_tmp}");
+    final Uri uri = Uri.parse(
+        "https://app.gozeri.com/versiones/v1.5.0/factura/view_print_comanda.php?empresa=${empresa}&id=${id_tmp}");
+
+    final resp = await http.get(uri);
+    print('el dato');
+    print(resp.body);
+    final data = json.decode(resp.body);
+    return data;
+  }
+
   Future dataFac(String factura) async {
     list.clear();
     list_detalle.clear();
@@ -21,9 +51,9 @@ class PrintProvider extends ChangeNotifier {
     final empresa = Preferencias.data_empresa;
 
     print(
-        "https://app.gozeri.com/desarrollo_flutter/factura/view_print.php?id=${factura}&empresa=${empresa}");
+        "https://app.gozeri.com/versiones/v1.5.0/factura/view_print.php?id=${factura}&empresa=${empresa}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/desarrollo_flutter/factura/view_print.php?id=${factura}&empresa=${empresa}");
+        "https://app.gozeri.com/versiones/v1.5.0/factura/view_print.php?id=${factura}&empresa=${empresa}");
 
     final resp = await http.get(uri);
     //print(resp.body);

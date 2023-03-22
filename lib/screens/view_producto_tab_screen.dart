@@ -33,9 +33,9 @@ class _viewproductotab extends State<ViewProductoTab> {
     final empresa = Preferencias.data_empresa;
 
     print(
-        "https://app.gozeri.com/desarrollo_flutter/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}");
+        "https://app.gozeri.com/versiones/v1.5.0/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/desarrollo_flutter/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}");
+        "https://app.gozeri.com/versiones/v1.5.0/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}");
     final response = await http.get(uri);
     i = i + 10;
     if (response.statusCode == 200) {

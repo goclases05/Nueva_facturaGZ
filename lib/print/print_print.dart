@@ -729,7 +729,8 @@ class _PrintScreenState extends State<PrintScreen> {
                                                                   .stopScan();
                                                               _startPrint(
                                                                   devices[i],
-                                                                  js['ID'],'f');
+                                                                  js['ID'],
+                                                                  'f');
                                                             },
                                                             child: Container(
                                                               margin:
@@ -772,7 +773,8 @@ class _PrintScreenState extends State<PrintScreen> {
                                         if (printer.address ==
                                             Preferencias.mac) {
                                           //store the element.
-                                          await _startPrint(printer, js['ID'],'f');
+                                          await _startPrint(
+                                              printer, js['ID'], 'f');
                                         }
                                       });
                                     }
@@ -816,11 +818,11 @@ class _PrintScreenState extends State<PrintScreen> {
                     child: TextButton.icon(
                         style: TextButton.styleFrom(
                           primary: Colors.white,
-                          backgroundColor: Color.fromARGB(255, 209, 179, 7),
+                          backgroundColor: Colors.blue,
                         ),
-                        onPressed: () async{
+                        onPressed: () async {
                           if (Preferencias.sunmi_preferencia) {
-                            await print_sunmi_comanda(context, widget.id_tmp);                     
+                            await print_sunmi_comanda(context, widget.id_tmp);
                           } else {
                             print('entro');
                             _printerManager.stopScan();
@@ -838,8 +840,8 @@ class _PrintScreenState extends State<PrintScreen> {
                                               255, 236, 133, 115),
                                           content: Text(
                                             'No se encontraron impresoras disponibles.',
-                                            style: TextStyle(
-                                                color: Colors.white),
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
                                         );
                                       }
@@ -856,11 +858,10 @@ class _PrintScreenState extends State<PrintScreen> {
                                             shrinkWrap: true,
                                             itemCount: devices.length,
                                             itemBuilder:
-                                                (BuildContext context,
-                                                    int i) {
+                                                (BuildContext context, int i) {
                                               return ListTile(
-                                                title: Text(
-                                                    "${devices[i].name}"),
+                                                title:
+                                                    Text("${devices[i].name}"),
                                                 subtitle: Text(
                                                     "${devices[i].address}"),
                                                 trailing: Row(
@@ -873,12 +874,12 @@ class _PrintScreenState extends State<PrintScreen> {
                                                             .stopScan();
                                                         _startPrint(
                                                             devices[i],
-                                                            widget.id_tmp,'comanda');
+                                                            widget.id_tmp,
+                                                            'comanda');
                                                       },
                                                       child: Container(
-                                                        margin:
-                                                            const EdgeInsets
-                                                                .all(5),
+                                                        margin: const EdgeInsets
+                                                            .all(5),
                                                         padding:
                                                             const EdgeInsets
                                                                 .all(10),
@@ -888,12 +889,12 @@ class _PrintScreenState extends State<PrintScreen> {
                                                                 color: widget
                                                                     .colorPrimary,
                                                                 borderRadius:
-                                                                    BorderRadius.circular(
-                                                                        15)),
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            15)),
                                                         child: const Icon(
                                                           Icons.print,
-                                                          color: Colors
-                                                              .white,
+                                                          color: Colors.white,
                                                           size: 25,
                                                         ),
                                                       ),
@@ -912,10 +913,10 @@ class _PrintScreenState extends State<PrintScreen> {
                                 devices.forEach((printer) async {
                                   print(printer);
                                   //get saved printer
-                                  if (printer.address ==
-                                      Preferencias.mac) {
+                                  if (printer.address == Preferencias.mac) {
                                     //store the element.
-                                    await _startPrint(printer, widget.id_tmp,'comanda');
+                                    await _startPrint(
+                                        printer, widget.id_tmp, 'comanda');
                                   }
                                 });
                               }
@@ -929,7 +930,7 @@ class _PrintScreenState extends State<PrintScreen> {
                         ),
                         label: Text(
                           'Comanda',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.white, fontSize: 12),
                         )),
                   )
                 ],
@@ -941,7 +942,8 @@ class _PrintScreenState extends State<PrintScreen> {
     );
   }
 
-  Future<void> _startPrint(PrinterBluetooth printer, String id_factura,String accion)async {
+  Future<void> _startPrint(
+      PrinterBluetooth printer, String id_factura, String accion) async {
     _printerManager.selectPrinter(printer);
     showDialog(
       context: context,
@@ -954,14 +956,13 @@ class _PrintScreenState extends State<PrintScreen> {
       ),
     );
     final result;
-    if(accion=='f'){
-       result =
-        await _printerManager.printTicket(await testTicket(id_factura));
-    }else{
-       result =
-        await _printerManager.printTicket(await comanda_bluetho(id_factura));
+    if (accion == 'f') {
+      result = await _printerManager.printTicket(await testTicket(id_factura));
+    } else {
+      result =
+          await _printerManager.printTicket(await comanda_bluetho(id_factura));
     }
-    
+
     Navigator.of(context, rootNavigator: true).pop(result);
     showDialog(
       context: context,
@@ -976,32 +977,50 @@ class _PrintScreenState extends State<PrintScreen> {
       ),
     );
     Navigator.of(context, rootNavigator: true).pop(result);
-    Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const EscritorioScreen()),
-        (Route<dynamic> route) => false);
+    if (accion == 'f') {
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const EscritorioScreen()),
+          (Route<dynamic> route) => false);
+    }
   }
 
   Future<List<int>> comanda_bluetho(String id_factura) async {
+    final print_data = Provider.of<PrintProvider>(context, listen: false);
+    final js = await print_data.generate_comanda(id_factura);
     // Using default profile
     final profile = await CapabilityProfile.load();
     final generatorr = Generator(PaperSize.mm58, profile);
 
     List<int> bytess = [];
+    //espacio
+    bytess += generatorr.feed(1);
     bytess += generatorr.setGlobalCodeTable('CP1252');
+    String name = '';
+    if (js['ENCABEZADO']['NOMBRE_EMPRESA_SUCU'] != null ||
+        js['ENCABEZADO']['NOMBRE_EMPRESA_SUCU'] != '') {
+      name = js['ENCABEZADO']['NOMBRE_EMPRESA_SUCU'];
+    } else {
+      name = js['ENCABEZADO']['NOMBRE_EMPRESA'];
+    }
+
     //cliente
-    bytess += generatorr.text('Mesa No. 1',
-            styles: const PosStyles(
-                codeTable: 'CP1252',
-                align: PosAlign.center,
-                bold: true,
-                width: PosTextSize.size3));
-    
+    bytess += generatorr.text(
+        '${js['ENCABEZADO']['NOMBRE']}  ${js['ENCABEZADO']['APELLIDOS']}',
+        styles: const PosStyles(
+            codeTable: 'CP1252',
+            align: PosAlign.center,
+            bold: true,
+            width: PosTextSize.size1));
+
     //numero
-    bytess += generatorr.text('# 2132156',
-            styles: const PosStyles(
-                    width: PosTextSize.size2, bold: true, codeTable: 'CP1252')
-                .copyWith(align: PosAlign.center));
+    bytess += generatorr.text('#${js['ENCABEZADO']['NO']}',
+        styles: const PosStyles(
+                width: PosTextSize.size2,
+                height: PosTextSize.size2,
+                bold: true,
+                codeTable: 'CP1252')
+            .copyWith(align: PosAlign.center));
 
     //espacio
     bytess += generatorr.feed(1);
@@ -1010,27 +1029,26 @@ class _PrintScreenState extends State<PrintScreen> {
     bytess += generatorr.row([
       PosColumn(
         text: 'Cantidad',
-        width: 3,
-        styles: const PosStyles(align: PosAlign.center, bold: true),
+        width: 4,
+        styles: const PosStyles(align: PosAlign.left, bold: true),
       ),
       PosColumn(
         text: 'Producto',
-        width: 9,
-        styles: const PosStyles(align: PosAlign.center, bold: true),
+        width: 8,
+        styles: const PosStyles(align: PosAlign.left, bold: true),
       ),
     ]);
 
-    for (int al = 0; al < 4; al++) {
-      
+    for (int al = 0; al < js['DETALLE'].length; al++) {
       bytess += generatorr.row([
         PosColumn(
-          text: '1',
-          width: 3,
-          styles: const PosStyles(align: PosAlign.left),
+          text: '${js['DETALLE'][al]['CANTIDAD']}',
+          width: 4,
+          styles: const PosStyles(align: PosAlign.center),
         ),
         PosColumn(
-          text: 'combo campero',
-          width: 9,
+          text: '${js['DETALLE'][al]['PRODUCTO']}',
+          width: 8,
           styles: const PosStyles(align: PosAlign.left),
         ),
       ]);
@@ -1040,19 +1058,18 @@ class _PrintScreenState extends State<PrintScreen> {
     bytess += generatorr.feed(1);
     bytess += generatorr.feed(1);
 
-    bytess += generatorr.text('nombre de la empresa',
-            styles: const PosStyles(
-                    width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
-                .copyWith(align: PosAlign.center));
+    bytess += generatorr.text('${name}',
+        styles: const PosStyles(
+                width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+            .copyWith(align: PosAlign.center));
 
     bytess += generatorr.text('realizado en www.gozeri.com',
-            styles: const PosStyles(
-                    width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
-                .copyWith(align: PosAlign.center));
+        styles: const PosStyles(
+                width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+            .copyWith(align: PosAlign.center));
 
     bytess += generatorr.cut();
     return bytess;
-
   }
 
   Future<List<int>> testTicket(String id_factura) async {
@@ -1750,16 +1767,17 @@ print_sunmi(BuildContext context, String id_factura) async {
 }
 
 print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
-  /*final print_data = Provider.of<PrintProvider>(context, listen: false);
-  await print_data.dataFac(id_factura);
-  List<Encabezado> encabezado = print_data.list;
-  List<Detalle> detalle = print_data.list_detalle;*/
+  final print_data = Provider.of<PrintProvider>(context, listen: false);
+  final js = await print_data.generate_comanda(id_f_tmp);
+
   showDialog(
     context: context,
     builder: (_) => const AlertDialog(
       backgroundColor: Color.fromARGB(255, 226, 178, 49),
       content: ListTile(
-        leading: CircularProgressIndicator(color: Colors.white,),
+        leading: CircularProgressIndicator(
+          color: Colors.white,
+        ),
         title: Text(
           'Imprimiendo comanda...',
           style: TextStyle(color: Colors.white),
@@ -1767,46 +1785,29 @@ print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
       ),
     ),
   );
+  String name = '';
+  if (js['ENCABEZADO']['NOMBRE_EMPRESA_SUCU'] != null ||
+      js['ENCABEZADO']['NOMBRE_EMPRESA_SUCU'] != '') {
+    name = js['ENCABEZADO']['NOMBRE_EMPRESA_SUCU'];
+  } else {
+    name = js['ENCABEZADO']['NOMBRE_EMPRESA'];
+  }
 
   await SunmiPrinter.initPrinter();
   await SunmiPrinter.startTransactionPrint(true);
   await SunmiPrinter.lineWrap(1);
   await SunmiPrinter.lineWrap(1);
-  await SunmiPrinter.printText('Mesa No.1',
+  await SunmiPrinter.printText(
+      '${js['ENCABEZADO']['NOMBRE']}  ${js['ENCABEZADO']['APELLIDOS']}',
+      style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD));
+  await SunmiPrinter.printText('#${js['ENCABEZADO']['NO']}',
       style: SunmiStyle(
           bold: false,
           align: SunmiPrintAlign.CENTER,
           fontSize: SunmiFontSize.XL));
-  await SunmiPrinter.printText('Factura No.125',
-      style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.CENTER,
-          fontSize: SunmiFontSize.XL));
-
-  //DETALLES
-  /*for (int al = 0; al < detalle.length; al++) {
-    double tota =
-        double.parse(detalle[al].cantidad) * double.parse(detalle[al].precio);
-    await SunmiPrinter.printRow(cols: [
-      ColumnMaker(
-          text: '${detalle[al].producto}',
-          width: 24,
-          align: SunmiPrintAlign.LEFT),
-      ColumnMaker(text: '', width: 6, align: SunmiPrintAlign.CENTER),
-    ]);
-
-    await SunmiPrinter.printRow(cols: [
-      ColumnMaker(
-          text:
-              '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
-          width: 20,
-          align: SunmiPrintAlign.LEFT),
-      ColumnMaker(
-          text: '${detalle[al].contenido}${tota}',
-          width: 10,
-          align: SunmiPrintAlign.RIGHT),
-    ]);
-  }*/
   //DETALLES
   //for (int al = 0; al < detalle.length; al++) {
   await SunmiPrinter.line();
@@ -1815,20 +1816,20 @@ print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
     ColumnMaker(text: 'Producto', width: 20, align: SunmiPrintAlign.LEFT),
   ]);
   await SunmiPrinter.line();
-  await SunmiPrinter.printRow(cols: [
-    ColumnMaker(text: '20', width: 6, align: SunmiPrintAlign.CENTER),
-    ColumnMaker(text: 'Hamburguesa', width: 24, align: SunmiPrintAlign.LEFT),
-  ]);
-  await SunmiPrinter.printRow(cols: [
-    ColumnMaker(text: '5', width: 6, align: SunmiPrintAlign.CENTER),
-    ColumnMaker(
-        text: 'Helados de fresa', width: 24, align: SunmiPrintAlign.LEFT),
-  ]);
-  //}
-
+  for (int al = 0; al < js['DETALLE'].length; al++) {
+    await SunmiPrinter.printRow(cols: [
+      ColumnMaker(
+          text: '${js['DETALLE'][al]['CANTIDAD']}',
+          width: 6,
+          align: SunmiPrintAlign.CENTER),
+      ColumnMaker(
+          text: '${js['DETALLE'][al]['PRODUCTO']}',
+          width: 24,
+          align: SunmiPrintAlign.LEFT),
+    ]);
+  }
   await SunmiPrinter.lineWrap(1);
-  await SunmiPrinter.lineWrap(1);
-  await SunmiPrinter.printText('nombre de la empresa',
+  await SunmiPrinter.printText('${name}',
       style: SunmiStyle(
         bold: false,
         align: SunmiPrintAlign.CENTER,
@@ -1846,4 +1847,3 @@ print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
   await SunmiPrinter.lineWrap(2);
   await SunmiPrinter.exitTransactionPrint(true);
 }
-

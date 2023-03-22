@@ -1,3 +1,4 @@
+import 'package:al_downloader/al_downloader.dart';
 import 'package:edge_alerts/edge_alerts.dart';
 import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
@@ -8,6 +9,9 @@ import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/widgets/registro_metodoPago_listas_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:sunmi_printer_plus/column_maker.dart';
 import 'package:sunmi_printer_plus/enums.dart';
@@ -39,13 +43,13 @@ class _ViewTicketState extends State<ViewTicket> {
   int paperSize = 0;
   String serialNumber = "";
   String printerVersion = "";
-  String estado='';
+  String estado = '';
   //SUNMIN
 
   @override
   void initState() {
     super.initState();
-    estado=widget.estado;
+    estado = widget.estado;
     // TODO: implement initState
     if (Preferencias.sunmi_preferencia) {
       _bindingPrinter().then((bool? isBind) async {
@@ -74,7 +78,6 @@ class _ViewTicketState extends State<ViewTicket> {
     } else {
       _printerManager.startScan(const Duration(seconds: 2));
     }
-    
   }
 
   @override
@@ -91,10 +94,9 @@ class _ViewTicketState extends State<ViewTicket> {
     final bool? result = await SunmiPrinter.bindingPrinter();
     return result;
   }
-  
+
   @override
   Widget build(BuildContext context) {
-    
     final facturaService = Provider.of<Facturacion>(context, listen: false);
     return WillPopScope(
       onWillPop: () async {
@@ -116,7 +118,8 @@ class _ViewTicketState extends State<ViewTicket> {
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text('Factura: ', style: TextStyle(color: widget.colorPrimary)),
+                  Text('Factura: ',
+                      style: TextStyle(color: widget.colorPrimary)),
                   Chip(
                       padding: const EdgeInsets.all(1),
                       backgroundColor: (estado == '2')
@@ -130,81 +133,93 @@ class _ViewTicketState extends State<ViewTicket> {
                             : (estado == '1')
                                 ? 'Pendiente de Pago'
                                 : 'Anulada',
-                        style: const TextStyle(fontSize: 15, color: Colors.white),
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.white),
                       )),
                 ],
               ),
               actions: [
-                (estado!='0')?
-                CircleAvatar(
-                  backgroundColor: Colors.red,
-                  child: IconButton(
-                    onPressed: ()async{
-                      await showDialog(
-                        context: context,
-                        builder: ((context) {
-                          return AlertDialog(
-                            title: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.red),
+                (estado != '0')
+                    ? CircleAvatar(
+                        backgroundColor: Colors.red,
+                        child: IconButton(
+                          onPressed: () async {
+                            await showDialog(
+                              context: context,
+                              builder: ((context) {
+                                return AlertDialog(
+                                  title: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          border: Border.all(color: Colors.red),
+                                        ),
+                                        padding: EdgeInsets.all(10),
+                                        margin: EdgeInsets.symmetric(
+                                            vertical: 5, horizontal: 5),
+                                        child: Text(
+                                          'Anular',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.red,
+                                              fontSize: 25),
+                                        ),
+                                      ),
+                                      const Text('¿Estas Seguro?',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                          )),
+                                      const Text(
+                                          'Estas a punto de anular esta factura',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                          )),
+                                    ],
                                   ),
-                                  padding: EdgeInsets.all(10),
-                                  margin: EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                                  child: Text('Anular',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.red, fontSize: 25),),
-                                ),
-                                const Text('¿Estas Seguro?',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                    )),
-                                const Text('Estas a punto de anular esta factura',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                    )),
-                              ],
-                            ),
-                            actions: [
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop(false);
-                                  },
-                                  child: const Text('No')),
-                              TextButton(
-                                  onPressed: ()async {
-                                    
-                                    var data =await facturaService.anular_factura(widget.factura);
-                                    if (data == '1') {
-                                      edgeAlert(context,
-                                          title: 'Listo!',
-                                          description: 'Factura anulada.',
-                                          gravity: Gravity.top,
-                                          backgroundColor: Color.fromARGB(255, 81, 131, 83));
-                                      setState(() {
-                                        estado = '0';
-                                      });
-                                    } else {
-                                      edgeAlert(context,
-                                          title: 'Error',
-                                          description: '${data}',
-                                          gravity: Gravity.top,
-                                          backgroundColor: Color.fromARGB(255, 165, 65, 26));
-                                    } 
-                                    Navigator.of(context).pop(false);
-                                    
-                                  },
-                                  child: const Text('Si'))
-                            ],
-                          );
-                    
-                        }),
-                      );
-                    },
-                    icon: Icon(Icons.close),
-                    color: Colors.white,
-                  ),
-                ):SizedBox(width: 1,),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(false);
+                                        },
+                                        child: const Text('No')),
+                                    TextButton(
+                                        onPressed: () async {
+                                          var data = await facturaService
+                                              .anular_factura(widget.factura);
+                                          if (data == '1') {
+                                            edgeAlert(context,
+                                                title: 'Listo!',
+                                                description: 'Factura anulada.',
+                                                gravity: Gravity.top,
+                                                backgroundColor: Color.fromARGB(
+                                                    255, 81, 131, 83));
+                                            setState(() {
+                                              estado = '0';
+                                            });
+                                          } else {
+                                            edgeAlert(context,
+                                                title: 'Error',
+                                                description: '${data}',
+                                                gravity: Gravity.top,
+                                                backgroundColor: Color.fromARGB(
+                                                    255, 165, 65, 26));
+                                          }
+                                          Navigator.of(context).pop(false);
+                                        },
+                                        child: const Text('Si'))
+                                  ],
+                                );
+                              }),
+                            );
+                          },
+                          icon: Icon(Icons.close),
+                          color: Colors.white,
+                        ),
+                      )
+                    : SizedBox(
+                        width: 1,
+                      ),
                 const SizedBox(
                   width: 15,
                 ),
@@ -221,17 +236,17 @@ class _ViewTicketState extends State<ViewTicket> {
                       color: widget.colorPrimary,
                     )));
               }
-    
+
               List<Encabezado> encabezado = printProvider.list;
               List<Detalle> detalle = printProvider.list_detalle;
-    
+
               List<Widget> frases = [];
               //frases del certificador
               for (int i = 0; i < encabezado[0].frases.length; i++) {
                 frases.add(
                     SimpleText(encabezado[0].frases[i], 13, TextAlign.center));
               }
-    
+
               int sede = 0;
               //0= empresa
               //1= sucursal
@@ -242,7 +257,7 @@ class _ViewTicketState extends State<ViewTicket> {
                   encabezado[0].felSucu == '0') {
                 sede = 0;
               }
-    
+
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 scrollDirection: Axis.vertical,
@@ -260,7 +275,8 @@ class _ViewTicketState extends State<ViewTicket> {
                               ?
                               //sucursal
                               FadeInImage(
-                                  width: MediaQuery.of(context).size.width * 0.25,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.25,
                                   placeholder:
                                       AssetImage('assets/productos_gz.jpg'),
                                   image: NetworkImage(encabezado[0].rutaSucu +
@@ -268,40 +284,41 @@ class _ViewTicketState extends State<ViewTicket> {
                               :
                               //empresa
                               FadeInImage(
-                                  width: MediaQuery.of(context).size.width * 0.25,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.25,
                                   placeholder:
                                       AssetImage('assets/productos_gz.jpg'),
                                   image: NetworkImage(encabezado[0].logoUrl +
                                       encabezado[0].logoNom)),
-    
+
                           const SizedBox(
                             height: 10,
                           ),
-    
+
                           //Nombre de empresa
                           (sede == 1)
                               ? TitleText(encabezado[0].nombreEmpresaSucu, 18,
                                   TextAlign.center)
                               : TitleText(encabezado[0].nombreEmpresa, 18,
                                   TextAlign.center),
-    
+
                           //Direccion de empresa
                           (sede == 1)
                               ? SimpleText(encabezado[0].direccionSucu, 15,
                                   TextAlign.center)
-                              : SimpleText(
-                                  encabezado[0].direccion, 15, TextAlign.center),
-    
+                              : SimpleText(encabezado[0].direccion, 15,
+                                  TextAlign.center),
+
                           const SizedBox(
                             height: 10,
                           ),
-    
+
                           //NIT de la empresa
                           (encabezado[0].nit_emisor != '')
                               ? claveValor('NIT: ', encabezado[0].nit_emisor,
                                   MainAxisAlignment.center)
                               : Container(),
-    
+
                           //Telefono de la empresa
                           (sede == 1)
                               ? (encabezado[0].teleSucu != '')
@@ -316,11 +333,11 @@ class _ViewTicketState extends State<ViewTicket> {
                                       encabezado[0].telefono,
                                       MainAxisAlignment.center)
                                   : Container(),
-    
+
                           const SizedBox(
                             height: 10,
                           ),
-    
+
                           //nombre comercial
                           (sede == 1)
                               ? (encabezado[0].nombre_comercial_sucu != '')
@@ -330,10 +347,12 @@ class _ViewTicketState extends State<ViewTicket> {
                                       TextAlign.center)
                                   : Container()
                               : (encabezado[0].nombre_comercial_emp != '')
-                                  ? SimpleText(encabezado[0].nombre_comercial_emp,
-                                      15, TextAlign.center)
+                                  ? SimpleText(
+                                      encabezado[0].nombre_comercial_emp,
+                                      15,
+                                      TextAlign.center)
                                   : Container(),
-    
+
                           const SizedBox(
                             height: 10,
                           ),
@@ -344,21 +363,29 @@ class _ViewTicketState extends State<ViewTicket> {
                                   18,
                                   TextAlign.center)
                               : Container(),
-    
+
                           //fecha
                           const SizedBox(
                             height: 15,
                           ),
-                          (estado!='2' && estado!='1')?
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.red),
-                            ),
-                            padding: EdgeInsets.all(10),
-                            margin: EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                            child: Text('Anulada',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.red, fontSize: 25),),
-                          ):Text(''),
-    
+                          (estado != '2' && estado != '1')
+                              ? Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.red),
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 5, horizontal: 5),
+                                  child: Text(
+                                    'Anulada',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.red,
+                                        fontSize: 25),
+                                  ),
+                                )
+                              : Text(''),
+
                           Text(
                             encabezado[0].fecha_letras,
                             textAlign: TextAlign.end,
@@ -366,7 +393,7 @@ class _ViewTicketState extends State<ViewTicket> {
                               fontSize: 11,
                             ),
                           ),
-    
+
                           const SizedBox(
                             height: 20,
                           ),
@@ -393,7 +420,7 @@ class _ViewTicketState extends State<ViewTicket> {
                               : Container(
                                   padding: const EdgeInsets.all(0),
                                 ),
-    
+
                           const SizedBox(
                             height: 20,
                           ),
@@ -417,7 +444,8 @@ class _ViewTicketState extends State<ViewTicket> {
                             children: [
                               const Text('Vendedor: ',
                                   style: TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 15)),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15)),
                               Expanded(
                                 child: Text(
                                   '${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
@@ -434,7 +462,8 @@ class _ViewTicketState extends State<ViewTicket> {
                             children: [
                               const Text('Cliente: ',
                                   style: TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 15)),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15)),
                               Expanded(
                                 child: Text(
                                   '${encabezado[0].nombre} ${encabezado[0].apellidos}',
@@ -468,18 +497,20 @@ class _ViewTicketState extends State<ViewTicket> {
                           const SizedBox(
                             height: 20,
                           ),
-    
+
                           //condicion de pago
-                          TitleText('Condiciones de pago:', 15, TextAlign.center),
-    
-                          claveValor(
-                              encabezado[0].forma, '', MainAxisAlignment.center),
-    
+                          TitleText(
+                              'Condiciones de pago:', 15, TextAlign.center),
+
+                          claveValor(encabezado[0].forma, '',
+                              MainAxisAlignment.center),
+
                           const SizedBox(
                             height: 20,
                           ),
                           ListTile(
-                            title: TitleText('Descripción', 16, TextAlign.start),
+                            title:
+                                TitleText('Descripción', 16, TextAlign.start),
                             trailing: TitleText('Subtotal', 16, TextAlign.end),
                           ),
                           Listdata(encabezado[0].contenido, detalle),
@@ -525,12 +556,14 @@ class _ViewTicketState extends State<ViewTicket> {
                                         MainAxisAlignment.start),
                                     claveValor('NIT: ', encabezado[0].nitCert,
                                         MainAxisAlignment.start),
-                                    claveValor('Fecha: ', encabezado[0].fechaCert,
+                                    claveValor(
+                                        'Fecha: ',
+                                        encabezado[0].fechaCert,
                                         MainAxisAlignment.start),
                                   ],
                                 )
                               : Container(),
-    
+
                           //creditos xd
                           const SizedBox(
                             height: 15,
@@ -594,7 +627,104 @@ class _ViewTicketState extends State<ViewTicket> {
                 child: TextButton.icon(
                     style: TextButton.styleFrom(
                         backgroundColor: Color.fromARGB(255, 221, 115, 108)),
-                    onPressed: () {},
+                    onPressed: () async {
+                      showDialog(
+                        context: context,
+                        builder: (_) => const AlertDialog(
+                          backgroundColor: Color.fromARGB(255, 115, 160, 236),
+                          content: ListTile(
+                            leading:
+                                CircularProgressIndicator(color: Colors.white),
+                            title: Text(
+                              'Generando archivo...',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      );
+
+                      final print_data =
+                          Provider.of<PrintProvider>(context, listen: false);
+                      var data = await print_data.pdf_factura(widget.factura);
+                      print('fuera');
+                      print('fuera' + data.toString());
+                      if (data['message'] == 'no') {
+                        print('ya salio');
+                        Future.delayed(const Duration(milliseconds: 1500), () {
+                          Navigator.of(context, rootNavigator: true).pop();
+                        });
+                        //
+                      } else if (data['message'] == 'Ok') {
+                        ///descarga de archivos
+                        final status = await Permission.storage.request();
+                        if (status.isGranted) {
+                          showDialog(
+                            context: context,
+                            builder: (_) => const AlertDialog(
+                              backgroundColor:
+                                  Color.fromARGB(255, 225, 130, 28),
+                              content: ListTile(
+                                leading: CircularProgressIndicator(
+                                    color: Colors.white),
+                                title: Text(
+                                  'descargando...',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          );
+                          final basestorage =
+                              await getApplicationDocumentsDirectory();
+                          String url = data['link'];
+                          ALDownloader.configurePrint(
+                              enabled: true, frequentEnabled: false);
+                          ALDownloader.download(url,
+                              directoryPath: basestorage!.path,
+                              fileName: data['name'],
+                              downloaderHandlerInterface:
+                                  ALDownloaderHandlerInterface(
+                                      progressHandler: (progress) {
+                                debugPrint(
+                                    'ALDownloader | download progress = $progress, url = $url\n');
+                              }, succeededHandler: () async {
+                                debugPrint(
+                                    'ALDownloader | download succeeded, url = $url\n');
+                                Navigator.of(context, rootNavigator: true)
+                                    .pop();
+                                //print('la ruta: '+basestorage.path+'/nuevo.pdf');
+                                final String filePath =
+                                    basestorage.path + '/' + data['name'];
+                                OpenFilex.open(filePath);
+                              }, failedHandler: () {
+                                Navigator.of(context, rootNavigator: true)
+                                    .pop();
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    backgroundColor:
+                                        Color.fromARGB(255, 224, 211, 18),
+                                    content: ListTile(
+                                      leading: Icon(
+                                        Icons.warning,
+                                        color: Colors.white,
+                                      ),
+                                      title: Text(
+                                        'Fallo la descarga por favor intentalo de nuevo',
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }, pausedHandler: () {
+                                debugPrint(
+                                    'ALDownloader | download paused, url = $url\n');
+                              }));
+                        } else {
+                          print('no permision');
+                        }
+                      }
+                    },
                     icon: Icon(
                       Icons.picture_as_pdf,
                       color: Colors.white,

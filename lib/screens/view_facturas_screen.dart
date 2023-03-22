@@ -17,6 +17,7 @@ import 'package:factura_gozeri/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh_plus/pull_to_refresh_plus.dart';
 import 'package:sunmi_printer_plus/column_maker.dart';
@@ -64,9 +65,9 @@ class _ViewFacturasState extends State<ViewFacturas> {
       list_tmp.clear();
     }
     print(
-        "https://app.gozeri.com/desarrollo_flutter/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
+        "https://app.gozeri.com/versiones/v1.5.0/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/desarrollo_flutter/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
+        "https://app.gozeri.com/versiones/v1.5.0/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
 
     final resp = await http.get(uri);
     final o = json.decode(resp.body);
@@ -127,7 +128,8 @@ class _ViewFacturasState extends State<ViewFacturas> {
       if (widget.accion == 'Emitidas') {
         _printerManager.startScan(const Duration(seconds: 5));
       } else {
-        _printerManager.stopScan();
+        _printerManager.startScan(const Duration(seconds: 5));
+        //_printerManager.stopScan();
       }
     }
   }
@@ -252,10 +254,17 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                   GestureDetector(
                                     onTap: () async {
                                       if (Preferencias.sunmi_preferencia) {
-                                        await print_sunmi_comanda(context, list_tmp[index]
-                                                        .idFactTmp);                     
+                                        await print_sunmi_comanda(
+                                            context, list_tmp[index].idFactTmp);
                                       } else {
                                         print('entro');
+
+                                        await Permission.bluetooth;
+                                        final st =
+                                            await Permission.bluetoothScan;
+                                        print('el estado: ');
+                                        print(st.status);
+
                                         _printerManager.stopScan();
                                         await _printerManager.scanResults
                                             .listen((devices) async {
@@ -267,12 +276,14 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                 builder: ((context) {
                                                   if (devices.length == 0) {
                                                     return const AlertDialog(
-                                                      backgroundColor: Color.fromARGB(
-                                                          255, 236, 133, 115),
+                                                      backgroundColor:
+                                                          Color.fromARGB(255,
+                                                              236, 133, 115),
                                                       content: Text(
                                                         'No se encontraron impresoras disponibles.',
                                                         style: TextStyle(
-                                                            color: Colors.white),
+                                                            color:
+                                                                Colors.white),
                                                       ),
                                                     );
                                                   }
@@ -287,9 +298,11 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                           300.0, // Change as per your requirement
                                                       child: ListView.builder(
                                                         shrinkWrap: true,
-                                                        itemCount: devices.length,
+                                                        itemCount:
+                                                            devices.length,
                                                         itemBuilder:
-                                                            (BuildContext context,
+                                                            (BuildContext
+                                                                    context,
                                                                 int i) {
                                                           return ListTile(
                                                             title: Text(
@@ -298,33 +311,35 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                                 "${devices[i].address}"),
                                                             trailing: Row(
                                                               mainAxisSize:
-                                                                  MainAxisSize.min,
+                                                                  MainAxisSize
+                                                                      .min,
                                                               children: [
                                                                 GestureDetector(
                                                                   onTap: () {
                                                                     _printerManager
                                                                         .stopScan();
                                                                     _startPrint(
-                                                                        devices[i],
-                                                                        list_tmp[index].idFactTmp,'comanda');
+                                                                        devices[
+                                                                            i],
+                                                                        list_tmp[index]
+                                                                            .idFactTmp,
+                                                                        'comanda');
                                                                   },
-                                                                  child: Container(
-                                                                    margin:
-                                                                        const EdgeInsets
-                                                                            .all(5),
+                                                                  child:
+                                                                      Container(
+                                                                    margin: const EdgeInsets
+                                                                        .all(5),
                                                                     padding:
-                                                                        const EdgeInsets
-                                                                            .all(10),
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                            //color: Theme.of(context).primaryColor,
-                                                                            color: widget
-                                                                                .colorPrimary,
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(
-                                                                                    15)),
-                                                                    child: const Icon(
-                                                                      Icons.print,
+                                                                        const EdgeInsets.all(
+                                                                            10),
+                                                                    decoration: BoxDecoration(
+                                                                        //color: Theme.of(context).primaryColor,
+                                                                        color: widget.colorPrimary,
+                                                                        borderRadius: BorderRadius.circular(15)),
+                                                                    child:
+                                                                        const Icon(
+                                                                      Icons
+                                                                          .print,
                                                                       color: Colors
                                                                           .white,
                                                                       size: 25,
@@ -348,8 +363,10 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                               if (printer.address ==
                                                   Preferencias.mac) {
                                                 //store the element.
-                                                await _startPrint(printer, list_tmp[index]
-                                                        .idFactTmp,'comanda');
+                                                await _startPrint(
+                                                    printer,
+                                                    list_tmp[index].idFactTmp,
+                                                    'comanda');
                                               }
                                             });
                                           }
@@ -510,7 +527,8 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                                             .stopScan();
                                                                         await _startPrint(
                                                                             devices[i],
-                                                                            list_emi[index].idFactTmp,'f');
+                                                                            list_emi[index].idFactTmp,
+                                                                            'f');
                                                                       },
                                                                       child:
                                                                           Container(
@@ -555,7 +573,8 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                     await _startPrint(
                                                         printer,
                                                         list_emi[index]
-                                                            .idFactTmp,'f');
+                                                            .idFactTmp,
+                                                        'f');
                                                   }
                                                 });
                                               }
@@ -643,7 +662,8 @@ class _ViewFacturasState extends State<ViewFacturas> {
         ));
   }
 
-  Future<void> _startPrint(PrinterBluetooth printer, String id_factura, String accion) async {
+  Future<void> _startPrint(
+      PrinterBluetooth printer, String id_factura, String accion) async {
     _printerManager.selectPrinter(printer);
     showDialog(
       context: context,
@@ -656,12 +676,11 @@ class _ViewFacturasState extends State<ViewFacturas> {
       ),
     );
     final result;
-    if(accion=='f'){
-       result =
-        await _printerManager.printTicket(await testTicket(id_factura));
-    }else{
-       result =
-        await _printerManager.printTicket(await comanda_bluetho(id_factura));
+    if (accion == 'f') {
+      result = await _printerManager.printTicket(await testTicket(id_factura));
+    } else {
+      result =
+          await _printerManager.printTicket(await comanda_bluetho(id_factura));
     }
     Navigator.of(context, rootNavigator: true).pop(result);
     showDialog(
@@ -679,38 +698,41 @@ class _ViewFacturasState extends State<ViewFacturas> {
   }
 
   Future<List<int>> comanda_bluetho(String id_factura) async {
-    showDialog(
-      context: context,
-      builder: (_) => const AlertDialog(
-        backgroundColor: Color.fromARGB(255, 226, 178, 49),
-        content: ListTile(
-          leading: CircularProgressIndicator(color: Colors.white,),
-          title: Text(
-            'Imprimiendo comanda...',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      ),
-    );
+    final print_data = Provider.of<PrintProvider>(context, listen: false);
+    final js = await print_data.generate_comanda(id_factura);
     // Using default profile
     final profile = await CapabilityProfile.load();
     final generatorr = Generator(PaperSize.mm58, profile);
 
     List<int> bytess = [];
+    //espacio
+    bytess += generatorr.feed(1);
     bytess += generatorr.setGlobalCodeTable('CP1252');
+    String name = '';
+    if (js['ENCABEZADO']['NOMBRE_EMPRESA_SUCU'] != null ||
+        js['ENCABEZADO']['NOMBRE_EMPRESA_SUCU'] != '') {
+      name = js['ENCABEZADO']['NOMBRE_EMPRESA_SUCU'];
+    } else {
+      name = js['ENCABEZADO']['NOMBRE_EMPRESA'];
+    }
+
     //cliente
-    bytess += generatorr.text('Mesa No. 1',
-            styles: const PosStyles(
-                codeTable: 'CP1252',
-                align: PosAlign.center,
-                bold: true,
-                width: PosTextSize.size3));
-    
+    bytess += generatorr.text(
+        '${js['ENCABEZADO']['NOMBRE']}  ${js['ENCABEZADO']['APELLIDOS']}',
+        styles: const PosStyles(
+            codeTable: 'CP1252',
+            align: PosAlign.center,
+            bold: true,
+            width: PosTextSize.size1));
+
     //numero
-    bytess += generatorr.text('# 2132156',
-            styles: const PosStyles(
-                    width: PosTextSize.size2, bold: true, codeTable: 'CP1252')
-                .copyWith(align: PosAlign.center));
+    bytess += generatorr.text('#${js['ENCABEZADO']['NO']}',
+        styles: const PosStyles(
+                width: PosTextSize.size2,
+                height: PosTextSize.size2,
+                bold: true,
+                codeTable: 'CP1252')
+            .copyWith(align: PosAlign.center));
 
     //espacio
     bytess += generatorr.feed(1);
@@ -719,27 +741,26 @@ class _ViewFacturasState extends State<ViewFacturas> {
     bytess += generatorr.row([
       PosColumn(
         text: 'Cantidad',
-        width: 3,
-        styles: const PosStyles(align: PosAlign.center, bold: true),
+        width: 4,
+        styles: const PosStyles(align: PosAlign.left, bold: true),
       ),
       PosColumn(
         text: 'Producto',
-        width: 9,
-        styles: const PosStyles(align: PosAlign.center, bold: true),
+        width: 8,
+        styles: const PosStyles(align: PosAlign.left, bold: true),
       ),
     ]);
 
-    for (int al = 0; al < 4; al++) {
-      
+    for (int al = 0; al < js['DETALLE'].length; al++) {
       bytess += generatorr.row([
         PosColumn(
-          text: '1',
-          width: 3,
-          styles: const PosStyles(align: PosAlign.left),
+          text: '${js['DETALLE'][al]['CANTIDAD']}',
+          width: 4,
+          styles: const PosStyles(align: PosAlign.center),
         ),
         PosColumn(
-          text: 'combo campero',
-          width: 9,
+          text: '${js['DETALLE'][al]['PRODUCTO']}',
+          width: 8,
           styles: const PosStyles(align: PosAlign.left),
         ),
       ]);
@@ -749,19 +770,18 @@ class _ViewFacturasState extends State<ViewFacturas> {
     bytess += generatorr.feed(1);
     bytess += generatorr.feed(1);
 
-    bytess += generatorr.text('nombre de la empresa',
-            styles: const PosStyles(
-                    width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
-                .copyWith(align: PosAlign.center));
+    bytess += generatorr.text('${name}',
+        styles: const PosStyles(
+                width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+            .copyWith(align: PosAlign.center));
 
     bytess += generatorr.text('realizado en www.gozeri.com',
-            styles: const PosStyles(
-                    width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
-                .copyWith(align: PosAlign.center));
+        styles: const PosStyles(
+                width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+            .copyWith(align: PosAlign.center));
 
     bytess += generatorr.cut();
     return bytess;
-
   }
 
   Future<List<int>> testTicket(String id_factura) async {
@@ -1459,16 +1479,17 @@ print_sunmi(BuildContext context, String id_factura) async {
 }
 
 print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
-  /*final print_data = Provider.of<PrintProvider>(context, listen: false);
-  await print_data.dataFac(id_factura);
-  List<Encabezado> encabezado = print_data.list;
-  List<Detalle> detalle = print_data.list_detalle;*/
+  final print_data = Provider.of<PrintProvider>(context, listen: false);
+  final js = await print_data.generate_comanda(id_f_tmp);
+
   showDialog(
     context: context,
     builder: (_) => const AlertDialog(
       backgroundColor: Color.fromARGB(255, 226, 178, 49),
       content: ListTile(
-        leading: CircularProgressIndicator(color: Colors.white,),
+        leading: CircularProgressIndicator(
+          color: Colors.white,
+        ),
         title: Text(
           'Imprimiendo comanda...',
           style: TextStyle(color: Colors.white),
@@ -1476,46 +1497,29 @@ print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
       ),
     ),
   );
+  String name = '';
+  if (js['ENCABEZADO']['NOMBRE_EMPRESA_SUCU'] != null ||
+      js['ENCABEZADO']['NOMBRE_EMPRESA_SUCU'] != '') {
+    name = js['ENCABEZADO']['NOMBRE_EMPRESA_SUCU'];
+  } else {
+    name = js['ENCABEZADO']['NOMBRE_EMPRESA'];
+  }
 
   await SunmiPrinter.initPrinter();
   await SunmiPrinter.startTransactionPrint(true);
   await SunmiPrinter.lineWrap(1);
   await SunmiPrinter.lineWrap(1);
-  await SunmiPrinter.printText('Mesa No.1',
+  await SunmiPrinter.printText(
+      '${js['ENCABEZADO']['NOMBRE']}  ${js['ENCABEZADO']['APELLIDOS']}',
+      style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+          fontSize: SunmiFontSize.MD));
+  await SunmiPrinter.printText('#${js['ENCABEZADO']['NO']}',
       style: SunmiStyle(
           bold: false,
           align: SunmiPrintAlign.CENTER,
           fontSize: SunmiFontSize.XL));
-  await SunmiPrinter.printText('Factura No.125',
-      style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.CENTER,
-          fontSize: SunmiFontSize.XL));
-
-  //DETALLES
-  /*for (int al = 0; al < detalle.length; al++) {
-    double tota =
-        double.parse(detalle[al].cantidad) * double.parse(detalle[al].precio);
-    await SunmiPrinter.printRow(cols: [
-      ColumnMaker(
-          text: '${detalle[al].producto}',
-          width: 24,
-          align: SunmiPrintAlign.LEFT),
-      ColumnMaker(text: '', width: 6, align: SunmiPrintAlign.CENTER),
-    ]);
-
-    await SunmiPrinter.printRow(cols: [
-      ColumnMaker(
-          text:
-              '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
-          width: 20,
-          align: SunmiPrintAlign.LEFT),
-      ColumnMaker(
-          text: '${detalle[al].contenido}${tota}',
-          width: 10,
-          align: SunmiPrintAlign.RIGHT),
-    ]);
-  }*/
   //DETALLES
   //for (int al = 0; al < detalle.length; al++) {
   await SunmiPrinter.line();
@@ -1523,25 +1527,27 @@ print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
     ColumnMaker(text: 'Cantidad', width: 15, align: SunmiPrintAlign.LEFT),
     ColumnMaker(text: 'Producto', width: 20, align: SunmiPrintAlign.LEFT),
   ]);
+
   await SunmiPrinter.line();
-  await SunmiPrinter.printRow(cols: [
-    ColumnMaker(text: '20', width: 6, align: SunmiPrintAlign.CENTER),
-    ColumnMaker(text: 'Hamburguesa', width: 24, align: SunmiPrintAlign.LEFT),
-  ]);
-  await SunmiPrinter.printRow(cols: [
-    ColumnMaker(text: '5', width: 6, align: SunmiPrintAlign.CENTER),
-    ColumnMaker(
-        text: 'Helados de fresa', width: 24, align: SunmiPrintAlign.LEFT),
-  ]);
-  //}
+  for (int al = 0; al < js['DETALLE'].length; al++) {
+    await SunmiPrinter.printRow(cols: [
+      ColumnMaker(
+          text: '${js['DETALLE'][al]['CANTIDAD']}',
+          width: 6,
+          align: SunmiPrintAlign.CENTER),
+      ColumnMaker(
+          text: '${js['DETALLE'][al]['PRODUCTO']}',
+          width: 24,
+          align: SunmiPrintAlign.LEFT),
+    ]);
+  }
 
   await SunmiPrinter.lineWrap(1);
-  await SunmiPrinter.lineWrap(1);
-  await SunmiPrinter.printText('nombre de la empresa',
-    style: SunmiStyle(
-      bold: false,
-      align: SunmiPrintAlign.CENTER,
-    ));
+  await SunmiPrinter.printText('${name}',
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.CENTER,
+      ));
   await SunmiPrinter.printText('Realizado en www.gozeri.com',
       style: SunmiStyle(
         bold: false,
