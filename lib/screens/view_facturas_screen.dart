@@ -125,12 +125,16 @@ class _ViewFacturasState extends State<ViewFacturas> {
         });
       });
     } else {
+      /*Permission.bluetoothConnect.request();
+      Permission.bluetoothScan.request();
+      Permission.locationWhenInUse.request();
+
       if (widget.accion == 'Emitidas') {
         _printerManager.startScan(const Duration(seconds: 5));
       } else {
         _printerManager.startScan(const Duration(seconds: 5));
         //_printerManager.stopScan();
-      }
+      }*/
     }
   }
 
@@ -264,7 +268,14 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                             await Permission.bluetoothScan;
                                         print('el estado: ');
                                         print(st.status);*/
-
+                                        await Permission.bluetoothConnect
+                                            .request();
+                                        await Permission.bluetoothScan
+                                            .request();
+                                        await Permission.locationWhenInUse
+                                            .request();
+                                        _printerManager
+                                            .startScan(Duration(seconds: 2));
                                         _printerManager.stopScan();
                                         await _printerManager.scanResults
                                             .listen((devices) async {
@@ -315,7 +326,20 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                                       .min,
                                                               children: [
                                                                 GestureDetector(
-                                                                  onTap: () {
+                                                                  onTap:
+                                                                      () async {
+                                                                    await Permission
+                                                                        .bluetoothConnect
+                                                                        .request();
+                                                                    await Permission
+                                                                        .bluetoothScan
+                                                                        .request();
+                                                                    await Permission
+                                                                        .locationWhenInUse
+                                                                        .request();
+                                                                    _printerManager.startScan(Duration(
+                                                                        seconds:
+                                                                            2));
                                                                     _printerManager
                                                                         .stopScan();
                                                                     _startPrint(
@@ -523,6 +547,18 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                                     GestureDetector(
                                                                       onTap:
                                                                           () async {
+                                                                        await Permission
+                                                                            .bluetoothConnect
+                                                                            .request();
+                                                                        await Permission
+                                                                            .bluetoothScan
+                                                                            .request();
+                                                                        await Permission
+                                                                            .locationWhenInUse
+                                                                            .request();
+                                                                        _printerManager.startScan(Duration(
+                                                                            seconds:
+                                                                                5));
                                                                         _printerManager
                                                                             .stopScan();
                                                                         await _startPrint(

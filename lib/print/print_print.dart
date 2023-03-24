@@ -21,6 +21,7 @@ import 'package:factura_gozeri/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -129,7 +130,10 @@ class _PrintScreenState extends State<PrintScreen> {
         });
       });
     } else {
-      _printerManager.startScan(Duration(seconds: 2));
+      Permission.bluetoothConnect.request();
+      Permission.bluetoothScan.request();
+      Permission.locationWhenInUse.request();
+      _printerManager.startScan(Duration(seconds: 5));
     }
 
     super.initState();
@@ -679,6 +683,11 @@ class _PrintScreenState extends State<PrintScreen> {
                                       (Route<dynamic> route) => false);
                                 } else {
                                   print('entro');
+                                  await Permission.bluetoothConnect.request();
+                                  await Permission.bluetoothScan.request();
+                                  await Permission.locationWhenInUse.request();
+                                  _printerManager
+                                      .startScan(Duration(seconds: 5));
                                   _printerManager.stopScan();
                                   await _printerManager.scanResults
                                       .listen((devices) async {
@@ -724,7 +733,21 @@ class _PrintScreenState extends State<PrintScreen> {
                                                             MainAxisSize.min,
                                                         children: [
                                                           GestureDetector(
-                                                            onTap: () {
+                                                            onTap: () async {
+                                                              await Permission
+                                                                  .bluetoothConnect
+                                                                  .request();
+                                                              await Permission
+                                                                  .bluetoothScan
+                                                                  .request();
+                                                              await Permission
+                                                                  .locationWhenInUse
+                                                                  .request();
+                                                              _printerManager
+                                                                  .startScan(
+                                                                      Duration(
+                                                                          seconds:
+                                                                              5));
                                                               _printerManager
                                                                   .stopScan();
                                                               _startPrint(
@@ -825,6 +848,10 @@ class _PrintScreenState extends State<PrintScreen> {
                             await print_sunmi_comanda(context, widget.id_tmp);
                           } else {
                             print('entro');
+                            await Permission.bluetoothConnect.request();
+                            await Permission.bluetoothScan.request();
+                            await Permission.locationWhenInUse.request();
+                            _printerManager.startScan(Duration(seconds: 5));
                             _printerManager.stopScan();
                             await _printerManager.scanResults
                                 .listen((devices) async {

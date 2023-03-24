@@ -7,8 +7,10 @@ import 'package:factura_gozeri/models/view_factura_print.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/widgets/registro_metodoPago_listas_widget.dart';
+import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'dart:io' show Platform;
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -37,6 +39,7 @@ class ViewTicket extends StatefulWidget {
 
 class _ViewTicketState extends State<ViewTicket> {
   PrinterBluetoothManager _printerManager = PrinterBluetoothManager();
+  BluetoothManager bluetoothManager = BluetoothManager.instance;
 
   //SUNMIN
   bool printBinded = false;
@@ -46,9 +49,11 @@ class _ViewTicketState extends State<ViewTicket> {
   String estado = '';
   //SUNMIN
 
+  List<PrinterBluetooth> _devices = [];
+  String _devicesMsg = "";
+
   @override
   void initState() {
-    super.initState();
     estado = widget.estado;
     // TODO: implement initState
     if (Preferencias.sunmi_preferencia) {
@@ -76,8 +81,103 @@ class _ViewTicketState extends State<ViewTicket> {
         });
       });
     } else {
-      _printerManager.startScan(const Duration(seconds: 2));
+      /*bluetoothManager.state.listen((val) {
+        print('state = $val');
+        if (val == 12) {
+          print('on');
+          //bt_initPrinter();
+        } else if (val == 10) {
+          print('off');
+          showDialog(
+            context: context,
+            builder: (_) => const AlertDialog(
+              backgroundColor: Color.fromARGB(255, 224, 140, 31),
+              content: Text(
+                'Bluetooth sin Conexión',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          );
+          setState(() => _devicesMsg = 'Bluetooth sin Conexión');
+        }
+      });*/
+      /*Permission.bluetoothConnect.request();
+      Permission.bluetoothScan.request();
+      Permission.locationWhenInUse.request();
+      _printerManager.startScan(const Duration(seconds: 2));*/
     }
+    super.initState();
+  }
+
+  void bt_initPrinter() async {
+    _printerManager.stopScan();
+    await Permission.bluetoothConnect.request();
+    await Permission.bluetoothScan.request();
+    await Permission.locationWhenInUse.request();
+    _printerManager.startScan(Duration(seconds: 4));
+    Future.delayed(Duration(seconds: 2), () {});
+    _printerManager.scanResults.listen((devices) async {
+      showDialog(
+          context: context,
+          builder: ((context) {
+            if (devices.length == 0) {
+              return const AlertDialog(
+                backgroundColor: Color.fromARGB(255, 236, 133, 115),
+                content: Text(
+                  'No se encontraron impresoras disponibles.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
+            } else {
+              return AlertDialog(
+                title: const Text('Impresoras Disponibles'),
+                content: Container(
+                  height: 300.0, // Change as per your requirement
+                  width: 300.0, // Change as per your requirement
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: devices.length,
+                    itemBuilder: (BuildContext context, int i) {
+                      return ListTile(
+                        title: Text("${devices[i].name}"),
+                        subtitle: Text("${devices[i].address}"),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                /*_startPrint(
+                                devices[
+                                    i],
+                                list_tmp[index]
+                                    .idFactTmp,
+                                'comanda');*/
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.all(5),
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                    //color: Theme.of(context).primaryColor,
+                                    color: widget.colorPrimary,
+                                    borderRadius: BorderRadius.circular(15)),
+                                child: const Icon(
+                                  Icons.print,
+                                  color: Colors.white,
+                                  size: 25,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        onTap: () {},
+                      );
+                    },
+                  ),
+                ),
+              );
+            }
+          }));
+    });
   }
 
   @override
@@ -98,6 +198,8 @@ class _ViewTicketState extends State<ViewTicket> {
   @override
   Widget build(BuildContext context) {
     final facturaService = Provider.of<Facturacion>(context, listen: false);
+    print('los devis');
+    print(_devices.length);
     return WillPopScope(
       onWillPop: () async {
         Navigator.of(context).pop();
@@ -743,15 +845,50 @@ class _ViewTicketState extends State<ViewTicket> {
             color: const Color.fromRGBO(246, 243, 244, 1),
             width: MediaQuery.of(context).size.width * 1,
             child: TextButton.icon(
-              onPressed: () {
-                //codigo de impresion
+              onPressed: () async {
                 if (Preferencias.sunmi_preferencia) {
+                  print_sunmi(context, widget.factura);
+                } else {
+                  if (Preferencias.sunmi_preferencia) {
+                    print_sunmi(context, widget.factura);
+                  } else {
+                    if (Platform.isAndroid) {
+                      bluetoothManager.state.listen((val) {
+                        print('state = $val');
+                        if (val == 12) {
+                          print('on');
+                          //escaneo
+                          bt_initPrinter();
+                          //escaneo
+                        } else if (val == 10) {
+                          print('off');
+                          showDialog(
+                            context: context,
+                            builder: (_) => const AlertDialog(
+                              backgroundColor:
+                                  Color.fromARGB(255, 224, 140, 31),
+                              content: Text(
+                                'Bluetooth sin Conexión',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          );
+                          setState(
+                              () => _devicesMsg = 'Bluetooth sin Conexión');
+                        }
+                      });
+                    } else {}
+                  }
+                }
+                //codigo de impresion
+                /*if (Preferencias.sunmi_preferencia) {
                   print_sunmi(context, widget.factura);
                 } else {
                   _printerManager.scanResults.listen((devices) async {
                     print(devices);
 
                     if (Preferencias.mac == '') {
+
                       showDialog(
                           context: context,
                           builder: ((context) {
@@ -782,8 +919,9 @@ class _ViewTicketState extends State<ViewTicket> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           GestureDetector(
-                                            onTap: () {
+                                            onTap: () async {
                                               _printerManager.stopScan();
+
                                               _startPrint(
                                                   devices[i], widget.factura);
                                             },
@@ -825,7 +963,7 @@ class _ViewTicketState extends State<ViewTicket> {
                       });
                     }
                   });
-                }
+                }*/
                 //codigo de impresion
               },
               style: TextButton.styleFrom(
