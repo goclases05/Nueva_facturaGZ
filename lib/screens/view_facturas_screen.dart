@@ -259,11 +259,11 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                       } else {
                                         print('entro');
 
-                                        await Permission.bluetooth;
+                                        /*await Permission.bluetooth;
                                         final st =
                                             await Permission.bluetoothScan;
                                         print('el estado: ');
-                                        print(st.status);
+                                        print(st.status);*/
 
                                         _printerManager.stopScan();
                                         await _printerManager.scanResults
