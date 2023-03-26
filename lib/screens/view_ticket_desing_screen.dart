@@ -5,6 +5,7 @@ import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/models/view_factura_print.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
+import 'package:factura_gozeri/providers/impresoras_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/widgets/registro_metodoPago_listas_widget.dart';
 import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
@@ -49,7 +50,7 @@ class _ViewTicketState extends State<ViewTicket> {
   String estado = '';
   //SUNMIN
 
-  List<PrinterBluetooth> _devices = [];
+  
   String _devicesMsg = "";
 
   @override
@@ -114,9 +115,230 @@ class _ViewTicketState extends State<ViewTicket> {
     await Permission.bluetoothConnect.request();
     await Permission.bluetoothScan.request();
     await Permission.locationWhenInUse.request();
-    _printerManager.startScan(Duration(seconds: 4));
-    Future.delayed(Duration(seconds: 2), () {});
-    _printerManager.scanResults.listen((devices) async {
+    _printerManager.startScan(Duration(seconds: 2));
+    print('escaneando');
+
+    showDialog(
+      context: context,
+      builder: (_) => const AlertDialog(
+        backgroundColor: Color.fromARGB(255, 243, 231, 155),
+        content: ListTile(
+          leading: CircularProgressIndicator(color: Colors.white,),
+          title: Text(
+            'Escaneando dispositivos de impresión',
+            style: TextStyle(color: Colors.white,fontSize: 15),
+          ),
+        ),
+      ),
+    );
+    
+    Future.delayed(Duration(seconds: 3),(){
+      Navigator.of(context).pop();
+      print('termino');
+      _printerManager.stopScan();
+
+      if(Preferencias.mac!=''){
+        _printerManager.scanResults.listen((event) { 
+          
+          print("preferencia impresora");
+          print(Preferencias.mac);
+          int u=0;
+          //existe una impresora predeterminada
+          for(var y=0;y<event.length;y++){
+            if (event[y].address == Preferencias.mac) {
+              //store the element.
+              print('esta es');
+              _startPrint(event[y], widget.factura);
+            }
+          }
+        });
+      }else{
+        showDialog(
+          context: context,
+          builder: ((context) {
+
+            return Consumer<ImpresorasProvider>(
+              builder: (context, impresoras, child) {
+                 _printerManager.scanResults.listen((devices)async {
+                    impresoras.impresoras_disponibles(devices);
+                 });
+
+                 /*impresoras.devices.forEach((printer) async {
+                    print('impresora');
+                    print(printer);
+                    //get saved printer
+                    if (printer.address == Preferencias.mac) {
+                      //store the element.
+                      print('esta es');
+                      //return await _startPrint(printer, widget.factura);
+                    }else{
+                      print('no es');
+                      Preferencias.mac ='';
+                    }
+                  });*/
+
+                if(Preferencias.mac != ''){
+                  print("preferencia impresora");
+                  print(Preferencias.mac);
+                  int u=0;
+                  //existe una impresora predeterminada
+                  for(var y=0;y<impresoras.devices.length;y++){
+                    if (impresoras.devices[y].address == Preferencias.mac) {
+                      //store the element.
+                      print('esta es');
+                      _startPrint(impresoras.devices[y], widget.factura);
+                    }
+                  }
+        
+                  print('salio de ciclo');
+                  if(u==0){
+                    return AlertDialog(
+                        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                        content: Text('impresión realizada'));
+                  }else{
+                    return AlertDialog(
+                        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                        content: Text('error'));
+                  }
+                  
+                    
+
+                }else{
+                  //no existe predeterminada
+                  return AlertDialog(
+                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Impresoras',
+                          style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                        (impresoras.devices.length==0)?
+                        Text(
+                          'No se encuentran Impresoras disponibles',
+                          style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ):
+                        Container(
+                          height: 300.0, // Change as per your requirement
+                          width: 300.0,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: impresoras.devices.length,
+                            itemBuilder: (BuildContext context, int i) {
+                              return ListTile(
+                                title: Text("${impresoras.devices[i].name}"),
+                                subtitle: Text("${impresoras.devices[i].address}"),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        _startPrint(impresoras.devices[i],widget.factura);
+                                      },
+                                      child: Container(
+                                        margin: const EdgeInsets.all(5),
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                            //color: Theme.of(context).primaryColor,
+                                            color: widget.colorPrimary,
+                                            borderRadius: BorderRadius.circular(15)),
+                                        child: const Icon(
+                                          Icons.print,
+                                          color: Colors.white,
+                                          size: 25,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                onTap: () {},
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              });
+          }));
+
+      }
+
+      
+    });
+
+    /*showDialog(
+          context: context,
+          builder: ((context) {
+            return Consumer<ImpresorasProvider>(
+              builder: (context, impresoras, child) {
+                 _printerManager.scanResults.listen((devices)async {
+                    impresoras.impresoras_disponibles(devices);
+                 });
+
+                if(Preferencias.mac == ''){
+                  //existe una impresora predeterminada
+                  if(_printerManager.isScanningStream==true){
+                    
+                  }
+
+                }else{
+                  //no existe predeterminada
+                  return AlertDialog(
+                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Impresoras',
+                          style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  );
+                }*/
+                
+
+              /*if(_printerManager.isScanningStream==true){
+                  return const AlertDialog(
+                    backgroundColor: Color.fromARGB(255, 236, 133, 115),
+                    content: Text(
+                      'No se encontraron impresoras disponibles.',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }else if (impresoras.devices.length == 0) {
+                    return const AlertDialog(
+                      backgroundColor: Color.fromARGB(255, 236, 133, 115),
+                      content: Text(
+                        'No se encontraron impresoras disponibles.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                } else {
+                    return const AlertDialog(
+                      backgroundColor: Color.fromARGB(255, 236, 133, 115),
+                      content: Text(
+                        'si hay',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                }*/
+              
+            //});
+         /* })
+    );*/
+
+    
+    
+    
+    
+    /*_printerManager.scanResults.listen((devices) async {
       showDialog(
           context: context,
           builder: ((context) {
@@ -177,7 +399,7 @@ class _ViewTicketState extends State<ViewTicket> {
               );
             }
           }));
-    });
+    });*/
   }
 
   @override
@@ -199,7 +421,6 @@ class _ViewTicketState extends State<ViewTicket> {
   Widget build(BuildContext context) {
     final facturaService = Provider.of<Facturacion>(context, listen: false);
     print('los devis');
-    print(_devices.length);
     return WillPopScope(
       onWillPop: () async {
         Navigator.of(context).pop();
@@ -873,8 +1094,7 @@ class _ViewTicketState extends State<ViewTicket> {
                               ),
                             ),
                           );
-                          setState(
-                              () => _devicesMsg = 'Bluetooth sin Conexión');
+                          
                         }
                       });
                     } else {}

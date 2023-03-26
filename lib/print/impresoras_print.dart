@@ -52,6 +52,33 @@ class _ImpresorasPrint extends State<ImpresorasPrint> {
         foregroundColor: Colors.cyan,
         title: const Text('Lista de Impresoras',
             style: TextStyle(fontSize: 18, color: Colors.cyan)),
+        actions: [
+          TextButton.icon(
+            style:TextButton.styleFrom(
+              primary: Colors.white,
+              backgroundColor: Colors.redAccent,
+              padding: EdgeInsets.symmetric(horizontal: 5)
+            ),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => const AlertDialog(
+                  backgroundColor: Color.fromARGB(255, 115, 160, 236),
+                  content: Text(
+                    'Se realizo el cambio',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              );
+              setState(() {
+                Preferencias.mac='';
+              });
+            },
+            icon: Icon(Icons.refresh),
+            label: Text('restablecer'),
+          ),
+          //SizedBox(width: 10,),
+        ],
       ),
       body: _devices.isEmpty
           ? Container(

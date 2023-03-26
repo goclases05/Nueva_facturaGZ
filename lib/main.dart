@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:factura_gozeri/providers/carshop_provider.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
+import 'package:factura_gozeri/providers/impresoras_provider.dart';
 import 'package:factura_gozeri/providers/items_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/providers/reportes_provider.dart';
@@ -51,6 +52,7 @@ class AppState extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => settingsProvider()),
         ChangeNotifierProvider(create: (_) => PrintProvider()),
         ChangeNotifierProvider(create: (_) => ReporteProvider()),
+        ChangeNotifierProvider(create: (_) => ImpresorasProvider()),
         ChangeNotifierProvider(
           create: (context) => Facturacion(),
         )
