@@ -15,9 +15,9 @@ class PrintProvider extends ChangeNotifier {
     final empresa = Preferencias.data_empresa;
     final id_usuario = Preferencias.data_id;
     print(
-        "https://admin.gozeri.com/app_facturacion/pdf_facturas.php?id_f=${id_f}");
+        "https://admin.gozeri.com/app_facturacion/pdf_facturas.php?id_f=${id_f}&empresa=${empresa}");
     final Uri uri = Uri.parse(
-        "https://admin.gozeri.com/app_facturacion/pdf_facturas.php?id_f=${id_f}");
+        "https://admin.gozeri.com/app_facturacion/pdf_facturas.php?id_f=${id_f}&empresa=${empresa}");
 
     final resp = await http.get(uri);
     print('el dato');
