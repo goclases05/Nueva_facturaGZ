@@ -9,10 +9,12 @@ import 'package:factura_gozeri/models/data_facturas_models.dart';
 import 'package:factura_gozeri/models/view_factura_print.dart';
 import 'package:factura_gozeri/print/print_print.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
+import 'package:factura_gozeri/providers/impresoras_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/screens/view_ticket_desing_screen.dart';
 import 'package:factura_gozeri/services/departamentos_services.dart';
 import 'package:factura_gozeri/widgets/registro_metodoPago_listas_widget.dart';
+import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
 import 'package:factura_gozeri/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,6 +39,7 @@ class ViewFacturas extends StatefulWidget {
 
 class _ViewFacturasState extends State<ViewFacturas> {
   PrinterBluetoothManager _printerManager = PrinterBluetoothManager();
+  BluetoothManager bluetoothManager = BluetoothManager.instance;
 
   List<DataFacturas> list_tmp = [];
   List<DataFacturas> list_emi = [];
@@ -50,6 +53,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
   String serialNumber = "";
   String printerVersion = "";
   //SUNMIN
+  bool state_bluetooth=false;
 
   Future<bool> getCursosData({bool isRefresh = false}) async {
     // Read all values
@@ -100,6 +104,25 @@ class _ViewFacturasState extends State<ViewFacturas> {
   @override
   void initState() {
     super.initState();
+
+    //estado del bluetooth
+    bluetoothManager.state.listen((val) {
+      print('state = $val');
+      if (val == 12) {
+        print('on');
+        //escaneo
+        setState(() {
+          state_bluetooth=true;
+        });
+        //escaneo
+      } else if (val == 10) {
+        setState(() {
+          state_bluetooth=false;
+        });
+      }
+    });
+    //estado del bluetooth
+
     if (Preferencias.sunmi_preferencia) {
       _bindingPrinter().then((bool? isBind) async {
         SunmiPrinter.paperSize().then((int size) {
@@ -124,17 +147,6 @@ class _ViewFacturasState extends State<ViewFacturas> {
           printBinded = isBind!;
         });
       });
-    } else {
-      /*Permission.bluetoothConnect.request();
-      Permission.bluetoothScan.request();
-      Permission.locationWhenInUse.request();
-
-      if (widget.accion == 'Emitidas') {
-        _printerManager.startScan(const Duration(seconds: 5));
-      } else {
-        _printerManager.startScan(const Duration(seconds: 5));
-        //_printerManager.stopScan();
-      }*/
     }
   }
 
@@ -142,6 +154,153 @@ class _ViewFacturasState extends State<ViewFacturas> {
   Future<bool?> _bindingPrinter() async {
     final bool? result = await SunmiPrinter.bindingPrinter();
     return result;
+  }
+
+  void bt_initPrinter(String accion, String id_f) async {
+    _printerManager.stopScan();
+    await Permission.bluetoothConnect.request();
+    await Permission.bluetoothScan.request();
+    await Permission.locationWhenInUse.request();
+    _printerManager.startScan(Duration(seconds: 2));
+    print('escaneando');
+
+    showDialog(
+      context: context,
+      builder: (_) => const AlertDialog(
+        backgroundColor: Color.fromARGB(255, 243, 231, 155),
+        content: ListTile(
+          leading: CircularProgressIndicator(color: Colors.white,),
+          title: Text(
+            'Escaneando dispositivos de impresión',
+            style: TextStyle(color: Colors.white,fontSize: 15),
+          ),
+        ),
+      ),
+    );
+    
+    Future.delayed(Duration(seconds: 3),(){
+      Navigator.of(context).pop();
+      print('termino');
+      _printerManager.stopScan();
+
+      if(Preferencias.mac!=''){
+        //impresora predeterminada 
+        _printerManager.scanResults.listen((event) { 
+          
+          print("preferencia impresora");
+          print(Preferencias.mac);
+          int u=0;
+          //existe una impresora predeterminada
+          for(var y=0;y<event.length;y++){
+            if (event[y].address == Preferencias.mac) {
+              //store the element.
+              print('esta es');
+               _startPrint(event[y],id_f,accion);
+            }
+          }
+        });
+      }else{
+        //lista de impresoras
+        showDialog(
+          context: context,
+          builder: ((context) {
+
+            return Consumer<ImpresorasProvider>(
+              builder: (context, impresoras, child) {
+                 _printerManager.scanResults.listen((devices)async {
+                    impresoras.impresoras_disponibles(devices);
+                 });
+
+                if(Preferencias.mac != ''){
+                  print("preferencia impresora");
+                  print(Preferencias.mac);
+                  int u=0;
+                  //existe una impresora predeterminada
+                  for(var y=0;y<impresoras.devices.length;y++){
+                    if (impresoras.devices[y].address == Preferencias.mac) {
+                      //store the element.
+                      print('esta es');
+                      _startPrint(impresoras.devices[y],id_f,accion);
+                    }
+                  }
+        
+                  print('salio de ciclo');
+                  if(u==0){
+                    return AlertDialog(
+                        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                        content: Text('impresión realizada'));
+                  }else{
+                    return AlertDialog(
+                        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                        content: Text('error'));
+                  }
+                  
+                    
+
+                }else{
+                  //no existe predeterminada
+                  return AlertDialog(
+                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Impresoras',
+                          style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                        (impresoras.devices.length==0)?
+                        Text(
+                          'No se encuentran Impresoras disponibles',
+                          style: TextStyle(color: Colors.black,fontSize: 15,),
+                          textAlign: TextAlign.center,
+                        ):
+                        Container(
+                          height: 300.0, // Change as per your requirement
+                          width: 300.0,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: impresoras.devices.length,
+                            itemBuilder: (BuildContext context, int i) {
+                              return ListTile(
+                                title: Text("${impresoras.devices[i].name}"),
+                                subtitle: Text("${impresoras.devices[i].address}"),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        _startPrint(impresoras.devices[i],id_f,accion);
+                                      },
+                                      child: Container(
+                                        margin: const EdgeInsets.all(5),
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                            //color: Theme.of(context).primaryColor,
+                                            color: widget.colorPrimary,
+                                            borderRadius: BorderRadius.circular(15)),
+                                        child: const Icon(
+                                          Icons.print,
+                                          color: Colors.white,
+                                          size: 25,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                onTap: () {},
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              });
+          }));
+      }
+    });
   }
 
   @override
@@ -261,141 +420,26 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                         await print_sunmi_comanda(
                                             context, list_tmp[index].idFactTmp);
                                       } else {
-                                        print('entro');
-
-                                        /*await Permission.bluetooth;
-                                        final st =
-                                            await Permission.bluetoothScan;
-                                        print('el estado: ');
-                                        print(st.status);*/
-                                        await Permission.bluetoothConnect
-                                            .request();
-                                        await Permission.bluetoothScan
-                                            .request();
-                                        await Permission.locationWhenInUse
-                                            .request();
-                                        _printerManager
-                                            .startScan(Duration(seconds: 2));
-                                        _printerManager.stopScan();
-                                        await _printerManager.scanResults
-                                            .listen((devices) async {
-                                          print(devices);
-
-                                          if (Preferencias.mac == '') {
-                                            showDialog(
-                                                context: context,
-                                                builder: ((context) {
-                                                  if (devices.length == 0) {
-                                                    return const AlertDialog(
-                                                      backgroundColor:
-                                                          Color.fromARGB(255,
-                                                              236, 133, 115),
-                                                      content: Text(
-                                                        'No se encontraron impresoras disponibles.',
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                    );
-                                                  }
-
-                                                  return AlertDialog(
-                                                    title: const Text(
-                                                        'Impresoras Disponibles'),
-                                                    content: Container(
-                                                      height:
-                                                          300.0, // Change as per your requirement
-                                                      width:
-                                                          300.0, // Change as per your requirement
-                                                      child: ListView.builder(
-                                                        shrinkWrap: true,
-                                                        itemCount:
-                                                            devices.length,
-                                                        itemBuilder:
-                                                            (BuildContext
-                                                                    context,
-                                                                int i) {
-                                                          return ListTile(
-                                                            title: Text(
-                                                                "${devices[i].name}"),
-                                                            subtitle: Text(
-                                                                "${devices[i].address}"),
-                                                            trailing: Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              children: [
-                                                                GestureDetector(
-                                                                  onTap:
-                                                                      () async {
-                                                                    await Permission
-                                                                        .bluetoothConnect
-                                                                        .request();
-                                                                    await Permission
-                                                                        .bluetoothScan
-                                                                        .request();
-                                                                    await Permission
-                                                                        .locationWhenInUse
-                                                                        .request();
-                                                                    _printerManager.startScan(Duration(
-                                                                        seconds:
-                                                                            2));
-                                                                    _printerManager
-                                                                        .stopScan();
-                                                                    _startPrint(
-                                                                        devices[
-                                                                            i],
-                                                                        list_tmp[index]
-                                                                            .idFactTmp,
-                                                                        'comanda');
-                                                                  },
-                                                                  child:
-                                                                      Container(
-                                                                    margin: const EdgeInsets
-                                                                        .all(5),
-                                                                    padding:
-                                                                        const EdgeInsets.all(
-                                                                            10),
-                                                                    decoration: BoxDecoration(
-                                                                        //color: Theme.of(context).primaryColor,
-                                                                        color: widget.colorPrimary,
-                                                                        borderRadius: BorderRadius.circular(15)),
-                                                                    child:
-                                                                        const Icon(
-                                                                      Icons
-                                                                          .print,
-                                                                      color: Colors
-                                                                          .white,
-                                                                      size: 25,
-                                                                    ),
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                            onTap: () {},
-                                                          );
-                                                        },
-                                                      ),
-                                                    ),
-                                                  );
-                                                }));
-                                          } else {
-                                            //impresion en predeterminada
-                                            devices.forEach((printer) async {
-                                              print(printer);
-                                              //get saved printer
-                                              if (printer.address ==
-                                                  Preferencias.mac) {
-                                                //store the element.
-                                                await _startPrint(
-                                                    printer,
-                                                    list_tmp[index].idFactTmp,
-                                                    'comanda');
-                                              }
-                                            });
-                                          }
-                                        });
-                                        print('salio');
+                                        //PRINT NO SUNMIN
+                                        if(state_bluetooth==true){
+                                          //escaneo
+                                          bt_initPrinter('comanda',list_tmp[index].idFactTmp);
+                                          //escaneo
+                                        }else{
+                                          print('off');
+                                          showDialog(
+                                            context: context,
+                                            builder: (_) => const AlertDialog(
+                                              backgroundColor:
+                                                  Color.fromARGB(255, 224, 140, 31),
+                                              content: Text(
+                                                'Bluetooth sin Conexión',
+                                                style: TextStyle(color: Colors.white),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                        //PRINT NO SUNMIN
                                       }
                                     },
                                     child: Container(
@@ -491,131 +535,24 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                 list_emi[index].idFactTmp);
                                           } else {
                                             //PRINT NO SUNMIN
-
-                                            _printerManager.scanResults
-                                                .listen((devices) async {
-                                              print(devices);
-
-                                              if (Preferencias.mac == '') {
-                                                showDialog(
-                                                    context: context,
-                                                    builder: ((context) {
-                                                      if (devices.length == 0) {
-                                                        return const AlertDialog(
-                                                          backgroundColor:
-                                                              Color.fromARGB(
-                                                                  255,
-                                                                  236,
-                                                                  133,
-                                                                  115),
-                                                          content: Text(
-                                                            'No se encontraron impresoras disponibles.',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white),
-                                                          ),
-                                                        );
-                                                      }
-
-                                                      return AlertDialog(
-                                                        title: const Text(
-                                                            'Impresoras Disponibles'),
-                                                        content: Container(
-                                                          height:
-                                                              300.0, // Change as per your requirement
-                                                          width:
-                                                              300.0, // Change as per your requirement
-                                                          child:
-                                                              ListView.builder(
-                                                            shrinkWrap: true,
-                                                            itemCount:
-                                                                devices.length,
-                                                            itemBuilder:
-                                                                (BuildContext
-                                                                        context,
-                                                                    int i) {
-                                                              return ListTile(
-                                                                title: Text(
-                                                                    "${devices[i].name}"),
-                                                                subtitle: Text(
-                                                                    "${devices[i].address}"),
-                                                                trailing: Row(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .min,
-                                                                  children: [
-                                                                    GestureDetector(
-                                                                      onTap:
-                                                                          () async {
-                                                                        await Permission
-                                                                            .bluetoothConnect
-                                                                            .request();
-                                                                        await Permission
-                                                                            .bluetoothScan
-                                                                            .request();
-                                                                        await Permission
-                                                                            .locationWhenInUse
-                                                                            .request();
-                                                                        _printerManager.startScan(Duration(
-                                                                            seconds:
-                                                                                5));
-                                                                        _printerManager
-                                                                            .stopScan();
-                                                                        await _startPrint(
-                                                                            devices[i],
-                                                                            list_emi[index].idFactTmp,
-                                                                            'f');
-                                                                      },
-                                                                      child:
-                                                                          Container(
-                                                                        margin:
-                                                                            const EdgeInsets.all(5),
-                                                                        padding:
-                                                                            const EdgeInsets.all(10),
-                                                                        decoration: BoxDecoration(
-                                                                            //color: Theme.of(context).primaryColor,
-                                                                            color: widget.colorPrimary,
-                                                                            borderRadius: BorderRadius.circular(15)),
-                                                                        child:
-                                                                            const Icon(
-                                                                          Icons
-                                                                              .print,
-                                                                          color:
-                                                                              Colors.white,
-                                                                          size:
-                                                                              25,
-                                                                        ),
-                                                                      ),
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                                onTap: () {},
-                                                              );
-                                                            },
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }));
-                                              } else {
-                                                //impresion en predeterminada
-
-                                                devices
-                                                    .forEach((printer) async {
-                                                  print(printer);
-                                                  //get saved printer
-                                                  if (printer.address ==
-                                                      Preferencias.mac) {
-                                                    //store the element.
-                                                    await _startPrint(
-                                                        printer,
-                                                        list_emi[index]
-                                                            .idFactTmp,
-                                                        'f');
-                                                  }
-                                                });
-                                              }
-                                            });
-
+                                            if(state_bluetooth==true){
+                                              //escaneo
+                                              bt_initPrinter('f',list_emi[index].idFactTmp);
+                                              //escaneo
+                                            }else{
+                                              print('off');
+                                              showDialog(
+                                                context: context,
+                                                builder: (_) => const AlertDialog(
+                                                  backgroundColor:
+                                                      Color.fromARGB(255, 224, 140, 31),
+                                                  content: Text(
+                                                    'Bluetooth sin Conexión',
+                                                    style: TextStyle(color: Colors.white),
+                                                  ),
+                                                ),
+                                              );
+                                            }
                                             //PRINT NO SUNMIN
                                           }
                                         },

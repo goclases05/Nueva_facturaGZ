@@ -48,14 +48,28 @@ class _ViewTicketState extends State<ViewTicket> {
   String serialNumber = "";
   String printerVersion = "";
   String estado = '';
+  bool state_bluetooth=false;
   //SUNMIN
 
-  
-  String _devicesMsg = "";
 
   @override
   void initState() {
     estado = widget.estado;
+    bluetoothManager.state.listen((val) {
+      print('state = $val');
+      if (val == 12) {
+        print('on');
+        //escaneo
+        setState(() {
+          state_bluetooth=true;
+        });
+        //escaneo
+      } else if (val == 10) {
+        setState(() {
+          state_bluetooth=false;
+        });
+      }
+    });
     // TODO: implement initState
     if (Preferencias.sunmi_preferencia) {
       _bindingPrinter().then((bool? isBind) async {
@@ -110,7 +124,7 @@ class _ViewTicketState extends State<ViewTicket> {
     super.initState();
   }
 
-  void bt_initPrinter() async {
+  void bt_initPrinter(String accion) async {
     _printerManager.stopScan();
     await Permission.bluetoothConnect.request();
     await Permission.bluetoothScan.request();
@@ -138,6 +152,7 @@ class _ViewTicketState extends State<ViewTicket> {
       _printerManager.stopScan();
 
       if(Preferencias.mac!=''){
+        //impresora predeterminada 
         _printerManager.scanResults.listen((event) { 
           
           print("preferencia impresora");
@@ -153,6 +168,7 @@ class _ViewTicketState extends State<ViewTicket> {
           }
         });
       }else{
+        //lista de impresoras
         showDialog(
           context: context,
           builder: ((context) {
@@ -162,20 +178,6 @@ class _ViewTicketState extends State<ViewTicket> {
                  _printerManager.scanResults.listen((devices)async {
                     impresoras.impresoras_disponibles(devices);
                  });
-
-                 /*impresoras.devices.forEach((printer) async {
-                    print('impresora');
-                    print(printer);
-                    //get saved printer
-                    if (printer.address == Preferencias.mac) {
-                      //store the element.
-                      print('esta es');
-                      //return await _startPrint(printer, widget.factura);
-                    }else{
-                      print('no es');
-                      Preferencias.mac ='';
-                    }
-                  });*/
 
                 if(Preferencias.mac != ''){
                   print("preferencia impresora");
@@ -218,7 +220,7 @@ class _ViewTicketState extends State<ViewTicket> {
                         (impresoras.devices.length==0)?
                         Text(
                           'No se encuentran Impresoras disponibles',
-                          style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold),
+                          style: TextStyle(color: Colors.black,fontSize: 15,),
                           textAlign: TextAlign.center,
                         ):
                         Container(
@@ -265,141 +267,8 @@ class _ViewTicketState extends State<ViewTicket> {
                 }
               });
           }));
-
       }
-
-      
     });
-
-    /*showDialog(
-          context: context,
-          builder: ((context) {
-            return Consumer<ImpresorasProvider>(
-              builder: (context, impresoras, child) {
-                 _printerManager.scanResults.listen((devices)async {
-                    impresoras.impresoras_disponibles(devices);
-                 });
-
-                if(Preferencias.mac == ''){
-                  //existe una impresora predeterminada
-                  if(_printerManager.isScanningStream==true){
-                    
-                  }
-
-                }else{
-                  //no existe predeterminada
-                  return AlertDialog(
-                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Impresoras',
-                          style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  );
-                }*/
-                
-
-              /*if(_printerManager.isScanningStream==true){
-                  return const AlertDialog(
-                    backgroundColor: Color.fromARGB(255, 236, 133, 115),
-                    content: Text(
-                      'No se encontraron impresoras disponibles.',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  );
-                }else if (impresoras.devices.length == 0) {
-                    return const AlertDialog(
-                      backgroundColor: Color.fromARGB(255, 236, 133, 115),
-                      content: Text(
-                        'No se encontraron impresoras disponibles.',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    );
-                } else {
-                    return const AlertDialog(
-                      backgroundColor: Color.fromARGB(255, 236, 133, 115),
-                      content: Text(
-                        'si hay',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    );
-                }*/
-              
-            //});
-         /* })
-    );*/
-
-    
-    
-    
-    
-    /*_printerManager.scanResults.listen((devices) async {
-      showDialog(
-          context: context,
-          builder: ((context) {
-            if (devices.length == 0) {
-              return const AlertDialog(
-                backgroundColor: Color.fromARGB(255, 236, 133, 115),
-                content: Text(
-                  'No se encontraron impresoras disponibles.',
-                  style: TextStyle(color: Colors.white),
-                ),
-              );
-            } else {
-              return AlertDialog(
-                title: const Text('Impresoras Disponibles'),
-                content: Container(
-                  height: 300.0, // Change as per your requirement
-                  width: 300.0, // Change as per your requirement
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: devices.length,
-                    itemBuilder: (BuildContext context, int i) {
-                      return ListTile(
-                        title: Text("${devices[i].name}"),
-                        subtitle: Text("${devices[i].address}"),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            GestureDetector(
-                              onTap: () async {
-                                /*_startPrint(
-                                devices[
-                                    i],
-                                list_tmp[index]
-                                    .idFactTmp,
-                                'comanda');*/
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.all(5),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    //color: Theme.of(context).primaryColor,
-                                    color: widget.colorPrimary,
-                                    borderRadius: BorderRadius.circular(15)),
-                                child: const Icon(
-                                  Icons.print,
-                                  color: Colors.white,
-                                  size: 25,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        onTap: () {},
-                      );
-                    },
-                  ),
-                ),
-              );
-            }
-          }));
-    });*/
   }
 
   @override
@@ -1073,31 +942,24 @@ class _ViewTicketState extends State<ViewTicket> {
                   if (Preferencias.sunmi_preferencia) {
                     print_sunmi(context, widget.factura);
                   } else {
-                    if (Platform.isAndroid) {
-                      bluetoothManager.state.listen((val) {
-                        print('state = $val');
-                        if (val == 12) {
-                          print('on');
-                          //escaneo
-                          bt_initPrinter();
-                          //escaneo
-                        } else if (val == 10) {
-                          print('off');
-                          showDialog(
-                            context: context,
-                            builder: (_) => const AlertDialog(
-                              backgroundColor:
-                                  Color.fromARGB(255, 224, 140, 31),
-                              content: Text(
-                                'Bluetooth sin Conexión',
-                                style: TextStyle(color: Colors.white),
-                              ),
+                      if(state_bluetooth==true){
+                        //escaneo
+                        bt_initPrinter('f');
+                        //escaneo
+                      }else{
+                        print('off');
+                        showDialog(
+                          context: context,
+                          builder: (_) => const AlertDialog(
+                            backgroundColor:
+                                Color.fromARGB(255, 224, 140, 31),
+                            content: Text(
+                              'Bluetooth sin Conexión',
+                              style: TextStyle(color: Colors.white),
                             ),
-                          );
-                          
-                        }
-                      });
-                    } else {}
+                          ),
+                        );
+                      }
                   }
                 }
                 //codigo de impresion

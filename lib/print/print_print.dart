@@ -9,10 +9,12 @@ import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/models/view_factura_print.dart';
 import 'package:factura_gozeri/print/print_page.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
+import 'package:factura_gozeri/providers/impresoras_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/screens/escritorio_screen.dart';
 import 'package:factura_gozeri/screens/no_internet_screen.dart';
 import 'package:factura_gozeri/screens/view_tabs_facturacion_screen.dart';
+import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
 import 'package:factura_gozeri/screens/view_tabs_screen.dart';
 import 'package:factura_gozeri/services/auth_services.dart';
 import 'package:factura_gozeri/widgets/item_dataCliente.dart';
@@ -63,6 +65,7 @@ class PrintScreen extends StatefulWidget {
 
 class _PrintScreenState extends State<PrintScreen> {
   PrinterBluetoothManager _printerManager = PrinterBluetoothManager();
+  BluetoothManager bluetoothManager = BluetoothManager.instance;
   int open = 0;
 
   ConnectivityResult _connectionStatus = ConnectivityResult.none;
@@ -75,6 +78,7 @@ class _PrintScreenState extends State<PrintScreen> {
   String serialNumber = "";
   String printerVersion = "";
   //SUNMIN
+  bool state_bluetooth=false;
 
   Future<void> initialActivity() async {
     late ConnectivityResult result;
@@ -102,8 +106,25 @@ class _PrintScreenState extends State<PrintScreen> {
   void initState() {
     // TODO: implement initState
     initialActivity();
-    _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    _connectivitySubscription =_connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+
+    //estado del bluetooth
+    bluetoothManager.state.listen((val) {
+      print('state = $val');
+      if (val == 12) {
+        print('on');
+        //escaneo
+        setState(() {
+          state_bluetooth=true;
+        });
+        //escaneo
+      } else if (val == 10) {
+        setState(() {
+          state_bluetooth=false;
+        });
+      }
+    });
+    //estado del bluetooth
 
     if (Preferencias.sunmi_preferencia) {
       _bindingPrinter().then((bool? isBind) async {
@@ -130,20 +151,169 @@ class _PrintScreenState extends State<PrintScreen> {
         });
       });
     } else {
-      Permission.bluetoothConnect.request();
-      Permission.bluetoothScan.request();
-      Permission.locationWhenInUse.request();
-      _printerManager.startScan(Duration(seconds: 5));
+      
     }
 
     super.initState();
   }
+
+
 
   /// must binding ur printer at first init in app
   Future<bool?> _bindingPrinter() async {
     final bool? result = await SunmiPrinter.bindingPrinter();
     return result;
   }
+
+  //funcion impresion 
+  void bt_initPrinter(String accion, String id_f) async {
+    _printerManager.stopScan();
+    await Permission.bluetoothConnect.request();
+    await Permission.bluetoothScan.request();
+    await Permission.locationWhenInUse.request();
+    _printerManager.startScan(Duration(seconds: 2));
+    print('escaneando');
+
+    showDialog(
+      context: context,
+      builder: (_) => const AlertDialog(
+        backgroundColor: Color.fromARGB(255, 243, 231, 155),
+        content: ListTile(
+          leading: CircularProgressIndicator(color: Colors.white,),
+          title: Text(
+            'Escaneando dispositivos de impresión',
+            style: TextStyle(color: Colors.white,fontSize: 15),
+          ),
+        ),
+      ),
+    );
+    
+    Future.delayed(Duration(seconds: 3),(){
+      Navigator.of(context).pop();
+      print('termino');
+      _printerManager.stopScan();
+
+      if(Preferencias.mac!=''){
+        //impresora predeterminada 
+        _printerManager.scanResults.listen((event) { 
+          
+          print("preferencia impresora");
+          print(Preferencias.mac);
+          int u=0;
+          //existe una impresora predeterminada
+          for(var y=0;y<event.length;y++){
+            if (event[y].address == Preferencias.mac) {
+              //store the element.
+              print('esta es');
+               _startPrint(event[y],id_f,accion);
+            }
+          }
+        });
+      }else{
+        //lista de impresoras
+        showDialog(
+          context: context,
+          builder: ((context) {
+
+            return Consumer<ImpresorasProvider>(
+              builder: (context, impresoras, child) {
+                 _printerManager.scanResults.listen((devices)async {
+                    impresoras.impresoras_disponibles(devices);
+                 });
+
+                if(Preferencias.mac != ''){
+                  print("preferencia impresora");
+                  print(Preferencias.mac);
+                  int u=0;
+                  //existe una impresora predeterminada
+                  for(var y=0;y<impresoras.devices.length;y++){
+                    if (impresoras.devices[y].address == Preferencias.mac) {
+                      //store the element.
+                      print('esta es');
+                      _startPrint(impresoras.devices[y],id_f,accion);
+                    }
+                  }
+        
+                  print('salio de ciclo');
+                  if(u==0){
+                    return AlertDialog(
+                        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                        content: Text('impresión realizada'));
+                  }else{
+                    return AlertDialog(
+                        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                        content: Text('error'));
+                  }
+                  
+                    
+
+                }else{
+                  //no existe predeterminada
+                  return AlertDialog(
+                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Impresoras',
+                          style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                        (impresoras.devices.length==0)?
+                        Text(
+                          'No se encuentran Impresoras disponibles',
+                          style: TextStyle(color: Colors.black,fontSize: 15,),
+                          textAlign: TextAlign.center,
+                        ):
+                        Container(
+                          height: 300.0, // Change as per your requirement
+                          width: 300.0,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: impresoras.devices.length,
+                            itemBuilder: (BuildContext context, int i) {
+                              return ListTile(
+                                title: Text("${impresoras.devices[i].name}"),
+                                subtitle: Text("${impresoras.devices[i].address}"),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        _startPrint(impresoras.devices[i],id_f,accion);
+                                      },
+                                      child: Container(
+                                        margin: const EdgeInsets.all(5),
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                            //color: Theme.of(context).primaryColor,
+                                            color: widget.colorPrimary,
+                                            borderRadius: BorderRadius.circular(15)),
+                                        child: const Icon(
+                                          Icons.print,
+                                          color: Colors.white,
+                                          size: 25,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                onTap: () {},
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              });
+          }));
+      }
+    });
+  }
+
+  //funcion impresion
 
   @override
   void dispose() {
@@ -230,11 +400,16 @@ class _PrintScreenState extends State<PrintScreen> {
                               textAlign: TextAlign.center,
                             )));
                         print('valor de drop ' + serieProv.initialSerie);
-
+                        var si_existe=false;
                         for (var i = 0;
                             i < authService.list_serie.length;
                             i++) {
                           print('item ' + authService.list_serie[i].idSerie);
+
+                          if(Preferencias.serie==authService.list_serie[i].idSerie){
+                            si_existe=true;
+                            facturaService.serie(widget.id_tmp, 'add', authService.list_serie[i].idSerie);
+                          }
 
                           menuItems.add(DropdownMenuItem(
                               value: authService.list_serie[i].idSerie,
@@ -254,13 +429,13 @@ class _PrintScreenState extends State<PrintScreen> {
 
                         return DropdownButton(
                           itemHeight: null,
-                          value: facturaService
-                              .initialSerie, //facturaService.initialSerie,
+                          value: (si_existe==true)?Preferencias.serie:'0', //facturaService.initialSerie,
                           isExpanded: true,
                           dropdownColor: Color.fromARGB(255, 241, 238, 241),
                           onChanged: (String? newValue) async {
                             var cambio = await facturaService.serie(
                                 widget.id_tmp, 'add', newValue!);
+                                Preferencias.serie=newValue;
                             if (cambio != '1') {
                               //Preferencias.serie = newValue!;
                               /*SnackBar snackBar = SnackBar(
@@ -541,109 +716,40 @@ class _PrintScreenState extends State<PrintScreen> {
                       flex: 2,
                       child: TextButton.icon(
                         onPressed: () async {
-                          /*final storage = new FlutterSecureStorage();
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();*/
-                          //dynamic device_store=await storage.read(key: 'IMPRESORA');
-                          //final dynamic din = await Preferencias.impresora as dynamic;
-                          //PrinterBluetooth device = await Preferencias.impresora as dynamic;
+
                           if (facturaService.list_det.length < 1) {
-                            //no tiene articulos agregados
-                            /*SnackBar snackBar = SnackBar(
-                          margin: EdgeInsets.only(
-                              bottom:
-                                  (MediaQuery.of(context).size.height * 0.95),
-                              right: 20,
-                              left: 20),
-                          dismissDirection: DismissDirection.up,
-                          padding: const EdgeInsets.all(20),
-                          content: const Text(
-                            'Error: Agrega articulos a la factura',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          backgroundColor: Color.fromARGB(255, 208, 96, 88),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                            //no tiene articulos la factyura
                             edgeAlert(context,
                                 description:
                                     'Error: Agrega articulos a la factura',
                                 gravity: Gravity.top,
                                 backgroundColor: Colors.redAccent);
                           } else if (facturaService.initialSerie == '0') {
-                            //no tiene seleccionada una serie
-                            /*SnackBar snackBar = SnackBar(
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          margin: const EdgeInsets.only(
-                              bottom: 100, right: 20, left: 20),
-                          padding: const EdgeInsets.all(20),
-                          content: const Text(
-                            'Error: Seleccióna una serie',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          backgroundColor: Color.fromARGB(255, 208, 96, 88),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                            //no se agrego serie a facturar
                             edgeAlert(context,
                                 description: 'Error: Seleccióna una serie',
                                 gravity: Gravity.top,
                                 backgroundColor: Colors.redAccent);
                           } else if (facturaService.id == '') {
-                            /*SnackBar snackBar = SnackBar(
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          margin: const EdgeInsets.only(
-                              bottom: 100, right: 20, left: 20),
-                          padding: const EdgeInsets.all(20),
-                          content: const Text(
-                            'Error: Seleccióne un cliente',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          backgroundColor: Color.fromARGB(255, 208, 96, 88),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                            //no tiene cliente agregado la factura
                             edgeAlert(context,
                                 description: 'Error: Seleccióne un cliente',
                                 gravity: Gravity.top,
                                 backgroundColor: Colors.redAccent);
                           } else if (double.parse(facturaService.saldo) >=
                               double.parse(facturaService.total_fac)) {
-                            //no aplico pagos a la factura
-                            /*SnackBar snackBar = const SnackBar(
-                          dismissDirection: DismissDirection.up,
-                          padding: EdgeInsets.all(20),
-                          content: Text(
-                            'Error: Aplicar pago',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          backgroundColor: Color.fromARGB(255, 208, 96, 88),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                            //no se aplico el pago
                             edgeAlert(context,
                                 description: 'Error: Aplicar pago',
                                 gravity: Gravity.top,
                                 backgroundColor: Colors.redAccent);
                           } else {
                             //FACTURANDO
-                            var facturar =
-                                await facturaService.facturar(widget.id_tmp);
+                            var facturar =await facturaService.facturar(widget.id_tmp);
                             var js = json.decode(facturar);
 
                             if (js['MENSAJE'] == 'OK') {
-                              /*SnackBar snackBar = const SnackBar(
-                            padding: EdgeInsets.all(20),
-                            content: Text(
-                              'Facturacion Completada',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            backgroundColor: Colors.green,
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
-
+                              //si se facturo
                               edgeAlert(context,
                                   description: 'Factura Realizada',
                                   gravity: Gravity.top,
@@ -673,7 +779,9 @@ class _PrintScreenState extends State<PrintScreen> {
                                             const EscritorioScreen()),
                                     (Route<dynamic> route) => false);
                               } else {
+                                //imprimir factura
                                 if (Preferencias.sunmi_preferencia) {
+                                  //impresion sunmi
                                   await print_sunmi(context, js['ID']);
                                   Navigator.pushAndRemoveUntil(
                                       context,
@@ -682,126 +790,27 @@ class _PrintScreenState extends State<PrintScreen> {
                                               const EscritorioScreen()),
                                       (Route<dynamic> route) => false);
                                 } else {
-                                  print('entro');
-                                  await Permission.bluetoothConnect.request();
-                                  await Permission.bluetoothScan.request();
-                                  await Permission.locationWhenInUse.request();
-                                  _printerManager
-                                      .startScan(Duration(seconds: 5));
-                                  _printerManager.stopScan();
-                                  await _printerManager.scanResults
-                                      .listen((devices) async {
-                                    print(devices);
-
-                                    if (Preferencias.mac == '') {
-                                      showDialog(
-                                          context: context,
-                                          builder: ((context) {
-                                            if (devices.length == 0) {
-                                              return const AlertDialog(
-                                                backgroundColor: Color.fromARGB(
-                                                    255, 236, 133, 115),
-                                                content: Text(
-                                                  'No se encontraron impresoras disponibles.',
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              );
-                                            }
-
-                                            return AlertDialog(
-                                              title: const Text(
-                                                  'Impresoras Disponibles'),
-                                              content: Container(
-                                                height:
-                                                    300.0, // Change as per your requirement
-                                                width:
-                                                    300.0, // Change as per your requirement
-                                                child: ListView.builder(
-                                                  shrinkWrap: true,
-                                                  itemCount: devices.length,
-                                                  itemBuilder:
-                                                      (BuildContext context,
-                                                          int i) {
-                                                    return ListTile(
-                                                      title: Text(
-                                                          "${devices[i].name}"),
-                                                      subtitle: Text(
-                                                          "${devices[i].address}"),
-                                                      trailing: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          GestureDetector(
-                                                            onTap: () async {
-                                                              await Permission
-                                                                  .bluetoothConnect
-                                                                  .request();
-                                                              await Permission
-                                                                  .bluetoothScan
-                                                                  .request();
-                                                              await Permission
-                                                                  .locationWhenInUse
-                                                                  .request();
-                                                              _printerManager
-                                                                  .startScan(
-                                                                      Duration(
-                                                                          seconds:
-                                                                              5));
-                                                              _printerManager
-                                                                  .stopScan();
-                                                              _startPrint(
-                                                                  devices[i],
-                                                                  js['ID'],
-                                                                  'f');
-                                                            },
-                                                            child: Container(
-                                                              margin:
-                                                                  const EdgeInsets
-                                                                      .all(5),
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(10),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                      //color: Theme.of(context).primaryColor,
-                                                                      color: widget
-                                                                          .colorPrimary,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              15)),
-                                                              child: const Icon(
-                                                                Icons.print,
-                                                                color: Colors
-                                                                    .white,
-                                                                size: 25,
-                                                              ),
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                      onTap: () {},
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                            );
-                                          }));
-                                    } else {
-                                      //impresion en predeterminada
-
-                                      devices.forEach((printer) async {
-                                        print(printer);
-                                        //get saved printer
-                                        if (printer.address ==
-                                            Preferencias.mac) {
-                                          //store the element.
-                                          await _startPrint(
-                                              printer, js['ID'], 'f');
-                                        }
-                                      });
-                                    }
-                                  });
+                                  //impresion bluetooth
+                                  //PRINT NO SUNMIN
+                                  if(state_bluetooth==true){
+                                    //escaneo
+                                    bt_initPrinter('f',js['ID']);
+                                    //escaneo
+                                  }else{
+                                    print('off');
+                                    showDialog(
+                                      context: context,
+                                      builder: (_) => const AlertDialog(
+                                        backgroundColor:
+                                            Color.fromARGB(255, 224, 140, 31),
+                                        content: Text(
+                                          'Bluetooth sin Conexión',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                  //PRINT NO SUNMIN
                                   print('salio');
                                 }
                               }
@@ -847,108 +856,26 @@ class _PrintScreenState extends State<PrintScreen> {
                           if (Preferencias.sunmi_preferencia) {
                             await print_sunmi_comanda(context, widget.id_tmp);
                           } else {
-                            print('entro');
-                            await Permission.bluetoothConnect.request();
-                            await Permission.bluetoothScan.request();
-                            await Permission.locationWhenInUse.request();
-                            _printerManager.startScan(Duration(seconds: 5));
-                            _printerManager.stopScan();
-                            await _printerManager.scanResults
-                                .listen((devices) async {
-                              print(devices);
-
-                              if (Preferencias.mac == '') {
-                                showDialog(
-                                    context: context,
-                                    builder: ((context) {
-                                      if (devices.length == 0) {
-                                        return const AlertDialog(
-                                          backgroundColor: Color.fromARGB(
-                                              255, 236, 133, 115),
-                                          content: Text(
-                                            'No se encontraron impresoras disponibles.',
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        );
-                                      }
-
-                                      return AlertDialog(
-                                        title: const Text(
-                                            'Impresoras Disponibles'),
-                                        content: Container(
-                                          height:
-                                              300.0, // Change as per your requirement
-                                          width:
-                                              300.0, // Change as per your requirement
-                                          child: ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount: devices.length,
-                                            itemBuilder:
-                                                (BuildContext context, int i) {
-                                              return ListTile(
-                                                title:
-                                                    Text("${devices[i].name}"),
-                                                subtitle: Text(
-                                                    "${devices[i].address}"),
-                                                trailing: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        _printerManager
-                                                            .stopScan();
-                                                        _startPrint(
-                                                            devices[i],
-                                                            widget.id_tmp,
-                                                            'comanda');
-                                                      },
-                                                      child: Container(
-                                                        margin: const EdgeInsets
-                                                            .all(5),
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(10),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                                //color: Theme.of(context).primaryColor,
-                                                                color: widget
-                                                                    .colorPrimary,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            15)),
-                                                        child: const Icon(
-                                                          Icons.print,
-                                                          color: Colors.white,
-                                                          size: 25,
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                                onTap: () {},
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      );
-                                    }));
-                              } else {
-                                //impresion en predeterminada
-                                devices.forEach((printer) async {
-                                  print(printer);
-                                  //get saved printer
-                                  if (printer.address == Preferencias.mac) {
-                                    //store the element.
-                                    await _startPrint(
-                                        printer, widget.id_tmp, 'comanda');
-                                  }
-                                });
-                              }
-                            });
-                            print('salio');
+                            //PRINT NO SUNMIN
+                            if(state_bluetooth==true){
+                              //escaneo
+                              bt_initPrinter('comanda',widget.id_tmp);
+                              //escaneo
+                            }else{
+                              print('off');
+                              showDialog(
+                                context: context,
+                                builder: (_) => const AlertDialog(
+                                  backgroundColor:
+                                      Color.fromARGB(255, 224, 140, 31),
+                                  content: Text(
+                                    'Bluetooth sin Conexión',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              );
+                            }
+                            //PRINT NO SUNMIN
                           }
                         },
                         icon: Icon(
@@ -983,6 +910,7 @@ class _PrintScreenState extends State<PrintScreen> {
       ),
     );
     final result;
+    print('esta es la accion '+accion);
     if (accion == 'f') {
       result = await _printerManager.printTicket(await testTicket(id_factura));
     } else {
