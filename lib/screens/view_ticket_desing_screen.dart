@@ -8,7 +8,6 @@ import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/impresoras_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/widgets/registro_metodoPago_listas_widget.dart';
-import 'package:file_saver/file_saver.dart';
 import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
 import 'package:flutter/material.dart';
 
@@ -20,8 +19,6 @@ import 'package:sunmi_printer_plus/column_maker.dart';
 import 'package:sunmi_printer_plus/enums.dart';
 import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
 import 'package:sunmi_printer_plus/sunmi_style.dart';
-
-
 
 import 'escritorio_screen.dart';
 
@@ -50,9 +47,8 @@ class _ViewTicketState extends State<ViewTicket> {
   String serialNumber = "";
   String printerVersion = "";
   String estado = '';
-  bool state_bluetooth=false;
+  bool state_bluetooth = false;
   //SUNMIN
-
 
   @override
   void initState() {
@@ -63,12 +59,12 @@ class _ViewTicketState extends State<ViewTicket> {
         print('on');
         //escaneo
         setState(() {
-          state_bluetooth=true;
+          state_bluetooth = true;
         });
         //escaneo
       } else if (val == 10) {
         setState(() {
-          state_bluetooth=false;
+          state_bluetooth = false;
         });
       }
     });
@@ -139,29 +135,30 @@ class _ViewTicketState extends State<ViewTicket> {
       builder: (_) => const AlertDialog(
         backgroundColor: Color.fromARGB(255, 243, 231, 155),
         content: ListTile(
-          leading: CircularProgressIndicator(color: Colors.white,),
+          leading: CircularProgressIndicator(
+            color: Colors.white,
+          ),
           title: Text(
             'Escaneando dispositivos de impresión',
-            style: TextStyle(color: Colors.white,fontSize: 15),
+            style: TextStyle(color: Colors.white, fontSize: 15),
           ),
         ),
       ),
     );
-    
-    Future.delayed(Duration(seconds: 3),(){
+
+    Future.delayed(Duration(seconds: 3), () {
       Navigator.of(context).pop();
       print('termino');
       _printerManager.stopScan();
 
-      if(Preferencias.mac!=''){
-        //impresora predeterminada 
-        _printerManager.scanResults.listen((event) { 
-          
+      if (Preferencias.mac != '') {
+        //impresora predeterminada
+        _printerManager.scanResults.listen((event) {
           print("preferencia impresora");
           print(Preferencias.mac);
-          int u=0;
+          int u = 0;
           //existe una impresora predeterminada
-          for(var y=0;y<event.length;y++){
+          for (var y = 0; y < event.length; y++) {
             if (event[y].address == Preferencias.mac) {
               //store the element.
               print('esta es');
@@ -169,45 +166,41 @@ class _ViewTicketState extends State<ViewTicket> {
             }
           }
         });
-      }else{
+      } else {
         //lista de impresoras
         showDialog(
-          context: context,
-          builder: ((context) {
+            context: context,
+            builder: ((context) {
+              return Consumer<ImpresorasProvider>(
+                  builder: (context, impresoras, child) {
+                _printerManager.scanResults.listen((devices) async {
+                  impresoras.impresoras_disponibles(devices);
+                });
 
-            return Consumer<ImpresorasProvider>(
-              builder: (context, impresoras, child) {
-                 _printerManager.scanResults.listen((devices)async {
-                    impresoras.impresoras_disponibles(devices);
-                 });
-
-                if(Preferencias.mac != ''){
+                if (Preferencias.mac != '') {
                   print("preferencia impresora");
                   print(Preferencias.mac);
-                  int u=0;
+                  int u = 0;
                   //existe una impresora predeterminada
-                  for(var y=0;y<impresoras.devices.length;y++){
+                  for (var y = 0; y < impresoras.devices.length; y++) {
                     if (impresoras.devices[y].address == Preferencias.mac) {
                       //store the element.
                       print('esta es');
                       _startPrint(impresoras.devices[y], widget.factura);
                     }
                   }
-        
+
                   print('salio de ciclo');
-                  if(u==0){
+                  if (u == 0) {
                     return AlertDialog(
                         backgroundColor: Color.fromARGB(255, 255, 255, 255),
                         content: Text('impresión realizada'));
-                  }else{
+                  } else {
                     return AlertDialog(
                         backgroundColor: Color.fromARGB(255, 255, 255, 255),
                         content: Text('error'));
                   }
-                  
-                    
-
-                }else{
+                } else {
                   //no existe predeterminada
                   return AlertDialog(
                     backgroundColor: Color.fromARGB(255, 255, 255, 255),
@@ -216,59 +209,70 @@ class _ViewTicketState extends State<ViewTicket> {
                       children: [
                         Text(
                           'Impresoras',
-                          style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
-                        (impresoras.devices.length==0)?
-                        Text(
-                          'No se encuentran Impresoras disponibles',
-                          style: TextStyle(color: Colors.black,fontSize: 15,),
-                          textAlign: TextAlign.center,
-                        ):
-                        Container(
-                          height: 300.0, // Change as per your requirement
-                          width: 300.0,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: impresoras.devices.length,
-                            itemBuilder: (BuildContext context, int i) {
-                              return ListTile(
-                                title: Text("${impresoras.devices[i].name}"),
-                                subtitle: Text("${impresoras.devices[i].address}"),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () async {
-                                        _startPrint(impresoras.devices[i],widget.factura);
-                                      },
-                                      child: Container(
-                                        margin: const EdgeInsets.all(5),
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                            //color: Theme.of(context).primaryColor,
-                                            color: widget.colorPrimary,
-                                            borderRadius: BorderRadius.circular(15)),
-                                        child: const Icon(
-                                          Icons.print,
-                                          color: Colors.white,
-                                          size: 25,
-                                        ),
-                                      ),
-                                    )
-                                  ],
+                        (impresoras.devices.length == 0)
+                            ? Text(
+                                'No se encuentran Impresoras disponibles',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
                                 ),
-                                onTap: () {},
-                              );
-                            },
-                          ),
-                        ),
+                                textAlign: TextAlign.center,
+                              )
+                            : Container(
+                                height: 300.0, // Change as per your requirement
+                                width: 300.0,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: impresoras.devices.length,
+                                  itemBuilder: (BuildContext context, int i) {
+                                    return ListTile(
+                                      title:
+                                          Text("${impresoras.devices[i].name}"),
+                                      subtitle: Text(
+                                          "${impresoras.devices[i].address}"),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () async {
+                                              _startPrint(impresoras.devices[i],
+                                                  widget.factura);
+                                            },
+                                            child: Container(
+                                              margin: const EdgeInsets.all(5),
+                                              padding: const EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                  //color: Theme.of(context).primaryColor,
+                                                  color: widget.colorPrimary,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15)),
+                                              child: const Icon(
+                                                Icons.print,
+                                                color: Colors.white,
+                                                size: 25,
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      onTap: () {},
+                                    );
+                                  },
+                                ),
+                              ),
                       ],
                     ),
                   );
                 }
               });
-          }));
+            }));
       }
     });
   }
@@ -825,132 +829,79 @@ class _ViewTicketState extends State<ViewTicket> {
                     onPressed: () async {
                       showDialog(
                         context: context,
-                        builder: (_) =>
-                            const AlertDialog(
-                          backgroundColor:
-                              Color.fromARGB(
-                                  255,
-                                  115,
-                                  160,
-                                  236),
+                        builder: (_) => const AlertDialog(
+                          backgroundColor: Color.fromARGB(255, 115, 160, 236),
                           content: ListTile(
                             leading:
-                                CircularProgressIndicator(
-                                    color: Colors
-                                        .white),
+                                CircularProgressIndicator(color: Colors.white),
                             title: Text(
                               'Generando reporte...',
-                              style: TextStyle(
-                                  color: Colors
-                                      .white),
+                              style: TextStyle(color: Colors.white),
                             ),
                           ),
                         ),
                       );
                       print('entro');
-                      var data =await print_f.pdf_factura(widget.factura);
+                      var data = await print_f.pdf_factura(widget.factura);
                       print('fuera');
-                      print('fuera' +
-                          data.toString());
+                      print('fuera' + data.toString());
                       if (data['message'] == 'Ok') {
-                        Navigator.of(context,
-                                rootNavigator:
-                                    true)
-                            .pop();
+                        Navigator.of(context, rootNavigator: true).pop();
                         showDialog(
                           context: context,
-                          builder: (_) =>
-                              AlertDialog(
+                          builder: (_) => AlertDialog(
                             backgroundColor:
-                                const Color
-                                        .fromARGB(
-                                    255,
-                                    109,
-                                    224,
-                                    186),
+                                const Color.fromARGB(255, 109, 224, 186),
                             content: Text(
                               'Listo para exportar!',
-                              style: const TextStyle(
-                                  color: Colors
-                                      .white),
+                              style: const TextStyle(color: Colors.white),
                             ),
                           ),
                         );
-                        Navigator.of(context,
-                                rootNavigator:
-                                    true)
-                            .pop();
+                        Navigator.of(context, rootNavigator: true).pop();
 
                         ///descarga de archivos
-                        final status =
-                            await Permission
-                                .storage
-                                .request();
+                        final status = await Permission.storage.request();
                         if (status.isGranted) {
                           showDialog(
                             context: context,
-                            builder: (_) =>
-                                const AlertDialog(
+                            builder: (_) => const AlertDialog(
                               backgroundColor:
-                                  Color
-                                      .fromARGB(
-                                          255,
-                                          225,
-                                          130,
-                                          28),
+                                  Color.fromARGB(255, 225, 130, 28),
                               content: ListTile(
                                 leading: CircularProgressIndicator(
-                                    color: Colors
-                                        .white),
+                                    color: Colors.white),
                                 title: Text(
                                   'descargando...',
-                                  style: TextStyle(
-                                      color: Colors
-                                          .white),
+                                  style: TextStyle(color: Colors.white),
                                 ),
                               ),
                             ),
                           );
-                          final basestorage =await getApplicationDocumentsDirectory();
-                          String url =data['link'];
+                          final basestorage =
+                              await getApplicationDocumentsDirectory();
+                          String url = data['link'];
                           ALDownloader.initialize();
                           ALDownloader.configurePrint(
-                                  enabled: true,
-                                  frequentEnabled:
-                                      false);
-                         ALDownloader.download(
-                              url,
-                              directoryPath:
-                                  basestorage!
-                                      .path,
-                              fileName:
-                                  data['name'],
+                              enabled: true, frequentEnabled: false);
+                          ALDownloader.download(url,
+                              directoryPath: basestorage!.path,
+                              fileName: data['name'],
                               downloaderHandlerInterface:
                                   ALDownloaderHandlerInterface(
-                                      progressHandler:
-                                          (progress) {
+                                      progressHandler: (progress) {
                                 debugPrint(
                                     'ALDownloader | download progress = $progress, url = $url\n');
-                              }, succeededHandler:
-                                          () async {
+                              }, succeededHandler: () async {
                                 debugPrint(
                                     'ALDownloader | download succeeded, url = $url\n');
-                                Navigator.of(
-                                        context,
-                                        rootNavigator:
-                                            true)
+                                Navigator.of(context, rootNavigator: true)
                                     .pop();
                                 //print('la ruta: '+basestorage.path+'/nuevo.pdf');
-                                final String
-                                    filePath =
-                                    basestorage
-                                            .path +
-                                        '/' +
-                                        data[
-                                            'name'];
+                                final String filePath =
+                                    basestorage.path + '/' + data['name'];
 
-                                OpenFilex.open(
-                                    filePath);
+                                OpenFilex.open(filePath);
                                 /*Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -960,49 +911,32 @@ class _ViewTicketState extends State<ViewTicket> {
                         if (!await launchUrl(_url)) {
                           throw 'Could not launch $_url';
                         }*/
-                              }, failedHandler:
-                                          () {
-                                Navigator.of(
-                                        context,
-                                        rootNavigator:
-                                            true)
+                              }, failedHandler: () {
+                                Navigator.of(context, rootNavigator: true)
                                     .pop();
                                 showDialog(
-                                  context:
-                                      context,
-                                  builder: (_) =>
-                                      AlertDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
                                     backgroundColor:
-                                        Color.fromARGB(
-                                            255,
-                                            224,
-                                            211,
-                                            18),
-                                    content:
-                                        ListTile(
-                                      leading:
-                                          Icon(
-                                        Icons
-                                            .warning,
-                                        color: Colors
-                                            .white,
+                                        Color.fromARGB(255, 224, 211, 18),
+                                    content: ListTile(
+                                      leading: Icon(
+                                        Icons.warning,
+                                        color: Colors.white,
                                       ),
-                                      title:
-                                          Text(
+                                      title: Text(
                                         'Fallo la descarga por favor intentalo de nuevo',
                                         style: const TextStyle(
-                                            color:
-                                                Colors.white),
+                                            color: Colors.white),
                                       ),
                                     ),
                                   ),
                                 );
-                              }, pausedHandler:
-                                          () {
+                              }, pausedHandler: () {
                                 debugPrint(
                                     'ALDownloader | download paused, url = $url\n');
                               }));
-                              /*await FileSaver.instance.saveFile(
+                          /*await FileSaver.instance.saveFile(
                                 name: data['name'],
                                 filePath: basestorage.path,
                                 link: data['link'],
@@ -1040,24 +974,23 @@ class _ViewTicketState extends State<ViewTicket> {
                   if (Preferencias.sunmi_preferencia) {
                     print_sunmi(context, widget.factura);
                   } else {
-                      if(state_bluetooth==true){
-                        //escaneo
-                        bt_initPrinter('f');
-                        //escaneo
-                      }else{
-                        print('off');
-                        showDialog(
-                          context: context,
-                          builder: (_) => const AlertDialog(
-                            backgroundColor:
-                                Color.fromARGB(255, 224, 140, 31),
-                            content: Text(
-                              'Bluetooth sin Conexión',
-                              style: TextStyle(color: Colors.white),
-                            ),
+                    if (state_bluetooth == true) {
+                      //escaneo
+                      bt_initPrinter('f');
+                      //escaneo
+                    } else {
+                      print('off');
+                      showDialog(
+                        context: context,
+                        builder: (_) => const AlertDialog(
+                          backgroundColor: Color.fromARGB(255, 224, 140, 31),
+                          content: Text(
+                            'Bluetooth sin Conexión',
+                            style: TextStyle(color: Colors.white),
                           ),
-                        );
-                      }
+                        ),
+                      );
+                    }
                   }
                 }
                 //codigo de impresion

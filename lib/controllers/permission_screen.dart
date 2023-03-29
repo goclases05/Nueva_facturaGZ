@@ -147,34 +147,79 @@ class _PermissionScreamState extends State<PermissionScream> {
             ],
           ),
           body: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                //Image.asset('assets/gozeri_blanco2.png',color: Colors.cyan.withOpacity(0.3), width: MediaQuery.of(context).size.width*0.3,),
-                Card(
-                    elevation: 5,
-                    child: Container(
-                        padding: EdgeInsets.all(5),
-                        child: Icon(
-                          Icons.location_on,
-                          color: Colors.cyan,
-                          size: 120,
-                        ))),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Text('Permiso de Localización',
-                    style: TextStyle(color: Colors.cyan, fontSize: 25),
-                    textAlign: TextAlign.center),
-                const Text(
-                  'Gozeri Facturación recoge datos de ubicación para habilitar las funciones de Impresión y búsqueda de dispositivos locales (ESC POS) aunque la aplicación esté cerrada o no se esté usando',
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.15,
-                )
-              ],
+            child: Container(
+              padding: EdgeInsets.all(15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  //Image.asset('assets/gozeri_blanco2.png',color: Colors.cyan.withOpacity(0.3), width: MediaQuery.of(context).size.width*0.3,),
+                  Card(
+                      elevation: 5,
+                      child: Container(
+                          padding: EdgeInsets.all(5),
+                          child: Icon(
+                            Icons.location_on,
+                            color: Colors.cyan,
+                            size: 120,
+                          ))),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Text('Permiso de Localización',
+                      style: TextStyle(color: Colors.cyan, fontSize: 25),
+                      textAlign: TextAlign.left),
+                  const Text(
+                    'Gozeri Facturación recoge datos de ubicación para habilitar las funciones de Impresión y búsqueda de dispositivos locales (ESC POS) aunque la aplicación esté cerrada o no se esté usando',
+                    textAlign: TextAlign.justify,
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'La ubicación en segundo plano la utiliza de fondo y permite a Gozeri Facturación encontrar dispositivos cercanos, conectarse a ellos y determinar su ubicacion relativa para las siguientes funciones:',
+                    textAlign: TextAlign.justify,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  ListView(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    reverse: true,
+                    children: [
+                      ListTile(
+                        contentPadding: EdgeInsets.all(0),
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.cyan,
+                          radius: 6,
+                        ),
+                        title: Text(
+                            'Imprimir en los dispositivos de impresión (ESC, POS)'),
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.all(0),
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.cyan,
+                          radius: 6,
+                        ),
+                        title: Text(
+                            'Enlistar los dispositivos cercanos posibles a conectarse'),
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.all(0),
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.cyan,
+                          radius: 6,
+                        ),
+                        title: Text(
+                            'Predeterminar dispositivos para hacer uso de impresión'),
+                      ),
+                    ],
+                  )
+                ],
+              ),
             ),
           ),
           bottomSheet: Row(children: [
