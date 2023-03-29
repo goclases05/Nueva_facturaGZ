@@ -8,10 +8,10 @@ import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/impresoras_provider.dart';
 import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/widgets/registro_metodoPago_listas_widget.dart';
+import 'package:file_saver/file_saver.dart';
 import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
-import 'dart:io' show Platform;
+
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -20,6 +20,8 @@ import 'package:sunmi_printer_plus/column_maker.dart';
 import 'package:sunmi_printer_plus/enums.dart';
 import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
 import 'package:sunmi_printer_plus/sunmi_style.dart';
+
+
 
 import 'escritorio_screen.dart';
 
@@ -289,6 +291,7 @@ class _ViewTicketState extends State<ViewTicket> {
   @override
   Widget build(BuildContext context) {
     final facturaService = Provider.of<Facturacion>(context, listen: false);
+    final print_f = Provider.of<PrintProvider>(context, listen: false);
     print('los devis');
     return WillPopScope(
       onWillPop: () async {
@@ -416,7 +419,7 @@ class _ViewTicketState extends State<ViewTicket> {
                   width: 15,
                 ),
               ]),
-          bottomSheet: sheetButton(context),
+          bottomSheet: sheetButton(context, print_f),
           body: Consumer<PrintProvider>(
             builder: (context, printProvider, child) {
               if (printProvider.loading) {
@@ -776,7 +779,7 @@ class _ViewTicketState extends State<ViewTicket> {
     );
   }
 
-  Container sheetButton(BuildContext context) {
+  Container sheetButton(BuildContext context, print_f) {
     return Container(
       padding: EdgeInsets.all(13),
       child: Column(
@@ -822,96 +825,191 @@ class _ViewTicketState extends State<ViewTicket> {
                     onPressed: () async {
                       showDialog(
                         context: context,
-                        builder: (_) => const AlertDialog(
-                          backgroundColor: Color.fromARGB(255, 115, 160, 236),
+                        builder: (_) =>
+                            const AlertDialog(
+                          backgroundColor:
+                              Color.fromARGB(
+                                  255,
+                                  115,
+                                  160,
+                                  236),
                           content: ListTile(
                             leading:
-                                CircularProgressIndicator(color: Colors.white),
+                                CircularProgressIndicator(
+                                    color: Colors
+                                        .white),
                             title: Text(
-                              'Generando archivo...',
-                              style: TextStyle(color: Colors.white),
+                              'Generando reporte...',
+                              style: TextStyle(
+                                  color: Colors
+                                      .white),
                             ),
                           ),
                         ),
                       );
-
-                      final print_data =
-                          Provider.of<PrintProvider>(context, listen: false);
-                      var data = await print_data.pdf_factura(widget.factura);
+                      print('entro');
+                      var data =await print_f.pdf_factura(widget.factura);
                       print('fuera');
-                      print('fuera' + data.toString());
-                      if (data['message'] == 'no') {
-                        print('ya salio');
-                        Future.delayed(const Duration(milliseconds: 1500), () {
-                          Navigator.of(context, rootNavigator: true).pop();
-                        });
-                        //
-                      } else if (data['message'] == 'Ok') {
+                      print('fuera' +
+                          data.toString());
+                      if (data['message'] == 'Ok') {
+                        Navigator.of(context,
+                                rootNavigator:
+                                    true)
+                            .pop();
+                        showDialog(
+                          context: context,
+                          builder: (_) =>
+                              AlertDialog(
+                            backgroundColor:
+                                const Color
+                                        .fromARGB(
+                                    255,
+                                    109,
+                                    224,
+                                    186),
+                            content: Text(
+                              'Listo para exportar!',
+                              style: const TextStyle(
+                                  color: Colors
+                                      .white),
+                            ),
+                          ),
+                        );
+                        Navigator.of(context,
+                                rootNavigator:
+                                    true)
+                            .pop();
+
                         ///descarga de archivos
-                        final status = await Permission.storage.request();
+                        final status =
+                            await Permission
+                                .storage
+                                .request();
                         if (status.isGranted) {
                           showDialog(
                             context: context,
-                            builder: (_) => const AlertDialog(
+                            builder: (_) =>
+                                const AlertDialog(
                               backgroundColor:
-                                  Color.fromARGB(255, 225, 130, 28),
+                                  Color
+                                      .fromARGB(
+                                          255,
+                                          225,
+                                          130,
+                                          28),
                               content: ListTile(
                                 leading: CircularProgressIndicator(
-                                    color: Colors.white),
+                                    color: Colors
+                                        .white),
                                 title: Text(
                                   'descargando...',
-                                  style: TextStyle(color: Colors.white),
+                                  style: TextStyle(
+                                      color: Colors
+                                          .white),
                                 ),
                               ),
                             ),
                           );
-                          final basestorage =
-                              await getApplicationDocumentsDirectory();
-                          String url = data['link'];
+                          final basestorage =await getApplicationDocumentsDirectory();
+                          String url =data['link'];
+                          ALDownloader.initialize();
                           ALDownloader.configurePrint(
-                              enabled: true, frequentEnabled: false);
-                          ALDownloader.download(url,
-                              directoryPath: basestorage!.path,
-                              fileName: data['name'],
+                                  enabled: true,
+                                  frequentEnabled:
+                                      false);
+                         ALDownloader.download(
+                              url,
+                              directoryPath:
+                                  basestorage!
+                                      .path,
+                              fileName:
+                                  data['name'],
                               downloaderHandlerInterface:
                                   ALDownloaderHandlerInterface(
-                                      progressHandler: (progress) {
+                                      progressHandler:
+                                          (progress) {
                                 debugPrint(
                                     'ALDownloader | download progress = $progress, url = $url\n');
-                              }, succeededHandler: () async {
+                              }, succeededHandler:
+                                          () async {
                                 debugPrint(
                                     'ALDownloader | download succeeded, url = $url\n');
-                                Navigator.of(context, rootNavigator: true)
+                                Navigator.of(
+                                        context,
+                                        rootNavigator:
+                                            true)
                                     .pop();
                                 //print('la ruta: '+basestorage.path+'/nuevo.pdf');
-                                final String filePath =
-                                    basestorage.path + '/' + data['name'];
-                                OpenFilex.open(filePath);
-                              }, failedHandler: () {
-                                Navigator.of(context, rootNavigator: true)
+                                final String
+                                    filePath =
+                                    basestorage
+                                            .path +
+                                        '/' +
+                                        data[
+                                            'name'];
+
+                                OpenFilex.open(
+                                    filePath);
+                                /*Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Screenfile(filePath: filePath),
+                          ));*/
+                                /*final Uri _url = Uri.parse(basestorage.path+'/nuevo.pdf');
+                        if (!await launchUrl(_url)) {
+                          throw 'Could not launch $_url';
+                        }*/
+                              }, failedHandler:
+                                          () {
+                                Navigator.of(
+                                        context,
+                                        rootNavigator:
+                                            true)
                                     .pop();
                                 showDialog(
-                                  context: context,
-                                  builder: (_) => AlertDialog(
+                                  context:
+                                      context,
+                                  builder: (_) =>
+                                      AlertDialog(
                                     backgroundColor:
-                                        Color.fromARGB(255, 224, 211, 18),
-                                    content: ListTile(
-                                      leading: Icon(
-                                        Icons.warning,
-                                        color: Colors.white,
+                                        Color.fromARGB(
+                                            255,
+                                            224,
+                                            211,
+                                            18),
+                                    content:
+                                        ListTile(
+                                      leading:
+                                          Icon(
+                                        Icons
+                                            .warning,
+                                        color: Colors
+                                            .white,
                                       ),
-                                      title: Text(
+                                      title:
+                                          Text(
                                         'Fallo la descarga por favor intentalo de nuevo',
                                         style: const TextStyle(
-                                            color: Colors.white),
+                                            color:
+                                                Colors.white),
                                       ),
                                     ),
                                   ),
                                 );
-                              }, pausedHandler: () {
+                              }, pausedHandler:
+                                          () {
                                 debugPrint(
                                     'ALDownloader | download paused, url = $url\n');
                               }));
+                              /*await FileSaver.instance.saveFile(
+                                name: data['name'],
+                                filePath: basestorage.path,
+                                link: data['link'],
+                                ext: '.pdf'
+                              );
+
+                              //OpenFilex.open(basestorage.path+'/'+data['name']);*/
                         } else {
                           print('no permision');
                         }
