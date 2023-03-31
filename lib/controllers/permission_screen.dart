@@ -166,18 +166,18 @@ class _PermissionScreamState extends State<PermissionScream> {
                   const SizedBox(
                     height: 10,
                   ),
-                  const Text('Permiso de Localización',
+                  const Text('Permiso de ubicación',
                       style: TextStyle(color: Colors.cyan, fontSize: 25),
                       textAlign: TextAlign.left),
                   const Text(
-                    'Gozeri Facturación recoge datos de ubicación para habilitar las funciones de Impresión y búsqueda de dispositivos locales (ESC POS) aunque la aplicación esté cerrada o no se esté usando',
+                    'Gozeri Facturación recopila datos de ubicación para habilitar las funciones de Impresión y búsqueda de dispositivos locales (ESC POS) incluso cuando la aplicación está cerrada o no está en uso.',
                     textAlign: TextAlign.justify,
                   ),
                   SizedBox(
                     height: 20,
                   ),
                   Text(
-                    'La ubicación en segundo plano la utiliza de fondo y permite a Gozeri Facturación encontrar dispositivos cercanos, conectarse a ellos y determinar su ubicacion relativa para las siguientes funciones:',
+                    'La ubicación permite a Gozeri Facturación encontrar dispositivos cercanos, conectarse a ellos y determinar su ubicación relativa para las siguientes funciones:',
                     textAlign: TextAlign.justify,
                   ),
                   SizedBox(
@@ -196,7 +196,16 @@ class _PermissionScreamState extends State<PermissionScream> {
                           radius: 6,
                         ),
                         title: Text(
-                            'Imprimir en los dispositivos de impresión (ESC, POS)'),
+                            'Imprimir en los dispositivos de impresión mas cercanos previamente seleccionados (ESC, POS)'),
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.all(0),
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.cyan,
+                          radius: 6,
+                        ),
+                        title: Text(
+                            'Permite la conección entre el dispositivo movil y el dispositivo bluetooth más cercanos (ESC, POS)'),
                       ),
                       ListTile(
                         contentPadding: EdgeInsets.all(0),
