@@ -30,9 +30,9 @@ class PrintProvider extends ChangeNotifier {
     final empresa = Preferencias.data_empresa;
     final id_usuario = Preferencias.data_id;
     print(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/view_print_comanda.php?empresa=${empresa}&id=${id_tmp}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/view_print_comanda.php?empresa=${empresa}&id=${id_tmp}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/view_print_comanda.php?empresa=${empresa}&id=${id_tmp}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/view_print_comanda.php?empresa=${empresa}&id=${id_tmp}");
 
     final resp = await http.get(uri);
     print('el dato');
@@ -51,9 +51,9 @@ class PrintProvider extends ChangeNotifier {
     final empresa = Preferencias.data_empresa;
 
     print(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/view_print.php?id=${factura}&empresa=${empresa}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/view_print.php?id=${factura}&empresa=${empresa}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/view_print.php?id=${factura}&empresa=${empresa}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/view_print.php?id=${factura}&empresa=${empresa}");
 
     final resp = await http.get(uri);
     //print(resp.body);

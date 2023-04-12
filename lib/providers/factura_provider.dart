@@ -51,9 +51,9 @@ class Facturacion extends ChangeNotifier {
       initialSerie = '0';
       notifyListeners();
       print(
-          "https://app.gozeri.com/versiones/v1.5.0/factura/serie_tmp.php?tmp=${tmp}&accion=read");
+          "https://app.gozeri.com/versiones/v1.5.2/factura/serie_tmp.php?tmp=${tmp}&accion=read");
       final Uri uri = Uri.parse(
-          "https://app.gozeri.com/versiones/v1.5.0/factura/serie_tmp.php?tmp=${tmp}&accion=read");
+          "https://app.gozeri.com/versiones/v1.5.2/factura/serie_tmp.php?tmp=${tmp}&accion=read");
 
       final resp = await http.get(uri);
       if (resp.body == '0') {
@@ -68,9 +68,9 @@ class Facturacion extends ChangeNotifier {
       }
     } else if (accion == 'add') {
       print(
-          "https://app.gozeri.com/versiones/v1.5.0/factura/serie_tmp.php?tmp=${tmp}&accion=add&serie=${serie}");
+          "https://app.gozeri.com/versiones/v1.5.2/factura/serie_tmp.php?tmp=${tmp}&accion=add&serie=${serie}");
       final Uri uri = Uri.parse(
-          "https://app.gozeri.com/versiones/v1.5.0/factura/serie_tmp.php?tmp=${tmp}&accion=add&serie=${serie}");
+          "https://app.gozeri.com/versiones/v1.5.2/factura/serie_tmp.php?tmp=${tmp}&accion=add&serie=${serie}");
 
       final resp = await http.get(uri);
       if (resp.body == '1') {
@@ -86,9 +86,9 @@ class Facturacion extends ChangeNotifier {
     final sucursal = Preferencias.sucursal;
     loadMetodo = true;
     notifyListeners();
-    print("https://app.gozeri.com/versiones/v1.5.0/metodoPago.php");
+    print("https://app.gozeri.com/versiones/v1.5.2/metodoPago.php");
     final Uri uri =
-        Uri.parse("https://app.gozeri.com/versiones/v1.5.0/metodoPago.php");
+        Uri.parse("https://app.gozeri.com/versiones/v1.5.2/metodoPago.php");
 
     final resp = await http.get(uri);
     var js = json.decode(resp.body);
@@ -112,9 +112,9 @@ class Facturacion extends ChangeNotifier {
 
     notifyListeners();
     print(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/transacciones.php?id=${tmp}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/transacciones.php?id=${tmp}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/transacciones.php?id=${tmp}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/transacciones.php?id=${tmp}");
 
     final resp = await http.get(uri);
     var js = json.decode(resp.body);
@@ -155,9 +155,9 @@ class Facturacion extends ChangeNotifier {
     final empresa = Preferencias.data_empresa;
     if (accion == 'add') {
       print(
-          "https://app.gozeri.com/versiones/v1.5.0/factura/fac_metodoPago.php?accion=${accion}&tmp=${tmp}&abono=${abono}&id_usuario=${usuario}&metodo=${metodo}&cuenta=${cuenta}&referencia=${referencia}&empresa=${empresa}");
+          "https://app.gozeri.com/versiones/v1.5.2/factura/fac_metodoPago.php?accion=${accion}&tmp=${tmp}&abono=${abono}&id_usuario=${usuario}&metodo=${metodo}&cuenta=${cuenta}&referencia=${referencia}&empresa=${empresa}");
       final Uri uri = Uri.parse(
-          "https://app.gozeri.com/versiones/v1.5.0/factura/fac_metodoPago.php?accion=${accion}&tmp=${tmp}&abono=${abono}&id_usuario=${usuario}&metodo=${metodo}&cuenta=${cuenta}&referencia=${referencia}&empresa=${empresa}");
+          "https://app.gozeri.com/versiones/v1.5.2/factura/fac_metodoPago.php?accion=${accion}&tmp=${tmp}&abono=${abono}&id_usuario=${usuario}&metodo=${metodo}&cuenta=${cuenta}&referencia=${referencia}&empresa=${empresa}");
 
       final resp = await http.get(uri);
       return resp.body;
@@ -170,9 +170,9 @@ class Facturacion extends ChangeNotifier {
     final empresa = Preferencias.data_empresa;
     final id_usuario = Preferencias.data_id;
     print(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/certificar_core.php?id=${tmp}&usuario=${id_usuario}&empresa=${empresa}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/certificar_core.php?id=${tmp}&usuario=${id_usuario}&empresa=${empresa}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/certificar_core.php?id=${tmp}&usuario=${id_usuario}&empresa=${empresa}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/certificar_core.php?id=${tmp}&usuario=${id_usuario}&empresa=${empresa}");
 
     final resp = await http.get(uri);
     print('el dato');
@@ -184,9 +184,9 @@ class Facturacion extends ChangeNotifier {
     final empresa = Preferencias.data_empresa;
     final id_usuario = Preferencias.data_id;
     print(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/anulacion_factura.php?id=${id_f}&usuario=${id_usuario}&empresa=${empresa}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/anulacion_factura.php?id=${id_f}&usuario=${id_usuario}&empresa=${empresa}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/anulacion_factura.php?id=${id_f}&usuario=${id_usuario}&empresa=${empresa}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/anulacion_factura.php?id=${id_f}&usuario=${id_usuario}&empresa=${empresa}");
 
     final resp = await http.get(uri);
     print('el dato');
@@ -199,9 +199,9 @@ class Facturacion extends ChangeNotifier {
     loadBancos = true;
     notifyListeners();
     print(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/bancos.php?empresa=${empresa}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/bancos.php?empresa=${empresa}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/bancos.php?empresa=${empresa}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/bancos.php?empresa=${empresa}");
 
     final resp = await http.get(uri);
 
@@ -229,9 +229,9 @@ class Facturacion extends ChangeNotifier {
     final id_usuario = Preferencias.data_id;
 
     print(
-        "https://${_baseUrl}/versiones/v1.5.0/factura/new_tmp_factura.php?empresa=${empresa}&id_usuario=${id_usuario}&sucu=${Preferencias.sucursal}");
+        "https://${_baseUrl}/versiones/v1.5.2/factura/new_tmp_factura.php?empresa=${empresa}&id_usuario=${id_usuario}&sucu=${Preferencias.sucursal}");
     final Uri uri = Uri.parse(
-        "https://${_baseUrl}/versiones/v1.5.0/factura/new_tmp_factura.php?empresa=${empresa}&id_usuario=${id_usuario}&sucu=${Preferencias.sucursal}");
+        "https://${_baseUrl}/versiones/v1.5.2/factura/new_tmp_factura.php?empresa=${empresa}&id_usuario=${id_usuario}&sucu=${Preferencias.sucursal}");
 
     final resp = await http.get(uri);
 
@@ -258,9 +258,9 @@ class Facturacion extends ChangeNotifier {
     final id_usuario = Preferencias.data_id;
 
     print(
-        "https://${_baseUrl}/versiones/v1.5.0/factura/read_det_factura.php?id_tmp=${id}&id_empresa=${empresa}");
+        "https://${_baseUrl}/versiones/v1.5.2/factura/read_det_factura.php?id_tmp=${id}&id_empresa=${empresa}");
     final Uri uri = Uri.parse(
-        "https://${_baseUrl}/versiones/v1.5.0/factura/read_det_factura.php?id_tmp=${id}&id_empresa=${empresa}");
+        "https://${_baseUrl}/versiones/v1.5.2/factura/read_det_factura.php?id_tmp=${id}&id_empresa=${empresa}");
 
     final resp = await http.get(uri);
 
@@ -291,9 +291,9 @@ class Facturacion extends ChangeNotifier {
 
   Future<dynamic> delete_producto(String id_tmp, String id_item) async {
     print(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/edit_articulo_detalle_car.php?id_tmp=${id_tmp}&id_item=${id_item}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/edit_articulo_detalle_car.php?id_tmp=${id_tmp}&id_item=${id_item}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/edit_articulo_detalle_car.php?id_tmp=${id_tmp}&id_item=${id_item}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/edit_articulo_detalle_car.php?id_tmp=${id_tmp}&id_item=${id_item}");
 
     final resp = await http.get(uri);
     if (resp.body == 'OK') {
@@ -306,9 +306,9 @@ class Facturacion extends ChangeNotifier {
   //elimina transacion
   Future<dynamic> delete_transaccion(String id_tmp, String trans) async {
     print(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/fac_metodoPago.php?id_tmp=${id_tmp}&id_trans=${trans}&accion=delete");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/fac_metodoPago.php?id_tmp=${id_tmp}&id_trans=${trans}&accion=delete");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/fac_metodoPago.php?id_tmp=${id_tmp}&id_trans=${trans}&accion=delete");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/fac_metodoPago.php?id_tmp=${id_tmp}&id_trans=${trans}&accion=delete");
 
     final resp = await http.get(uri);
     return resp.body;
@@ -324,9 +324,9 @@ class Facturacion extends ChangeNotifier {
     if (accion == 'read') {
       //busca si se encuentra un cliente registrado a la factura
       print(
-          "https://app.gozeri.com/versiones/v1.5.0/factura/fac_cliente.php?tmp=${tmp}&accion=read");
+          "https://app.gozeri.com/versiones/v1.5.2/factura/fac_cliente.php?tmp=${tmp}&accion=read");
       final Uri uri = Uri.parse(
-          "https://app.gozeri.com/versiones/v1.5.0/factura/fac_cliente.php?tmp=${tmp}&accion=read");
+          "https://app.gozeri.com/versiones/v1.5.2/factura/fac_cliente.php?tmp=${tmp}&accion=read");
 
       final resp = await http.get(uri);
       final res_json = await json.decode(resp.body);
@@ -339,9 +339,9 @@ class Facturacion extends ChangeNotifier {
       return notifyListeners();
     } else if (accion == 'remove') {
       print(
-          "https://app.gozeri.com/versiones/v1.5.0/factura/fac_cliente.php?tmp=${tmp}&accion=remove&cliente=${id_cliente}");
+          "https://app.gozeri.com/versiones/v1.5.2/factura/fac_cliente.php?tmp=${tmp}&accion=remove&cliente=${id_cliente}");
       final Uri uri = Uri.parse(
-          "https://app.gozeri.com/versiones/v1.5.0/factura/fac_cliente.php?tmp=${tmp}&accion=remove&cliente=${id_cliente}");
+          "https://app.gozeri.com/versiones/v1.5.2/factura/fac_cliente.php?tmp=${tmp}&accion=remove&cliente=${id_cliente}");
 
       final resp = await http.get(uri);
 
@@ -361,9 +361,9 @@ class Facturacion extends ChangeNotifier {
     final id_usuario = Preferencias.data_id;
 
     print(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/create_cliente.php?tmp=${tmp}&nombre=${nombre}&apellidos=${apellidos}&nit=${nit}&idempresa=${empresa}&idusuario=${id_usuario}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/create_cliente.php?tmp=${tmp}&nombre=${nombre}&apellidos=${apellidos}&nit=${nit}&idempresa=${empresa}&idusuario=${id_usuario}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/create_cliente.php?tmp=${tmp}&nombre=${nombre}&apellidos=${apellidos}&nit=${nit}&idempresa=${empresa}&idusuario=${id_usuario}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/create_cliente.php?tmp=${tmp}&nombre=${nombre}&apellidos=${apellidos}&nit=${nit}&idempresa=${empresa}&idusuario=${id_usuario}");
 
     final resp = await http.get(uri);
     Map<String, dynamic> rhh = await json.decode(resp.body);
@@ -376,9 +376,9 @@ class Facturacion extends ChangeNotifier {
 
   Future<String> delete_tmp(String tmp) async {
     print(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/eliminar_factura.php?id=${tmp}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/eliminar_factura.php?id=${tmp}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/eliminar_factura.php?id=${tmp}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/eliminar_factura.php?id=${tmp}");
 
     final resp = await http.get(uri);
     print('se elimino: ' + resp.body);
@@ -390,9 +390,9 @@ class Facturacion extends ChangeNotifier {
     final id_usuario = Preferencias.data_id;
     cambio_c = '0';
     print(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/search_cliente_sat.php?SAT=${nit}&empresa=${empresa}&idusuario=${id_usuario}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/search_cliente_sat.php?SAT=${nit}&empresa=${empresa}&idusuario=${id_usuario}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/search_cliente_sat.php?SAT=${nit}&empresa=${empresa}&idusuario=${id_usuario}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/search_cliente_sat.php?SAT=${nit}&empresa=${empresa}&idusuario=${id_usuario}");
 
     final resp = await http.get(uri);
     final jso = json.decode(resp.body);

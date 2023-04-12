@@ -31,9 +31,9 @@ class _ItemCliente extends State<ItemCliente> {
     final tipo = Preferencias.tipo;
 
     print(
-        "https://${_baseUrl}/versiones/v1.5.0/factura/clientes_factura.php?empresa=${empresa}&idusuario=${id_usuario}&clientes=${_inputText}&tipo=${tipo}");
+        "https://${_baseUrl}/versiones/v1.5.2/factura/clientes_factura.php?empresa=${empresa}&idusuario=${id_usuario}&clientes=${_inputText}&tipo=${tipo}");
     final Uri uri = Uri.parse(
-        "https://${_baseUrl}/versiones/v1.5.0/factura/clientes_factura.php?empresa=${empresa}&idusuario=${id_usuario}&clientes=${_inputText}&tipo=${tipo}");
+        "https://${_baseUrl}/versiones/v1.5.2/factura/clientes_factura.php?empresa=${empresa}&idusuario=${id_usuario}&clientes=${_inputText}&tipo=${tipo}");
 
     final resp = await http.get(uri);
     int count = json.decode(resp.body).length;

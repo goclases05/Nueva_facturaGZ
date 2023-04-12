@@ -53,7 +53,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
   String serialNumber = "";
   String printerVersion = "";
   //SUNMIN
-  bool state_bluetooth=false;
+  bool state_bluetooth = false;
 
   Future<bool> getCursosData({bool isRefresh = false}) async {
     // Read all values
@@ -69,9 +69,9 @@ class _ViewFacturasState extends State<ViewFacturas> {
       list_tmp.clear();
     }
     print(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.0/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
+        "https://app.gozeri.com/versiones/v1.5.2/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
 
     final resp = await http.get(uri);
     final o = json.decode(resp.body);
@@ -112,12 +112,12 @@ class _ViewFacturasState extends State<ViewFacturas> {
         print('on');
         //escaneo
         setState(() {
-          state_bluetooth=true;
+          state_bluetooth = true;
         });
         //escaneo
       } else if (val == 10) {
         setState(() {
-          state_bluetooth=false;
+          state_bluetooth = false;
         });
       }
     });
@@ -169,75 +169,72 @@ class _ViewFacturasState extends State<ViewFacturas> {
       builder: (_) => const AlertDialog(
         backgroundColor: Color.fromARGB(255, 243, 231, 155),
         content: ListTile(
-          leading: CircularProgressIndicator(color: Colors.white,),
+          leading: CircularProgressIndicator(
+            color: Colors.white,
+          ),
           title: Text(
             'Escaneando dispositivos de impresión',
-            style: TextStyle(color: Colors.white,fontSize: 15),
+            style: TextStyle(color: Colors.white, fontSize: 15),
           ),
         ),
       ),
     );
-    
-    Future.delayed(Duration(seconds: 3),(){
+
+    Future.delayed(Duration(seconds: 3), () {
       Navigator.of(context).pop();
       print('termino');
       _printerManager.stopScan();
 
-      if(Preferencias.mac!=''){
-        //impresora predeterminada 
-        _printerManager.scanResults.listen((event) { 
-          
+      if (Preferencias.mac != '') {
+        //impresora predeterminada
+        _printerManager.scanResults.listen((event) {
           print("preferencia impresora");
           print(Preferencias.mac);
-          int u=0;
+          int u = 0;
           //existe una impresora predeterminada
-          for(var y=0;y<event.length;y++){
+          for (var y = 0; y < event.length; y++) {
             if (event[y].address == Preferencias.mac) {
               //store the element.
               print('esta es');
-               _startPrint(event[y],id_f,accion);
+              _startPrint(event[y], id_f, accion);
             }
           }
         });
-      }else{
+      } else {
         //lista de impresoras
         showDialog(
-          context: context,
-          builder: ((context) {
+            context: context,
+            builder: ((context) {
+              return Consumer<ImpresorasProvider>(
+                  builder: (context, impresoras, child) {
+                _printerManager.scanResults.listen((devices) async {
+                  impresoras.impresoras_disponibles(devices);
+                });
 
-            return Consumer<ImpresorasProvider>(
-              builder: (context, impresoras, child) {
-                 _printerManager.scanResults.listen((devices)async {
-                    impresoras.impresoras_disponibles(devices);
-                 });
-
-                if(Preferencias.mac != ''){
+                if (Preferencias.mac != '') {
                   print("preferencia impresora");
                   print(Preferencias.mac);
-                  int u=0;
+                  int u = 0;
                   //existe una impresora predeterminada
-                  for(var y=0;y<impresoras.devices.length;y++){
+                  for (var y = 0; y < impresoras.devices.length; y++) {
                     if (impresoras.devices[y].address == Preferencias.mac) {
                       //store the element.
                       print('esta es');
-                      _startPrint(impresoras.devices[y],id_f,accion);
+                      _startPrint(impresoras.devices[y], id_f, accion);
                     }
                   }
-        
+
                   print('salio de ciclo');
-                  if(u==0){
+                  if (u == 0) {
                     return AlertDialog(
                         backgroundColor: Color.fromARGB(255, 255, 255, 255),
                         content: Text('impresión realizada'));
-                  }else{
+                  } else {
                     return AlertDialog(
                         backgroundColor: Color.fromARGB(255, 255, 255, 255),
                         content: Text('error'));
                   }
-                  
-                    
-
-                }else{
+                } else {
                   //no existe predeterminada
                   return AlertDialog(
                     backgroundColor: Color.fromARGB(255, 255, 255, 255),
@@ -246,59 +243,70 @@ class _ViewFacturasState extends State<ViewFacturas> {
                       children: [
                         Text(
                           'Impresoras',
-                          style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
-                        (impresoras.devices.length==0)?
-                        Text(
-                          'No se encuentran Impresoras disponibles',
-                          style: TextStyle(color: Colors.black,fontSize: 15,),
-                          textAlign: TextAlign.center,
-                        ):
-                        Container(
-                          height: 300.0, // Change as per your requirement
-                          width: 300.0,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: impresoras.devices.length,
-                            itemBuilder: (BuildContext context, int i) {
-                              return ListTile(
-                                title: Text("${impresoras.devices[i].name}"),
-                                subtitle: Text("${impresoras.devices[i].address}"),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () async {
-                                        _startPrint(impresoras.devices[i],id_f,accion);
-                                      },
-                                      child: Container(
-                                        margin: const EdgeInsets.all(5),
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                            //color: Theme.of(context).primaryColor,
-                                            color: widget.colorPrimary,
-                                            borderRadius: BorderRadius.circular(15)),
-                                        child: const Icon(
-                                          Icons.print,
-                                          color: Colors.white,
-                                          size: 25,
-                                        ),
-                                      ),
-                                    )
-                                  ],
+                        (impresoras.devices.length == 0)
+                            ? Text(
+                                'No se encuentran Impresoras disponibles',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
                                 ),
-                                onTap: () {},
-                              );
-                            },
-                          ),
-                        ),
+                                textAlign: TextAlign.center,
+                              )
+                            : Container(
+                                height: 300.0, // Change as per your requirement
+                                width: 300.0,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: impresoras.devices.length,
+                                  itemBuilder: (BuildContext context, int i) {
+                                    return ListTile(
+                                      title:
+                                          Text("${impresoras.devices[i].name}"),
+                                      subtitle: Text(
+                                          "${impresoras.devices[i].address}"),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () async {
+                                              _startPrint(impresoras.devices[i],
+                                                  id_f, accion);
+                                            },
+                                            child: Container(
+                                              margin: const EdgeInsets.all(5),
+                                              padding: const EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                  //color: Theme.of(context).primaryColor,
+                                                  color: widget.colorPrimary,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15)),
+                                              child: const Icon(
+                                                Icons.print,
+                                                color: Colors.white,
+                                                size: 25,
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      onTap: () {},
+                                    );
+                                  },
+                                ),
+                              ),
                       ],
                     ),
                   );
                 }
               });
-          }));
+            }));
       }
     });
   }
@@ -421,20 +429,22 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                             context, list_tmp[index].idFactTmp);
                                       } else {
                                         //PRINT NO SUNMIN
-                                        if(state_bluetooth==true){
+                                        if (state_bluetooth == true) {
                                           //escaneo
-                                          bt_initPrinter('comanda',list_tmp[index].idFactTmp);
+                                          bt_initPrinter('comanda',
+                                              list_tmp[index].idFactTmp);
                                           //escaneo
-                                        }else{
+                                        } else {
                                           print('off');
                                           showDialog(
                                             context: context,
                                             builder: (_) => const AlertDialog(
-                                              backgroundColor:
-                                                  Color.fromARGB(255, 224, 140, 31),
+                                              backgroundColor: Color.fromARGB(
+                                                  255, 224, 140, 31),
                                               content: Text(
                                                 'Bluetooth sin Conexión',
-                                                style: TextStyle(color: Colors.white),
+                                                style: TextStyle(
+                                                    color: Colors.white),
                                               ),
                                             ),
                                           );
@@ -535,20 +545,24 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                 list_emi[index].idFactTmp);
                                           } else {
                                             //PRINT NO SUNMIN
-                                            if(state_bluetooth==true){
+                                            if (state_bluetooth == true) {
                                               //escaneo
-                                              bt_initPrinter('f',list_emi[index].idFactTmp);
+                                              bt_initPrinter('f',
+                                                  list_emi[index].idFactTmp);
                                               //escaneo
-                                            }else{
+                                            } else {
                                               print('off');
                                               showDialog(
                                                 context: context,
-                                                builder: (_) => const AlertDialog(
+                                                builder: (_) =>
+                                                    const AlertDialog(
                                                   backgroundColor:
-                                                      Color.fromARGB(255, 224, 140, 31),
+                                                      Color.fromARGB(
+                                                          255, 224, 140, 31),
                                                   content: Text(
                                                     'Bluetooth sin Conexión',
-                                                    style: TextStyle(color: Colors.white),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
                                                   ),
                                                 ),
                                               );

@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:factura_gozeri/global/globals.dart';
+import 'package:factura_gozeri/providers/preferencias_art_provider.dart';
 import 'package:factura_gozeri/widgets/articulo_horizontal_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh_plus/pull_to_refresh_plus.dart';
 
 import '../models/producto_x_departamento_models.dart';
@@ -23,6 +27,7 @@ class ViewProductoTab extends StatefulWidget {
 
 class _viewproductotab extends State<ViewProductoTab> {
   List<Producto> list_producto = [];
+  bool edit_precio = false;
 
   final RefreshController refreshController =
       RefreshController(initialRefresh: true);
@@ -33,9 +38,9 @@ class _viewproductotab extends State<ViewProductoTab> {
     final empresa = Preferencias.data_empresa;
 
     print(
-        "https://app.gozeri.com/versiones/v1.5.0/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}");
+        "https://app.gozeri.com/versiones/v1.5.2/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.0/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}");
+        "https://app.gozeri.com/versiones/v1.5.2/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}");
     final response = await http.get(uri);
     i = i + 10;
     if (response.statusCode == 200) {
@@ -66,7 +71,17 @@ class _viewproductotab extends State<ViewProductoTab> {
     return initWidget();
   }
 
-  initWidget() {
+  initWidget() async {
+    final preferencias_art =
+        Provider.of<Preferencias_art>(context, listen: false);
+    var data;
+    Future.delayed(Duration(milliseconds: 0), () async {
+      data = await preferencias_art.preferencias_producto();
+      print('es el data');
+      print(data['70']);
+    });
+    print('salio xd');
+    print(data['70']);
     return Container(
       /*decoration: const BoxDecoration(
         gradient: LinearGradient(

@@ -31,9 +31,9 @@ class Cart with ChangeNotifier {
     final empresa = Preferencias.data_empresa;
     final id_usuario = Preferencias.data_id;
     print(
-        "https://${_baseUrl}/versiones/v1.5.0/factura/add_cart_factura.php?id_prod=${id_prod}&id_fact=${id_tmp}&idusuario=${id_usuario}&cantida=${cantidad_p}&precio=${precio}");
+        "https://${_baseUrl}/versiones/v1.5.2/factura/add_cart_factura.php?id_prod=${id_prod}&id_fact=${id_tmp}&idusuario=${id_usuario}&cantida=${cantidad_p}&precio=${precio}");
     final Uri uri = Uri.parse(
-        "https://${_baseUrl}/versiones/v1.5.0/factura/add_cart_factura.php?id_prod=${id_prod}&id_fact=${id_tmp}&idusuario=${id_usuario}&cantida=${cantidad_p}&precio=${precio}");
+        "https://${_baseUrl}/versiones/v1.5.2/factura/add_cart_factura.php?id_prod=${id_prod}&id_fact=${id_tmp}&idusuario=${id_usuario}&cantida=${cantidad_p}&precio=${precio}");
 
     final resp = await http.get(uri);
 
