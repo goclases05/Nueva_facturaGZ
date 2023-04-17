@@ -9,7 +9,7 @@ class Preferencias_art extends ChangeNotifier {
 
   Preferencias_art() {}
 
-  Future preferencias_producto() async {
+  Future<Map<dynamic, dynamic>> preferencias_producto() async {
     final empresa = Preferencias.data_empresa;
     final id_usuario = Preferencias.data_id;
     print(

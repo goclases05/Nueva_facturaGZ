@@ -4,6 +4,7 @@ import 'package:edge_alerts/edge_alerts.dart';
 import 'package:factura_gozeri/global/globals.dart';
 import 'package:factura_gozeri/models/producto_x_departamento_models.dart';
 import 'package:factura_gozeri/providers/carshop_provider.dart';
+import 'package:factura_gozeri/providers/preferencias_art_provider.dart';
 import 'package:factura_gozeri/widgets/articulo_sheet_widget.dart';
 import 'package:factura_gozeri/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -55,6 +56,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
   List<String> precios_list = [];
   late int _counterValue = 1;
   String _counterString = '';
+  String edit_precio = '0';
 
   String? _dropdownValue = '';
   int position = 0;
@@ -126,11 +128,24 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
   }
 
   final myController = TextEditingController();
+  late TextEditingController _controller;
 
   @override
   void initState() {
     super.initState();
 
+    Future.delayed(Duration(milliseconds: 0), () async {
+      final preferencias_art =
+          Provider.of<Preferencias_art>(context, listen: false);
+      final js = await preferencias_art.preferencias_producto();
+      print('dalor ');
+
+      print(js['70']['CONTENIDO']);
+      edit_precio = js['70']['CONTENIDO'];
+      setState(() {});
+    });
+    _controller = TextEditingController();
+    _controller.text = "${widget.listProd.precio}";
     myController.addListener(_printLatestValue);
   }
 
@@ -139,6 +154,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
     // Limpia el controlador cuando el widget se elimine del árbol de widgets
     // Esto también elimina el listener _printLatestValue
     myController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -235,26 +251,48 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                           color: widget.colorPrimary),
                                     ),
                                     Expanded(
-                                      child: DropdownButton<String>(
-                                          isExpanded: true,
-                                          hint: Text("0.00"),
-                                          items: _do
-                                              .map<DropdownMenuItem<String>>(
+                                      child: (edit_precio == '0')
+                                          ? DropdownButton<String>(
+                                              isExpanded: true,
+                                              hint: Text("0.00"),
+                                              items: _do.map<
+                                                      DropdownMenuItem<String>>(
                                                   (String value) {
-                                            /*(position == 0) ? position : position++;
+                                                /*(position == 0) ? position : position++;
                                             setState(() {});*/
-                                            return DropdownMenuItem<String>(
-                                              value:
-                                                  value, //position.toString(),
-                                              child: Text(value),
-                                            );
-                                          }).toList(),
-                                          value: (_dropdownValue == '')
-                                              ? _do[0]
-                                              : _dropdownValue,
-                                          onChanged: ((value) => setState(() {
-                                                _dropdownValue = value;
-                                              }))),
+                                                return DropdownMenuItem<String>(
+                                                  value:
+                                                      value, //position.toString(),
+                                                  child: Text(value),
+                                                );
+                                              }).toList(),
+                                              value: (_dropdownValue == '')
+                                                  ? _do[0]
+                                                  : _dropdownValue,
+                                              onChanged: ((value) =>
+                                                  setState(() {
+                                                    _dropdownValue = value;
+                                                  })))
+                                          : TextField(
+                                              textAlign: TextAlign.left,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              cursorColor: widget.colorPrimary,
+                                              decoration: const InputDecoration(
+                                                fillColor: Colors.white,
+                                                hintText: "0.00",
+                                                enabledBorder: InputBorder.none,
+                                                focusedBorder: InputBorder.none,
+                                              ),
+                                              controller: _controller,
+                                              onChanged: (value) {
+                                                print(value);
+                                                _controller.text = value;
+                                                setState(() {
+                                                  _dropdownValue = value;
+                                                });
+                                              },
+                                            ),
                                     )
                                   ],
                                 ),

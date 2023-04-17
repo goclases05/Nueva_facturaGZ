@@ -27,7 +27,7 @@ class ViewProductoTab extends StatefulWidget {
 
 class _viewproductotab extends State<ViewProductoTab> {
   List<Producto> list_producto = [];
-  bool edit_precio = false;
+  String edit_precio = '0';
 
   final RefreshController refreshController =
       RefreshController(initialRefresh: true);
@@ -67,21 +67,27 @@ class _viewproductotab extends State<ViewProductoTab> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return initWidget();
+  void initState() {
+    // TODO: implement initState
+    Future.delayed(Duration(milliseconds: 0), () async {
+      final preferencias_art =
+          Provider.of<Preferencias_art>(context, listen: false);
+      final js = await preferencias_art.preferencias_producto();
+      print('dalor ');
+
+      print(js['70']['CONTENIDO']);
+      edit_precio = js['70']['CONTENIDO'];
+    });
+
+    super.initState();
   }
 
-  initWidget() async {
-    final preferencias_art =
-        Provider.of<Preferencias_art>(context, listen: false);
-    var data;
-    Future.delayed(Duration(milliseconds: 0), () async {
-      data = await preferencias_art.preferencias_producto();
-      print('es el data');
-      print(data['70']);
-    });
-    print('salio xd');
-    print(data['70']);
+  @override
+  Widget build(BuildContext context) {
+    return initWidget(edit_precio);
+  }
+
+  initWidget(String edit_precio) {
     return Container(
       /*decoration: const BoxDecoration(
         gradient: LinearGradient(
