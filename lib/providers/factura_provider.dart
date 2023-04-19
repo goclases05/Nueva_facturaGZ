@@ -82,6 +82,18 @@ class Facturacion extends ChangeNotifier {
     }
   }
 
+  Future addOB(String observacion, String id) async {
+    print(
+        "https://app.gozeri.com/versiones/v1.5.2/factura/save_ob.php?ob=${observacion}&id=${id}");
+    final Uri uri = Uri.parse(
+        "https://app.gozeri.com/versiones/v1.5.2/factura/save_ob.php?ob=${observacion}&id=${id}");
+
+    final resp = await http.get(uri);
+    var js = json.decode(resp.body);
+
+    return notifyListeners();
+  }
+
   Future metodoPago() async {
     final sucursal = Preferencias.sucursal;
     loadMetodo = true;

@@ -9,11 +9,13 @@ class ModoVenta2 extends StatefulWidget {
       {Key? key,
       required this.colorPrimary,
       required this.listProd,
-      required this.id_tmp})
+      required this.id_tmp,
+      required this.edit_precio})
       : super(key: key);
   Color colorPrimary;
   final Producto listProd;
   final String id_tmp;
+  final String edit_precio;
 
   @override
   State<ModoVenta2> createState() => _ModoVenta2State();
@@ -23,15 +25,200 @@ class _ModoVenta2State extends State<ModoVenta2> {
   final precio_controller_field = TextEditingController();
   final cantidad_controller_field = TextEditingController();
   final monto_controller_field = TextEditingController();
+
+  final _controller = TextEditingController();
+
   late String? _precio_field = widget.listProd.precio;
-  late String _cantidad_field = '0';
+  late String _cantidad_field = '1';
   late String _monto_field = '0';
 
   @override
   void initState() {
     super.initState();
 
+    _precio_field = "${widget.listProd.precio}";
+
+    _controller.addListener(() {
+      _precio_field = _controller.text;
+      String precio;
+      String monto;
+      String cantidad;
+
+      if (isNumeric(_cantidad_field)) {
+        if (_cantidad_field.contains('-')) {
+          cantidad = '1';
+        } else {
+          //no es negativo
+          cantidad = _cantidad_field;
+        }
+        print('es numerico');
+      } else {
+        print('no es numerico');
+        cantidad = '1';
+      }
+
+      //valida monto
+      if (_monto_field.contains('-')) {
+        monto = '0';
+      } else {
+        if (isNumeric(_monto_field)) {
+          monto = _monto_field;
+        } else {
+          monto = '0';
+        }
+      }
+      //valida monto
+
+      //valida precio
+      if (_precio_field!.contains('-')) {
+        precio = '0';
+      } else {
+        if (isNumeric(_precio_field!)) {
+          precio = _precio_field!;
+        } else {
+          precio = '0';
+        }
+      }
+      //valida precio
+
+      calculo_monto(monto, cantidad, precio);
+    });
+
+    cantidad_controller_field.addListener(() {
+      _cantidad_field = cantidad_controller_field.text;
+      String precio;
+      String monto;
+      String cantidad;
+
+      if (isNumeric(_cantidad_field)) {
+        if (_cantidad_field.contains('-')) {
+          cantidad = '1';
+        } else {
+          //no es negativo
+          cantidad = _cantidad_field;
+        }
+        print('es numerico');
+      } else {
+        print('no es numerico');
+        cantidad = '1';
+      }
+
+      //valida monto
+      if (_monto_field.contains('-')) {
+        monto = '0';
+      } else {
+        if (isNumeric(_monto_field)) {
+          monto = _monto_field;
+        } else {
+          monto = '0';
+        }
+      }
+      //valida monto
+
+      //valida precio
+      if (_precio_field!.contains('-')) {
+        precio = '0';
+      } else {
+        if (isNumeric(_precio_field!)) {
+          precio = _precio_field!;
+        } else {
+          precio = '0';
+        }
+      }
+      //valida precio
+
+      calculo_monto(monto, cantidad, precio);
+    });
+
+    monto_controller_field.addListener(() {
+      _monto_field = monto_controller_field.text;
+      String precio;
+      String monto;
+      String cantidad;
+
+      if (isNumeric(_cantidad_field)) {
+        if (_cantidad_field.contains('-')) {
+          cantidad = '1';
+        } else {
+          //no es negativo
+          cantidad = _cantidad_field;
+        }
+        print('es numerico');
+      } else {
+        print('no es numerico');
+        cantidad = '1';
+      }
+
+      //valida monto
+      if (_monto_field.contains('-')) {
+        monto = '0';
+      } else {
+        if (isNumeric(_monto_field)) {
+          monto = _monto_field;
+        } else {
+          monto = '0';
+        }
+      }
+      //valida monto
+
+      //valida precio
+      if (_precio_field!.contains('-')) {
+        precio = '0';
+      } else {
+        if (isNumeric(_precio_field!)) {
+          precio = _precio_field!;
+        } else {
+          precio = '0';
+        }
+      }
+      //valida precio
+
+      calculo_cantidad(monto, cantidad, precio);
+    });
+
+    /*_controller.addListener(() {
+      _precio_field = _controller.text;
+      if (_monto_field == '' && _cantidad_field != '') {
+        double total_mont =
+            double.parse(_precio_field!) * double.parse(_cantidad_field);
+        _monto_field = total_mont.toString();
+      } else if (_monto_field != '' && _cantidad_field == '' ||
+          (_monto_field != '' && _cantidad_field != '')) {
+        double total_cant =
+            double.parse(_monto_field) / double.parse(_precio_field!);
+        _cantidad_field = total_cant.toString();
+      }
+    });*/
     //myController.addListener(_printLatestValue);
+  }
+
+  void calculo_cantidad(String monto, String cantidad, String precio) {
+    double val_monto = double.parse(monto);
+    double val_precio = double.parse(precio);
+    double cantidad_total;
+    if (precio == '0') {
+      cantidad_total = 1;
+    } else {
+      cantidad_total = val_monto / val_precio;
+    }
+    _cantidad_field = cantidad_total.toString();
+  }
+
+  void calculo_monto(String monto, String cantidad, String precio) {
+    double val_cantidad = double.parse(cantidad);
+    double val_precio = double.parse(precio);
+    double monto_total;
+
+    monto_total = val_cantidad * val_precio;
+
+    _monto_field = monto_total.toString();
+  }
+
+  bool isNumeric(String s) {
+    if (s == null) {
+      return false;
+    }
+    return double.tryParse(s) != null;
   }
 
   @override
@@ -46,6 +233,12 @@ class _ModoVenta2State extends State<ModoVenta2> {
 
   @override
   Widget build(BuildContext context) {
+    _controller.text = _precio_field!;
+    //cantidad controller
+    _controller.text = _precio_field.toString();
+    _controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: _controller.text.length));
+
     precio_controller_field.text = _precio_field.toString();
     precio_controller_field.selection = TextSelection.fromPosition(
         TextPosition(offset: precio_controller_field.text.length));
@@ -154,38 +347,101 @@ class _ModoVenta2State extends State<ModoVenta2> {
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(5.0)),
                           ),
-                          child: DropdownButton<String>(
-                              dropdownColor: Colors.blueGrey[50],
-                              isExpanded: true,
-                              hint: const Text("0.00"),
-                              items: _do.map<DropdownMenuItem<String>>(
-                                  (String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                              value: (_precio_field == '')
-                                  ? _do[0]
-                                  : _precio_field,
-                              onChanged: ((value) => setState(() {
-                                    _precio_field = value;
-                                    if (_monto_field == '' &&
-                                        _cantidad_field != '') {
-                                      double total_mont =
-                                          double.parse(_precio_field!) *
-                                              double.parse(_cantidad_field);
-                                      _monto_field = total_mont.toString();
-                                    } else if (_monto_field != '' &&
-                                            _cantidad_field == '' ||
-                                        (_monto_field != '' &&
-                                            _cantidad_field != '')) {
-                                      double total_cant =
-                                          double.parse(_monto_field) /
-                                              double.parse(_precio_field!);
-                                      _cantidad_field = total_cant.toString();
-                                    }
-                                  }))),
+                          child: (widget.edit_precio == '0')
+                              ? DropdownButton<String>(
+                                  dropdownColor: Colors.blueGrey[50],
+                                  isExpanded: true,
+                                  hint: const Text("0.00"),
+                                  items: _do.map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                  value: (_precio_field == '')
+                                      ? _do[0]
+                                      : _precio_field,
+                                  /*onChanged: ((value) => setState(() {
+                                        _precio_field = value;
+                                        /*if (_monto_field == '' &&
+                                            _cantidad_field != '') {
+                                          double total_mont =
+                                              double.parse(_precio_field!) *
+                                                  double.parse(_cantidad_field);
+                                          _monto_field = total_mont.toString();
+                                        } else if (_monto_field != '' &&
+                                                _cantidad_field == '' ||
+                                            (_monto_field != '' &&
+                                                _cantidad_field != '')) {
+                                          double total_cant =
+                                              double.parse(_monto_field) /
+                                                  double.parse(_precio_field!);
+                                          _cantidad_field =
+                                              total_cant.toString();
+                                        }*/
+                                  }))*/
+                                  onChanged: ((value) {
+                                    setState(() {
+                                      _precio_field = value;
+                                      String precio;
+                                      String monto;
+                                      String cantidad;
+
+                                      if (isNumeric(_cantidad_field)) {
+                                        if (_cantidad_field.contains('-')) {
+                                          cantidad = '1';
+                                        } else {
+                                          //no es negativo
+                                          cantidad = _cantidad_field;
+                                        }
+                                        print('es numerico');
+                                      } else {
+                                        print('no es numerico');
+                                        cantidad = '1';
+                                      }
+
+                                      //valida monto
+                                      if (_monto_field.contains('-')) {
+                                        monto = '0';
+                                      } else {
+                                        if (isNumeric(_monto_field)) {
+                                          monto = _monto_field;
+                                        } else {
+                                          monto = '0';
+                                        }
+                                      }
+                                      //valida monto
+
+                                      //valida precio
+                                      if (_precio_field!.contains('-')) {
+                                        precio = '0';
+                                      } else {
+                                        if (isNumeric(_precio_field!)) {
+                                          precio = _precio_field!;
+                                        } else {
+                                          precio = '0';
+                                        }
+                                      }
+                                      //valida precio
+
+                                      calculo_monto(monto, cantidad, precio);
+                                    });
+                                  }),
+                                )
+                              : TextField(
+                                  textAlign: TextAlign.left,
+                                  keyboardType: TextInputType.number,
+                                  cursorColor: widget.colorPrimary,
+                                  decoration: const InputDecoration(
+                                    fillColor: Colors.white,
+                                    hintText: "0.00",
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                  ),
+                                  controller: _controller,
+                                  onChanged: (value) {},
+                                ),
                         ),
                 ),
               ],
@@ -219,9 +475,9 @@ class _ModoVenta2State extends State<ModoVenta2> {
                       controller: cantidad_controller_field,
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        setState(() {
+                        /*setState(() {
                           _cantidad_field = value;
-                          double total_monto = 0;
+                          /*double total_monto = 0;
                           if ((_precio_field == '' && _cantidad_field == '') ||
                               _precio_field == '' ||
                               _cantidad_field == '') {
@@ -232,13 +488,13 @@ class _ModoVenta2State extends State<ModoVenta2> {
                           _monto_field = total_monto.toString();
                           monto_controller_field.text = _monto_field.toString();
                           cantidad_controller_field.text =
-                              _cantidad_field.toString();
-                        });
-                        if (_cantidad_field == '') {
+                              _cantidad_field.toString();*/
+                        });*/
+                        /*if (_cantidad_field == '') {
                           print('sin cantidad');
                         } else {
                           print(_cantidad_field);
-                        }
+                        }*/
                       },
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
@@ -277,10 +533,10 @@ class _ModoVenta2State extends State<ModoVenta2> {
               controller: monto_controller_field,
               keyboardType: TextInputType.number,
               onChanged: (value) {
-                setState(() {
-                  _monto_field = value;
+                /*setState(() {
+                  //_monto_field = value;
 
-                  double total_cantidad = 0;
+                  /*double total_cantidad = 0;
                   if ((_precio_field == '' && _monto_field == '') ||
                       _precio_field == '' ||
                       _monto_field == '') {
@@ -290,13 +546,13 @@ class _ModoVenta2State extends State<ModoVenta2> {
                   }
                   _cantidad_field = total_cantidad.toString();
                   monto_controller_field.text = _monto_field.toString();
-                  cantidad_controller_field.text = _cantidad_field.toString();
-                });
-                if (_cantidad_field == '') {
+                  cantidad_controller_field.text = _cantidad_field.toString();*/
+                });*/
+                /*if (_cantidad_field == '') {
                   print('sin cantidad');
                 } else {
                   print(_cantidad_field);
-                }
+                }*/
               },
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),

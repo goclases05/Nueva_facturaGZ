@@ -79,9 +79,11 @@ class _ItemsCart extends State<ItemsCart> {
                                     child: Column(
                                       children: [
                                         ArticuloSheet(
-                                            listProd: p,
-                                            colorPrimary: widget.colorPrimary,
-                                            id_tmp: widget.id_tmp),
+                                          listProd: p,
+                                          colorPrimary: widget.colorPrimary,
+                                          id_tmp: widget.id_tmp,
+                                          edit_precio: '0',
+                                        ),
                                       ],
                                     ))),
                       ],

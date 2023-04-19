@@ -72,13 +72,15 @@ class _PrintScreenState extends State<PrintScreen> {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
+  final _controller = TextEditingController();
+
   //SUNMIN
   bool printBinded = false;
   int paperSize = 0;
   String serialNumber = "";
   String printerVersion = "";
   //SUNMIN
-  bool state_bluetooth=false;
+  bool state_bluetooth = false;
 
   Future<void> initialActivity() async {
     late ConnectivityResult result;
@@ -106,7 +108,13 @@ class _PrintScreenState extends State<PrintScreen> {
   void initState() {
     // TODO: implement initState
     initialActivity();
-    _connectivitySubscription =_connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    final facturaService = Provider.of<Facturacion>(context, listen: false);
+    _controller.addListener(() {
+      facturaService.addOB(_controller.text, widget.id_tmp);
+    });
+
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
 
     //estado del bluetooth
     bluetoothManager.state.listen((val) {
@@ -115,12 +123,12 @@ class _PrintScreenState extends State<PrintScreen> {
         print('on');
         //escaneo
         setState(() {
-          state_bluetooth=true;
+          state_bluetooth = true;
         });
         //escaneo
       } else if (val == 10) {
         setState(() {
-          state_bluetooth=false;
+          state_bluetooth = false;
         });
       }
     });
@@ -150,14 +158,10 @@ class _PrintScreenState extends State<PrintScreen> {
           printBinded = isBind!;
         });
       });
-    } else {
-      
-    }
+    } else {}
 
     super.initState();
   }
-
-
 
   /// must binding ur printer at first init in app
   Future<bool?> _bindingPrinter() async {
@@ -165,7 +169,7 @@ class _PrintScreenState extends State<PrintScreen> {
     return result;
   }
 
-  //funcion impresion 
+  //funcion impresion
   void bt_initPrinter(String accion, String id_f) async {
     _printerManager.stopScan();
     await Permission.bluetoothConnect.request();
@@ -179,75 +183,72 @@ class _PrintScreenState extends State<PrintScreen> {
       builder: (_) => const AlertDialog(
         backgroundColor: Color.fromARGB(255, 243, 231, 155),
         content: ListTile(
-          leading: CircularProgressIndicator(color: Colors.white,),
+          leading: CircularProgressIndicator(
+            color: Colors.white,
+          ),
           title: Text(
             'Escaneando dispositivos de impresión',
-            style: TextStyle(color: Colors.white,fontSize: 15),
+            style: TextStyle(color: Colors.white, fontSize: 15),
           ),
         ),
       ),
     );
-    
-    Future.delayed(Duration(seconds: 3),(){
+
+    Future.delayed(Duration(seconds: 3), () {
       Navigator.of(context).pop();
       print('termino');
       _printerManager.stopScan();
 
-      if(Preferencias.mac!=''){
-        //impresora predeterminada 
-        _printerManager.scanResults.listen((event) { 
-          
+      if (Preferencias.mac != '') {
+        //impresora predeterminada
+        _printerManager.scanResults.listen((event) {
           print("preferencia impresora");
           print(Preferencias.mac);
-          int u=0;
+          int u = 0;
           //existe una impresora predeterminada
-          for(var y=0;y<event.length;y++){
+          for (var y = 0; y < event.length; y++) {
             if (event[y].address == Preferencias.mac) {
               //store the element.
               print('esta es');
-               _startPrint(event[y],id_f,accion);
+              _startPrint(event[y], id_f, accion);
             }
           }
         });
-      }else{
+      } else {
         //lista de impresoras
         showDialog(
-          context: context,
-          builder: ((context) {
+            context: context,
+            builder: ((context) {
+              return Consumer<ImpresorasProvider>(
+                  builder: (context, impresoras, child) {
+                _printerManager.scanResults.listen((devices) async {
+                  impresoras.impresoras_disponibles(devices);
+                });
 
-            return Consumer<ImpresorasProvider>(
-              builder: (context, impresoras, child) {
-                 _printerManager.scanResults.listen((devices)async {
-                    impresoras.impresoras_disponibles(devices);
-                 });
-
-                if(Preferencias.mac != ''){
+                if (Preferencias.mac != '') {
                   print("preferencia impresora");
                   print(Preferencias.mac);
-                  int u=0;
+                  int u = 0;
                   //existe una impresora predeterminada
-                  for(var y=0;y<impresoras.devices.length;y++){
+                  for (var y = 0; y < impresoras.devices.length; y++) {
                     if (impresoras.devices[y].address == Preferencias.mac) {
                       //store the element.
                       print('esta es');
-                      _startPrint(impresoras.devices[y],id_f,accion);
+                      _startPrint(impresoras.devices[y], id_f, accion);
                     }
                   }
-        
+
                   print('salio de ciclo');
-                  if(u==0){
+                  if (u == 0) {
                     return AlertDialog(
                         backgroundColor: Color.fromARGB(255, 255, 255, 255),
                         content: Text('impresión realizada'));
-                  }else{
+                  } else {
                     return AlertDialog(
                         backgroundColor: Color.fromARGB(255, 255, 255, 255),
                         content: Text('error'));
                   }
-                  
-                    
-
-                }else{
+                } else {
                   //no existe predeterminada
                   return AlertDialog(
                     backgroundColor: Color.fromARGB(255, 255, 255, 255),
@@ -256,59 +257,70 @@ class _PrintScreenState extends State<PrintScreen> {
                       children: [
                         Text(
                           'Impresoras',
-                          style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
-                        (impresoras.devices.length==0)?
-                        Text(
-                          'No se encuentran Impresoras disponibles',
-                          style: TextStyle(color: Colors.black,fontSize: 15,),
-                          textAlign: TextAlign.center,
-                        ):
-                        Container(
-                          height: 300.0, // Change as per your requirement
-                          width: 300.0,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: impresoras.devices.length,
-                            itemBuilder: (BuildContext context, int i) {
-                              return ListTile(
-                                title: Text("${impresoras.devices[i].name}"),
-                                subtitle: Text("${impresoras.devices[i].address}"),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () async {
-                                        _startPrint(impresoras.devices[i],id_f,accion);
-                                      },
-                                      child: Container(
-                                        margin: const EdgeInsets.all(5),
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                            //color: Theme.of(context).primaryColor,
-                                            color: widget.colorPrimary,
-                                            borderRadius: BorderRadius.circular(15)),
-                                        child: const Icon(
-                                          Icons.print,
-                                          color: Colors.white,
-                                          size: 25,
-                                        ),
-                                      ),
-                                    )
-                                  ],
+                        (impresoras.devices.length == 0)
+                            ? Text(
+                                'No se encuentran Impresoras disponibles',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
                                 ),
-                                onTap: () {},
-                              );
-                            },
-                          ),
-                        ),
+                                textAlign: TextAlign.center,
+                              )
+                            : Container(
+                                height: 300.0, // Change as per your requirement
+                                width: 300.0,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: impresoras.devices.length,
+                                  itemBuilder: (BuildContext context, int i) {
+                                    return ListTile(
+                                      title:
+                                          Text("${impresoras.devices[i].name}"),
+                                      subtitle: Text(
+                                          "${impresoras.devices[i].address}"),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () async {
+                                              _startPrint(impresoras.devices[i],
+                                                  id_f, accion);
+                                            },
+                                            child: Container(
+                                              margin: const EdgeInsets.all(5),
+                                              padding: const EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                  //color: Theme.of(context).primaryColor,
+                                                  color: widget.colorPrimary,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15)),
+                                              child: const Icon(
+                                                Icons.print,
+                                                color: Colors.white,
+                                                size: 25,
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      onTap: () {},
+                                    );
+                                  },
+                                ),
+                              ),
                       ],
                     ),
                   );
                 }
               });
-          }));
+            }));
       }
     });
   }
@@ -319,6 +331,7 @@ class _PrintScreenState extends State<PrintScreen> {
   void dispose() {
     // TODO: implement dispose
     _connectivitySubscription.cancel();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -326,6 +339,10 @@ class _PrintScreenState extends State<PrintScreen> {
   Widget build(BuildContext context) {
     int _total = 0;
     List<DropdownMenuItem<String>> menuItems = [];
+
+    _controller.text = _controller.text.toString();
+    _controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: _controller.text.length));
 
     print('conexion :' + _connectionStatus.name);
     if (_connectionStatus.name != 'wifi' &&
@@ -400,15 +417,17 @@ class _PrintScreenState extends State<PrintScreen> {
                               textAlign: TextAlign.center,
                             )));
                         print('valor de drop ' + serieProv.initialSerie);
-                        var si_existe=false;
+                        var si_existe = false;
                         for (var i = 0;
                             i < authService.list_serie.length;
                             i++) {
                           print('item ' + authService.list_serie[i].idSerie);
 
-                          if(Preferencias.serie==authService.list_serie[i].idSerie){
-                            si_existe=true;
-                            facturaService.serie(widget.id_tmp, 'add', authService.list_serie[i].idSerie);
+                          if (Preferencias.serie ==
+                              authService.list_serie[i].idSerie) {
+                            si_existe = true;
+                            facturaService.serie(widget.id_tmp, 'add',
+                                authService.list_serie[i].idSerie);
                           }
 
                           menuItems.add(DropdownMenuItem(
@@ -429,13 +448,15 @@ class _PrintScreenState extends State<PrintScreen> {
 
                         return DropdownButton(
                           itemHeight: null,
-                          value: (si_existe==true)?Preferencias.serie:'0', //facturaService.initialSerie,
+                          value: (si_existe == true)
+                              ? Preferencias.serie
+                              : '0', //facturaService.initialSerie,
                           isExpanded: true,
                           dropdownColor: Color.fromARGB(255, 241, 238, 241),
                           onChanged: (String? newValue) async {
                             var cambio = await facturaService.serie(
                                 widget.id_tmp, 'add', newValue!);
-                                Preferencias.serie=newValue;
+                            Preferencias.serie = newValue;
                             if (cambio != '1') {
                               //Preferencias.serie = newValue!;
                               /*SnackBar snackBar = SnackBar(
@@ -489,9 +510,9 @@ class _PrintScreenState extends State<PrintScreen> {
                       physics: const BouncingScrollPhysics(),
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
-                      itemCount: 4,
+                      itemCount: 5,
                       itemBuilder: ((context, index) {
-                        if (index == 3) {
+                        if (index == 4) {
                           return Consumer<Facturacion>(
                               builder: (context, fact, child) {
                             return Container(
@@ -611,7 +632,9 @@ class _PrintScreenState extends State<PrintScreen> {
                                 ? const Text('Detalle del Pedido')
                                 : (index == 1)
                                     ? const Text('Datos de Cliente')
-                                    : const Text('Detalle de Pago'),
+                                    : (index == 2)
+                                        ? const Text('Detalle de Pago')
+                                        : const Text('Observaciones'),
                             children: [
                               (index == 0)
                                   ? ItemsCart(
@@ -628,7 +651,19 @@ class _PrintScreenState extends State<PrintScreen> {
                                               id_tmp: widget.id_tmp,
                                               estado: 'tmp',
                                             )
-                                          : const Text(''),
+                                          : TextField(
+                                              textAlign: TextAlign.left,
+                                              maxLines: 3,
+                                              keyboardType: TextInputType.text,
+                                              cursorColor: widget.colorPrimary,
+                                              decoration: const InputDecoration(
+                                                border: OutlineInputBorder(),
+                                                labelText:
+                                                    'Detalles especificos y observaciones',
+                                              ),
+                                              controller: _controller,
+                                              onChanged: (value) {},
+                                            ),
                               Row(
                                 mainAxisAlignment: (index == 0)
                                     ? MainAxisAlignment.spaceBetween
@@ -669,7 +704,7 @@ class _PrintScreenState extends State<PrintScreen> {
                                       : Text(''),
                                   Container(
                                     alignment: Alignment.centerRight,
-                                    child: (index == 2)
+                                    child: (index == 3)
                                         ? const Text('')
                                         : ElevatedButton.icon(
                                             label: const Icon(
@@ -683,8 +718,10 @@ class _PrintScreenState extends State<PrintScreen> {
                                                   open = 1;
                                                 } else if (index == 1) {
                                                   open = 2;
+                                                } else if (index == 2) {
+                                                  open = 3;
                                                 } else {
-                                                  //open = 0;
+                                                  open = 1;
                                                 }
                                               });
                                               print(open);
@@ -716,7 +753,6 @@ class _PrintScreenState extends State<PrintScreen> {
                       flex: 2,
                       child: TextButton.icon(
                         onPressed: () async {
-
                           if (facturaService.list_det.length < 1) {
                             //no tiene articulos la factyura
                             edgeAlert(context,
@@ -745,7 +781,8 @@ class _PrintScreenState extends State<PrintScreen> {
                                 backgroundColor: Colors.redAccent);
                           } else {
                             //FACTURANDO
-                            var facturar =await facturaService.facturar(widget.id_tmp);
+                            var facturar =
+                                await facturaService.facturar(widget.id_tmp);
                             var js = json.decode(facturar);
 
                             if (js['MENSAJE'] == 'OK') {
@@ -792,11 +829,11 @@ class _PrintScreenState extends State<PrintScreen> {
                                 } else {
                                   //impresion bluetooth
                                   //PRINT NO SUNMIN
-                                  if(state_bluetooth==true){
+                                  if (state_bluetooth == true) {
                                     //escaneo
-                                    bt_initPrinter('f',js['ID']);
+                                    bt_initPrinter('f', js['ID']);
                                     //escaneo
-                                  }else{
+                                  } else {
                                     print('off');
                                     showDialog(
                                       context: context,
@@ -857,11 +894,11 @@ class _PrintScreenState extends State<PrintScreen> {
                             await print_sunmi_comanda(context, widget.id_tmp);
                           } else {
                             //PRINT NO SUNMIN
-                            if(state_bluetooth==true){
+                            if (state_bluetooth == true) {
                               //escaneo
-                              bt_initPrinter('comanda',widget.id_tmp);
+                              bt_initPrinter('comanda', widget.id_tmp);
                               //escaneo
-                            }else{
+                            } else {
                               print('off');
                               showDialog(
                                 context: context,
@@ -910,7 +947,7 @@ class _PrintScreenState extends State<PrintScreen> {
       ),
     );
     final result;
-    print('esta es la accion '+accion);
+    print('esta es la accion ' + accion);
     if (accion == 'f') {
       result = await _printerManager.printTicket(await testTicket(id_factura));
     } else {
@@ -943,6 +980,7 @@ class _PrintScreenState extends State<PrintScreen> {
   Future<List<int>> comanda_bluetho(String id_factura) async {
     final print_data = Provider.of<PrintProvider>(context, listen: false);
     final js = await print_data.generate_comanda(id_factura);
+    print(js);
     // Using default profile
     final profile = await CapabilityProfile.load();
     final generatorr = Generator(PaperSize.mm58, profile);
@@ -1007,6 +1045,21 @@ class _PrintScreenState extends State<PrintScreen> {
           styles: const PosStyles(align: PosAlign.left),
         ),
       ]);
+    }
+
+    String ob = js['ENCABEZADO']['OBSER'];
+
+    if (ob.length > 0) {
+      bytess += generatorr.feed(1);
+      bytess += generatorr.feed(1);
+      bytess += generatorr.text('Observación:',
+          styles: const PosStyles(
+                  width: PosTextSize.size1, bold: false, codeTable: 'CP1252')
+              .copyWith(align: PosAlign.left));
+      bytess += generatorr.text('${ob}',
+          styles: const PosStyles(
+                  width: PosTextSize.size1, bold: false, codeTable: 'CP1252')
+              .copyWith(align: PosAlign.left));
     }
 
     //espacio
@@ -1339,6 +1392,24 @@ class _PrintScreenState extends State<PrintScreen> {
             width: PosTextSize.size1,
             bold: true,
             codeTable: 'CP1252'));
+
+    String ob = encabezado[0].obser;
+
+    if (ob.length > 0) {
+      bytess += generatorr.feed(1);
+      bytess += generatorr.text('Observación:',
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
+      bytess += generatorr.text('${ob}',
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
+    }
 
     //espacio
     bytess += generatorr.feed(1);
@@ -1678,6 +1749,20 @@ print_sunmi(BuildContext context, String id_factura) async {
         align: SunmiPrintAlign.CENTER,
       ));
 
+  String ob = encabezado[0].obser;
+
+  if (ob.length > 0) {
+    await SunmiPrinter.printText('Observación:',
+        style: SunmiStyle(
+          bold: true,
+          align: SunmiPrintAlign.LEFT,
+        ));
+    await SunmiPrinter.printText('${ob}:',
+        style: SunmiStyle(
+          align: SunmiPrintAlign.LEFT,
+        ));
+  }
+
   //frases
   for (int rl = 0; rl < encabezado[0].frases.length; rl++) {
     await SunmiPrinter.printText('${encabezado[0].frases[rl]}',
@@ -1783,6 +1868,23 @@ print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
           align: SunmiPrintAlign.LEFT),
     ]);
   }
+
+  String ob = js['ENCABEZADO']['OBSER'];
+
+  if (ob.length > 0) {
+    await SunmiPrinter.lineWrap(1);
+    await SunmiPrinter.printText('Observación:',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
+    await SunmiPrinter.printText('${js['ENCABEZADO']['OBSER']}',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
+  }
+
   await SunmiPrinter.lineWrap(1);
   await SunmiPrinter.printText('${name}',
       style: SunmiStyle(

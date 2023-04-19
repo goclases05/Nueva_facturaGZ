@@ -753,6 +753,20 @@ class _ViewFacturasState extends State<ViewFacturas> {
       ]);
     }
 
+    String ob = js['ENCABEZADO']['OBSER'];
+
+    if (ob.length > 0) {
+      bytess += generatorr.feed(1);
+      bytess += generatorr.feed(1);
+      bytess += generatorr.text('Observación:',
+          styles: const PosStyles(
+                  width: PosTextSize.size1, bold: false, codeTable: 'CP1252')
+              .copyWith(align: PosAlign.left));
+      bytess += generatorr.text('${ob}',
+          styles: const PosStyles(
+                  width: PosTextSize.size1, bold: false, codeTable: 'CP1252')
+              .copyWith(align: PosAlign.left));
+    }
     //espacio
     bytess += generatorr.feed(1);
     bytess += generatorr.feed(1);
@@ -1527,6 +1541,21 @@ print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
           width: 24,
           align: SunmiPrintAlign.LEFT),
     ]);
+  }
+  String ob = js['ENCABEZADO']['OBSER'];
+
+  if (ob.length > 0) {
+    await SunmiPrinter.lineWrap(1);
+    await SunmiPrinter.printText('Observación:',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
+    await SunmiPrinter.printText('${js['ENCABEZADO']['OBSER']}',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
   }
 
   await SunmiPrinter.lineWrap(1);

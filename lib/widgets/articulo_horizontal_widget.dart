@@ -113,7 +113,8 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                     child: ArticuloSheet(
                                         listProd: widget.listProd,
                                         colorPrimary: widget.colorPrimary,
-                                        id_tmp: widget.id_tmp))),
+                                        id_tmp: widget.id_tmp,
+                                        edit_precio: edit_precio))),
                       ],
                     ),
                   );
@@ -128,7 +129,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
   }
 
   final myController = TextEditingController();
-  late TextEditingController _controller;
+  final _controller = TextEditingController();
 
   @override
   void initState() {
@@ -144,8 +145,11 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
       edit_precio = js['70']['CONTENIDO'];
       setState(() {});
     });
-    _controller = TextEditingController();
-    _controller.text = "${widget.listProd.precio}";
+    _dropdownValue = "${widget.listProd.precio}";
+    _controller.addListener(() {
+      _dropdownValue = _controller.text;
+    });
+
     myController.addListener(_printLatestValue);
   }
 
@@ -166,6 +170,8 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
   Widget build(BuildContext context) {
     List<String> _do = []; //= ['One', 'Two', 'Free', 'Four'];
 
+    _controller.text = _dropdownValue!;
+
     if (_do.contains(widget.listProd.precio) == false) {
       _do.add("${widget.listProd.precio}");
     }
@@ -181,6 +187,10 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
     myController.text = _counterValue.toString();
     myController.selection = TextSelection.fromPosition(
         TextPosition(offset: myController.text.length));
+
+    _controller.text = _dropdownValue.toString();
+    _controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: _controller.text.length));
 
     return Card(
       elevation: 2,
@@ -285,13 +295,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                                 focusedBorder: InputBorder.none,
                                               ),
                                               controller: _controller,
-                                              onChanged: (value) {
-                                                print(value);
-                                                _controller.text = value;
-                                                setState(() {
-                                                  _dropdownValue = value;
-                                                });
-                                              },
+                                              onChanged: (value) {},
                                             ),
                                     )
                                   ],

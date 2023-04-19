@@ -9,11 +9,13 @@ class ModoVenta1 extends StatefulWidget {
       {Key? key,
       required this.colorPrimary,
       required this.listProd,
-      required this.id_tmp})
+      required this.id_tmp,
+      required this.edit_precio})
       : super(key: key);
   final Producto listProd;
   final Color colorPrimary;
   final String id_tmp;
+  final String edit_precio;
 
   @override
   State<ModoVenta1> createState() => _ModoVenta1State();
@@ -22,12 +24,17 @@ class ModoVenta1 extends StatefulWidget {
 class _ModoVenta1State extends State<ModoVenta1> {
   final precio_controller_field = TextEditingController();
   final myController = TextEditingController();
+
+  final _controller = TextEditingController();
   late String? _precio_field = widget.listProd.precio;
   late int _counterValue = 0;
 
   @override
   void initState() {
     super.initState();
+    _controller.addListener(() {
+      _precio_field = _controller.text;
+    });
   }
 
   @override
@@ -35,11 +42,16 @@ class _ModoVenta1State extends State<ModoVenta1> {
     // Limpia el controlador cuando el widget se elimine del árbol de widgets
     // Esto también elimina el listener _printLatestValue
     precio_controller_field.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    _controller.text = _precio_field.toString();
+    _controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: _controller.text.length));
+
     precio_controller_field.text = _precio_field.toString();
     precio_controller_field.selection = TextSelection.fromPosition(
         TextPosition(offset: precio_controller_field.text.length));
@@ -120,23 +132,37 @@ class _ModoVenta1State extends State<ModoVenta1> {
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(5.0)),
                           ),
-                          child: DropdownButton<String>(
-                              dropdownColor: Colors.blueGrey[50],
-                              isExpanded: true,
-                              hint: const Text("0.00"),
-                              items: _do.map<DropdownMenuItem<String>>(
-                                  (String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                              value: (_precio_field == '')
-                                  ? _do[0]
-                                  : _precio_field,
-                              onChanged: ((value) => setState(() {
-                                    _precio_field = value;
-                                  }))),
+                          child: (widget.edit_precio == '0')
+                              ? DropdownButton<String>(
+                                  dropdownColor: Colors.blueGrey[50],
+                                  isExpanded: true,
+                                  hint: const Text("0.00"),
+                                  items: _do.map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                  value: (_precio_field == '')
+                                      ? _do[0]
+                                      : _precio_field,
+                                  onChanged: ((value) => setState(() {
+                                        _precio_field = value;
+                                      })))
+                              : TextField(
+                                  textAlign: TextAlign.left,
+                                  keyboardType: TextInputType.number,
+                                  cursorColor: widget.colorPrimary,
+                                  decoration: const InputDecoration(
+                                    fillColor: Colors.white,
+                                    hintText: "0.00",
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                  ),
+                                  controller: _controller,
+                                  onChanged: (value) {},
+                                ),
                         ),
                 ),
               ],

@@ -8,11 +8,13 @@ class ArticuloSheet extends StatefulWidget {
       {Key? key,
       required this.listProd,
       required this.colorPrimary,
-      required this.id_tmp})
+      required this.id_tmp,
+      required this.edit_precio})
       : super(key: key);
   final Producto listProd;
   final Color colorPrimary;
   final String id_tmp;
+  final String edit_precio;
 
   @override
   State<ArticuloSheet> createState() => _ArticuloSheetState();
@@ -145,13 +147,14 @@ class _ArticuloSheetState extends State<ArticuloSheet> {
                     ? ModoVenta2(
                         colorPrimary: widget.colorPrimary,
                         listProd: widget.listProd,
-                        id_tmp: widget.id_tmp)
+                        id_tmp: widget.id_tmp,
+                        edit_precio: widget.edit_precio)
                     : SingleChildScrollView(
                         child: ModoVenta1(
-                          id_tmp: widget.id_tmp,
-                          listProd: widget.listProd,
-                          colorPrimary: widget.colorPrimary,
-                        ),
+                            id_tmp: widget.id_tmp,
+                            listProd: widget.listProd,
+                            colorPrimary: widget.colorPrimary,
+                            edit_precio: widget.edit_precio),
                       )
               ],
             ))
