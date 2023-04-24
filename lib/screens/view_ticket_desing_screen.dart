@@ -738,6 +738,17 @@ class _ViewTicketState extends State<ViewTicket> {
                           const SizedBox(
                             height: 15,
                           ),
+
+                          (encabezado[0].obser.length > 0)
+                              ? Column(
+                                  children: [
+                                    claveValor('Observación', '',
+                                        MainAxisAlignment.start),
+                                    claveValor('', '${encabezado[0].obser}',
+                                        MainAxisAlignment.start)
+                                  ],
+                                )
+                              : Text(''),
                           Column(
                             children: frases,
                           ),
@@ -1509,6 +1520,24 @@ class _ViewTicketState extends State<ViewTicket> {
             bold: true,
             codeTable: 'CP1252'));
 
+    String ob = encabezado[0].obser;
+
+    if (ob.length > 0) {
+      bytess += generatorr.feed(1);
+      bytess += generatorr.text('Observación:',
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
+      bytess += generatorr.text('${ob}',
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
+    }
+
     //espacio
     bytess += generatorr.feed(1);
 
@@ -1845,6 +1874,22 @@ print_sunmi(BuildContext context, String id_factura) async {
         bold: true,
         align: SunmiPrintAlign.CENTER,
       ));
+
+  String ob = encabezado[0].obser;
+
+  if (ob.length > 0) {
+    await SunmiPrinter.lineWrap(1);
+    await SunmiPrinter.printText('Observación:',
+        style: SunmiStyle(
+          bold: true,
+          align: SunmiPrintAlign.LEFT,
+        ));
+    await SunmiPrinter.printText('${ob}',
+        style: SunmiStyle(
+          align: SunmiPrintAlign.LEFT,
+        ));
+    await SunmiPrinter.lineWrap(1);
+  }
 
   //frases
   for (int rl = 0; rl < encabezado[0].frases.length; rl++) {

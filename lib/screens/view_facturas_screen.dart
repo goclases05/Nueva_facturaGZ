@@ -383,6 +383,9 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                       final _facturacion =
                                           Provider.of<Facturacion>(context,
                                               listen: false);
+
+                                      await _facturacion
+                                          .readOB(list_tmp[index].idFactTmp);
                                       _facturacion
                                           .list_cart(list_tmp[index].idFactTmp);
                                       _facturacion.read_cliente('read', '0',
@@ -1098,6 +1101,24 @@ class _ViewFacturasState extends State<ViewFacturas> {
             bold: true,
             codeTable: 'CP1252'));
 
+    String ob = encabezado[0].obser;
+
+    if (ob.length > 0) {
+      bytess += generatorr.feed(1);
+      bytess += generatorr.text('Observación:',
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
+      bytess += generatorr.text('${ob}',
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
+    }
+
     //espacio
     bytess += generatorr.feed(1);
 
@@ -1435,6 +1456,22 @@ print_sunmi(BuildContext context, String id_factura) async {
           bold: true,
           align: SunmiPrintAlign.CENTER,
           fontSize: SunmiFontSize.MD));
+
+  String ob = encabezado[0].obser;
+
+  if (ob.length > 0) {
+    await SunmiPrinter.lineWrap(1);
+    await SunmiPrinter.printText('Observación:',
+        style: SunmiStyle(
+          bold: true,
+          align: SunmiPrintAlign.LEFT,
+        ));
+    await SunmiPrinter.printText('${ob}',
+        style: SunmiStyle(
+          align: SunmiPrintAlign.LEFT,
+        ));
+    await SunmiPrinter.lineWrap(1);
+  }
 
   //frases
   for (int rl = 0; rl < encabezado[0].frases.length; rl++) {

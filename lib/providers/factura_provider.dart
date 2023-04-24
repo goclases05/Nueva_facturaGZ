@@ -11,6 +11,9 @@ class Facturacion extends ChangeNotifier {
   final String _baseUrl = "app.gozeri.com";
   bool tmp_creada = false;
 
+  //observación
+  String ob = '';
+
   //serie
   String initialSerie = '0';
   bool cargainiSerie = true;
@@ -57,7 +60,7 @@ class Facturacion extends ChangeNotifier {
 
       final resp = await http.get(uri);
       if (resp.body == '0') {
-        initialSerie = (Preferencias.serie == '') ? '0' : Preferencias.serie;
+        initialSerie = (Preferencias.serie.isEmpty) ? '0' : Preferencias.serie;
         cargainiSerie = false;
         notifyListeners();
         return this.serie(tmp, 'add', initialSerie);
@@ -75,9 +78,9 @@ class Facturacion extends ChangeNotifier {
       final resp = await http.get(uri);
       if (resp.body == '1') {
         initialSerie = serie;
-        notifyListeners();
+        //notifyListeners();
       }
-      notifyListeners();
+      //notifyListeners();
       return resp.body;
     }
   }
@@ -90,6 +93,20 @@ class Facturacion extends ChangeNotifier {
 
     final resp = await http.get(uri);
     var js = json.decode(resp.body);
+
+    ob = observacion;
+
+    return notifyListeners();
+  }
+
+  Future readOB(String id) async {
+    print(
+        "https://app.gozeri.com/versiones/v1.5.2/factura/read_ob.phpid=${id}");
+    final Uri uri = Uri.parse(
+        "https://app.gozeri.com/versiones/v1.5.2/factura/read_ob.php?id=${id}");
+
+    final resp = await http.get(uri);
+    ob = resp.body;
 
     return notifyListeners();
   }

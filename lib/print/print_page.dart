@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
 import 'dart:io' show Platform;
 import 'package:image/image.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PrintSC extends StatefulWidget {
   String id_tmp;
@@ -21,6 +22,9 @@ class _PrintState extends State<PrintSC> {
 
   @override
   void initState() {
+    Permission.bluetoothConnect.request();
+    Permission.bluetoothScan.request();
+    Permission.locationWhenInUse.request();
     if (Platform.isAndroid) {
       bluetoothManager.state.listen((val) {
         print('state = $val');

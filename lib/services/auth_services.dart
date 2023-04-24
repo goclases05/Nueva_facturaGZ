@@ -81,7 +81,7 @@ class AuthService extends ChangeNotifier {
     //membresia
     final empresa = Preferencias.data_empresa;
     //PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    String version = '1.5.0'; // packageInfo.version;
+    String version = '1.5.2'; // packageInfo.version;
 
     print(
         "https://app.gozeri.com/versiones/v1.5.2/membresia.php?empresa=${empresa}&version=" +

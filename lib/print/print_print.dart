@@ -14,6 +14,7 @@ import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/screens/escritorio_screen.dart';
 import 'package:factura_gozeri/screens/no_internet_screen.dart';
 import 'package:factura_gozeri/screens/view_tabs_facturacion_screen.dart';
+import 'package:factura_gozeri/widgets/item_observacion_widget.dart';
 import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
 import 'package:factura_gozeri/screens/view_tabs_screen.dart';
 import 'package:factura_gozeri/services/auth_services.dart';
@@ -72,8 +73,6 @@ class _PrintScreenState extends State<PrintScreen> {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
-  final _controller = TextEditingController();
-
   //SUNMIN
   bool printBinded = false;
   int paperSize = 0;
@@ -108,10 +107,6 @@ class _PrintScreenState extends State<PrintScreen> {
   void initState() {
     // TODO: implement initState
     initialActivity();
-    final facturaService = Provider.of<Facturacion>(context, listen: false);
-    _controller.addListener(() {
-      facturaService.addOB(_controller.text, widget.id_tmp);
-    });
 
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
@@ -331,7 +326,6 @@ class _PrintScreenState extends State<PrintScreen> {
   void dispose() {
     // TODO: implement dispose
     _connectivitySubscription.cancel();
-    _controller.dispose();
     super.dispose();
   }
 
@@ -339,10 +333,6 @@ class _PrintScreenState extends State<PrintScreen> {
   Widget build(BuildContext context) {
     int _total = 0;
     List<DropdownMenuItem<String>> menuItems = [];
-
-    _controller.text = _controller.text.toString();
-    _controller.selection = TextSelection.fromPosition(
-        TextPosition(offset: _controller.text.length));
 
     print('conexion :' + _connectionStatus.name);
     if (_connectionStatus.name != 'wifi' &&
@@ -416,18 +406,28 @@ class _PrintScreenState extends State<PrintScreen> {
                               'Selecciona una serie',
                               textAlign: TextAlign.center,
                             )));
-                        print('valor de drop ' + serieProv.initialSerie);
+                        //print('valor de drop ' + serieProv.initialSerie);
                         var si_existe = false;
+                        if (facturaService.initialSerie != '0') {
+                          Preferencias.serie = facturaService.initialSerie;
+                        }
                         for (var i = 0;
                             i < authService.list_serie.length;
                             i++) {
-                          print('item ' + authService.list_serie[i].idSerie);
+                          //print('item ' + authService.list_serie[i].idSerie);
 
-                          if (Preferencias.serie ==
-                              authService.list_serie[i].idSerie) {
-                            si_existe = true;
-                            facturaService.serie(widget.id_tmp, 'add',
-                                authService.list_serie[i].idSerie);
+                          if (!Preferencias.serie.isEmpty) {
+                            if (Preferencias.serie ==
+                                authService.list_serie[i].idSerie) {
+                              si_existe = true;
+
+                              print('preferencia: ' +
+                                  Preferencias.serie +
+                                  ' id: ' +
+                                  authService.list_serie[i].idSerie);
+                              facturaService.serie(widget.id_tmp, 'add',
+                                  authService.list_serie[i].idSerie);
+                            }
                           }
 
                           menuItems.add(DropdownMenuItem(
@@ -651,18 +651,10 @@ class _PrintScreenState extends State<PrintScreen> {
                                               id_tmp: widget.id_tmp,
                                               estado: 'tmp',
                                             )
-                                          : TextField(
-                                              textAlign: TextAlign.left,
-                                              maxLines: 3,
-                                              keyboardType: TextInputType.text,
-                                              cursorColor: widget.colorPrimary,
-                                              decoration: const InputDecoration(
-                                                border: OutlineInputBorder(),
-                                                labelText:
-                                                    'Detalles especificos y observaciones',
-                                              ),
-                                              controller: _controller,
-                                              onChanged: (value) {},
+                                          : ItemObservacion(
+                                              colorPrimary: widget.colorPrimary,
+                                              id: widget.id_tmp,
+                                              tmp: 'tmp',
                                             ),
                               Row(
                                 mainAxisAlignment: (index == 0)
@@ -1752,15 +1744,17 @@ print_sunmi(BuildContext context, String id_factura) async {
   String ob = encabezado[0].obser;
 
   if (ob.length > 0) {
+    await SunmiPrinter.lineWrap(1);
     await SunmiPrinter.printText('Observación:',
         style: SunmiStyle(
           bold: true,
           align: SunmiPrintAlign.LEFT,
         ));
-    await SunmiPrinter.printText('${ob}:',
+    await SunmiPrinter.printText('${ob}',
         style: SunmiStyle(
           align: SunmiPrintAlign.LEFT,
         ));
+    await SunmiPrinter.lineWrap(1);
   }
 
   //frases

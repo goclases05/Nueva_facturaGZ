@@ -3,45 +3,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class VersionScreen extends StatelessWidget {
   const VersionScreen({Key? key}) : super(key: key);
 
-   @override
+  @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
     return Stack(
       children: [
         Container(
-          width: MediaQuery.of(context).size.width*1,
-          height: MediaQuery.of(context).size.height*1,
+          width: MediaQuery.of(context).size.width * 1,
+          height: MediaQuery.of(context).size.height * 1,
           color: Colors.white,
         ),
         Positioned(
           left: -50,
           top: 20,
           child: CircleAvatar(
-            backgroundColor: Color.fromARGB(255, 174, 192, 195).withOpacity(0.2),
+            backgroundColor:
+                Color.fromARGB(255, 174, 192, 195).withOpacity(0.2),
             radius: 60,
-        
           ),
         ),
         Positioned(
           right: -70,
           top: -5,
           child: CircleAvatar(
-            backgroundColor: Color.fromARGB(255, 174, 192, 195).withOpacity(0.2),
+            backgroundColor:
+                Color.fromARGB(255, 174, 192, 195).withOpacity(0.2),
             radius: 150,
-        
           ),
         ),
         Positioned(
           left: -70,
           bottom: -70,
           child: CircleAvatar(
-            backgroundColor: Color.fromARGB(255, 174, 192, 195).withOpacity(0.2),
+            backgroundColor:
+                Color.fromARGB(255, 174, 192, 195).withOpacity(0.2),
             radius: 150,
-        
           ),
         ),
         /*Center(
@@ -59,8 +60,12 @@ class VersionScreen extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            title: Image.asset('assets/gozeri_blanco2.png',color: Colors.cyan.withOpacity(0.8), width: MediaQuery.of(context).size.width*0.3,),
-            actions:const [
+            title: Image.asset(
+              'assets/gozeri_blanco2.png',
+              color: Colors.cyan.withOpacity(0.8),
+              width: MediaQuery.of(context).size.width * 0.3,
+            ),
+            actions: const [
               SizedBox(
                 width: 10,
               ),
@@ -97,50 +102,63 @@ class VersionScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 //Image.asset('assets/gozeri_blanco2.png',color: Colors.cyan.withOpacity(0.3), width: MediaQuery.of(context).size.width*0.3,),
-                 Card(
-                  elevation: 5,
-                  child: Container(
-                    padding: EdgeInsets.all(5),
-                    child: Icon(Icons.refresh,color: Colors.cyan, size: 120,)
-                    )
+                Card(
+                    elevation: 5,
+                    child: Container(
+                        padding: EdgeInsets.all(5),
+                        child: Icon(
+                          Icons.refresh,
+                          color: Colors.cyan,
+                          size: 120,
+                        ))),
+                const SizedBox(
+                  height: 10,
                 ),
-                const SizedBox(height: 10,),
-                const Text('Actualización Disponible',style: TextStyle(color: Colors.cyan, fontSize: 25), textAlign: TextAlign.center),
-                const Text('La aplicación actual se encuentra desactualizada, por favor actualiza el sistema para poder gozar de la nueva versión y las nuevas opciónes disponibles',textAlign: TextAlign.center,),
+                const Text('Actualización Disponible',
+                    style: TextStyle(color: Colors.cyan, fontSize: 25),
+                    textAlign: TextAlign.center),
+                const Text(
+                  'La aplicación actual se encuentra desactualizada, por favor actualiza el sistema para poder gozar de la nueva versión y las nuevas opciónes disponibles',
+                  textAlign: TextAlign.center,
+                ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height*0.15,
+                  height: MediaQuery.of(context).size.height * 0.15,
                 )
               ],
             ),
           ),
-          bottomSheet: Row(
-            children:[ 
-              SizedBox(
-                width: MediaQuery.of(context).size.width*0.1,
-              ),
-              Expanded(
-                child: Container(
-                  margin:const EdgeInsets.only(bottom: 10),
-                  child: TextButton.icon(
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(context, 'checking');
-                    },
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Actualizar'),
-                    style: TextButton.styleFrom(
-                      primary: Colors.white,
-                      backgroundColor: Colors.cyan,
-                    ),
+          bottomSheet: Row(children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.1,
+            ),
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                child: TextButton.icon(
+                  onPressed: () => _launchUrl(),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Actualizar'),
+                  style: TextButton.styleFrom(
+                    primary: Colors.white,
+                    backgroundColor: Colors.cyan,
                   ),
                 ),
               ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width*0.1,
-              ),
-            ]
-          ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.1,
+            ),
+          ]),
         )
       ],
     );
+  }
+
+  Future<void> _launchUrl() async {
+    final Uri _url = Uri.parse(
+        'https://play.google.com/store/apps/details?id=com.gozeri.factura_gozeri&hl=es_419&gl=US');
+    if (!await launchUrl(_url)) {
+      throw 'Could not launch $_url';
+    }
   }
 }
