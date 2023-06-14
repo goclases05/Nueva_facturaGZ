@@ -69,9 +69,9 @@ class _ViewFacturasState extends State<ViewFacturas> {
       list_tmp.clear();
     }
     print(
-        "https://app.gozeri.com/versiones/v1.5.2/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
+        "https://app.gozeri.com/versiones/v1.5.3/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}&usuario=${id_usuario}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.2/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}");
+        "https://app.gozeri.com/versiones/v1.5.3/factura/listFacturas.php?empresa=${empresa}&limit=${i}&accion=${widget.accion}&idusuario=${id_usuario}&sucu=${Preferencias.sucursal}&usuario=${id_usuario}");
 
     final resp = await http.get(uri);
     final o = json.decode(resp.body);

@@ -13,9 +13,9 @@ class Preferencias_art extends ChangeNotifier {
     final empresa = Preferencias.data_empresa;
     final id_usuario = Preferencias.data_id;
     print(
-        "https://${_baseUrl}/versiones/v1.5.2/preferencias_productos.php?id_empresa=${empresa}");
+        "https://${_baseUrl}/versiones/v1.5.3/preferencias_productos.php?id_empresa=${empresa}&usuario=${id_usuario}");
     final Uri uri = Uri.parse(
-        "https://${_baseUrl}/versiones/v1.5.2/preferencias_productos.php?id_empresa=${empresa}");
+        "https://${_baseUrl}/versiones/v1.5.3/preferencias_productos.php?id_empresa=${empresa}&usuario=${id_usuario}");
 
     final resp = await http.get(uri);
     print('el dato');

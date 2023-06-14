@@ -20,9 +20,9 @@ class ItemProvider extends ChangeNotifier {
     final id_usuario = Preferencias.data_id;
 
     print(
-        "https://${_baseUrl}/versiones/v1.5.2/search_items.php?id_empresa=${empresa}&data=${query}");
+        "https://${_baseUrl}/versiones/v1.5.3/search_items.php?id_empresa=${empresa}&data=${query}&usuario=${id_usuario}");
     final Uri uri = Uri.parse(
-        "https://${_baseUrl}/versiones/v1.5.2/search_items.php?id_empresa=${empresa}&data=${query}");
+        "https://${_baseUrl}/versiones/v1.5.3/search_items.php?id_empresa=${empresa}&data=${query}&usuario=${id_usuario}");
 
     final resp = await http.get(uri);
     final search = ProductosDepartamento.fromJson(resp.body);
