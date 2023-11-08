@@ -57,8 +57,8 @@ class ItemsSearch extends SearchDelegate {
       return Container(
         child: Center(
           child: Icon(
-            Icons.search,
-            color: settings.colorPrimary,
+            Icons.widgets_outlined,
+            color: Color.fromARGB(255, 216, 216, 216),
             size: 130,
           ),
         ),
@@ -100,8 +100,8 @@ class ItemsSearch extends SearchDelegate {
             return Container(
               child: Center(
                 child: Icon(
-                  Icons.search,
-                  color: colorPrimary,
+                  Icons.widgets_outlined,
+                  color: Color.fromARGB(255, 216, 216, 216),
                   size: 130,
                 ),
               ),

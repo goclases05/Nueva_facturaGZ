@@ -22,7 +22,7 @@ class AuthService extends ChangeNotifier {
   Future<String?> login(String user, String pass) async {
     final Map<String, dynamic> authData = {'usuario': user, 'pass': pass};
 
-    final url = Uri.https(_baseUrl, '/versiones/v1.5.3/login.php');
+    final url = Uri.https(_baseUrl, '/versiones/v1.5.5/login.php');
     final resp = await http.post(url, body: authData);
 
     final Map<String, dynamic> decodeResp = json.decode(resp.body);
@@ -85,11 +85,13 @@ class AuthService extends ChangeNotifier {
     String version = '1.5.3'; // packageInfo.version;
 
     print(
-        "https://app.gozeri.com/versiones/v1.5.3/membresia.php?empresa=${empresa}&version=" +
-            version+"&usuario=${id_usuario}");
+        "https://app.gozeri.com/versiones/v1.5.5/membresia.php?empresa=${empresa}&version=" +
+            version +
+            "&usuario=${id_usuario}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.3/membresia.php?empresa=${empresa}&version=" +
-            version+"&usuario=${id_usuario}");
+        "https://app.gozeri.com/versiones/v1.5.5/membresia.php?empresa=${empresa}&version=" +
+            version +
+            "&usuario=${id_usuario}");
 
     final resp = await http.get(uri);
     final us = await storage.read(key: 'USUARIO') ?? '';
@@ -113,9 +115,9 @@ class AuthService extends ChangeNotifier {
     final id_usuario = Preferencias.data_id;
 
     print(
-        "https://app.gozeri.com/versiones/v1.5.3/sucursales.php?empresa=${empresa}&usuario=${id_usuario}");
+        "https://app.gozeri.com/versiones/v1.5.5/sucursales.php?empresa=${empresa}&usuario=${id_usuario}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.3/sucursales.php?empresa=${empresa}&usuario=${id_usuario}");
+        "https://app.gozeri.com/versiones/v1.5.5/sucursales.php?empresa=${empresa}&usuario=${id_usuario}");
 
     final resp = await http.get(uri);
     var js = json.decode(resp.body);
@@ -142,9 +144,9 @@ class AuthService extends ChangeNotifier {
     final sucursal = Preferencias.sucursal;
     final id_usuario = Preferencias.data_id;
     print(
-        "https://app.gozeri.com/versiones/v1.5.3/series.php?sucursal=${sucursal}&usuario=${id_usuario}");
+        "https://app.gozeri.com/versiones/v1.5.5/series.php?sucursal=${sucursal}&usuario=${id_usuario}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.3/series.php?sucursal=${sucursal}&usuario=${id_usuario}");
+        "https://app.gozeri.com/versiones/v1.5.5/series.php?sucursal=${sucursal}&usuario=${id_usuario}");
 
     final resp = await http.get(uri);
     var js = json.decode(resp.body);

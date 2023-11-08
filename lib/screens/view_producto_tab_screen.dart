@@ -39,9 +39,9 @@ class _viewproductotab extends State<ViewProductoTab> {
     final id_usuario = Preferencias.data_id;
 
     print(
-        "https://app.gozeri.com/versiones/v1.5.3/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}&usuario=${id_usuario}");
+        "https://app.gozeri.com/versiones/v1.5.5/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}&usuario=${id_usuario}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.3/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}&usuario=${id_usuario}");
+        "https://app.gozeri.com/versiones/v1.5.5/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}&usuario=${id_usuario}");
     final response = await http.get(uri);
     i = i + 10;
     if (response.statusCode == 200) {

@@ -21,9 +21,9 @@ class DepartamentoService extends ChangeNotifier {
     final empresa = Preferencias.data_empresa;
     final id_usuario = Preferencias.data_id;
     print(
-        "https://${_baseUrl}/versiones/v1.5.3/departamentos.php?empresa=${empresa}&usuario=${id_usuario}");
+        "https://${_baseUrl}/versiones/v1.5.5/departamentos.php?empresa=${empresa}&usuario=${id_usuario}");
     final Uri uri = Uri.parse(
-        "https://${_baseUrl}/versiones/v1.5.3/departamentos.php?empresa=${empresa}&usuario=${id_usuario}");
+        "https://${_baseUrl}/versiones/v1.5.5/departamentos.php?empresa=${empresa}&usuario=${id_usuario}");
 
     final resp = await http.get(uri);
 

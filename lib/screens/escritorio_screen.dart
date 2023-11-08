@@ -9,6 +9,7 @@ import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:factura_gozeri/providers/seattings_provider.dart';
 import 'package:factura_gozeri/screens/no_internet_screen.dart';
 import 'package:factura_gozeri/screens/screens.dart';
+import 'package:factura_gozeri/search/facturas_search.dart';
 import 'package:factura_gozeri/services/auth_services.dart';
 import 'package:factura_gozeri/services/departamentos_services.dart';
 import 'package:factura_gozeri/widgets/drawer_header.dart';
@@ -96,6 +97,19 @@ class _EscritorioScreenState extends State<EscritorioScreen> {
               backgroundColor: Colors.white,
               elevation: 0,
               actions: [
+                CircleAvatar(
+                  backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
+                  child: IconButton(
+                    onPressed: () {
+                      showSearch(context: context, delegate: FacturasSearch());
+                    },
+                    icon: Icon(Icons.search),
+                    color: colorPrimary,
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
                 CircleAvatar(
                   backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
                   child: IconButton(
