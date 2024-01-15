@@ -12,6 +12,7 @@ class Cart with ChangeNotifier {
   List<Producto> _list_producto = [];
   int cantidad = 0;
   double _price = 0.0;
+  bool loading_cart = false;
 
   final String _baseUrl = "app.gozeri.com";
 
@@ -19,12 +20,16 @@ class Cart with ChangeNotifier {
       String precio) async {
     print(item);
     print(cantidad_p);
+    loading_cart = true;
+    notifyListeners();
     final htt = await HttpCart(item, cantidad_producto, id_tmp, precio);
     print('holi ${htt}');
+
     if (htt == 'OK') {
       cantidad = cantidad + cantidad_p;
-      notifyListeners();
     }
+    loading_cart = false;
+    notifyListeners();
   }
 
   Future<String> HttpCart(id_prod, cantidad_p, id_tmp, precio) async {

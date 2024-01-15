@@ -38,6 +38,10 @@ class _viewproductotab extends State<ViewProductoTab> {
     final empresa = Preferencias.data_empresa;
     final id_usuario = Preferencias.data_id;
 
+    if (isRefresh) {
+      i = 0;
+    }
+
     print(
         "https://app.gozeri.com/versiones/v1.5.5/productos_core.php?id_empresa=${empresa}&accion=2&id_categoria=${widget.id_departamento}&producto=${i}&usuario=${id_usuario}");
     final Uri uri = Uri.parse(

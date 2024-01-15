@@ -364,7 +364,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                   )
                 : Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const SizedBox(
                         width: 10,
@@ -530,6 +530,20 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                         ),
                       ),
                       Consumer<Cart>(builder: (context, cart, child) {
+                        if (cart.loading_cart) {
+                          return TextButton(
+                            onPressed: () => false,
+                            child: Container(
+                              width: 30,
+                              height: 30,
+                              child: CircularProgressIndicator(
+                                valueColor:
+                                    AlwaysStoppedAnimation(widget.colorPrimary),
+                                backgroundColor: Colors.grey,
+                              ),
+                            ),
+                          );
+                        }
                         return GestureDetector(
                           onTap: () {
                             if (widget.listProd.facturar == '1') {

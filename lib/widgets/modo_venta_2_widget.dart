@@ -566,6 +566,10 @@ class _ModoVenta2State extends State<ModoVenta2> {
             width: MediaQuery.of(context).size.width * 0.9,
             child: Consumer<Cart>(
               builder: (context, cart, child) {
+                if (cart.loading_cart) {
+                  return TextButton(
+                      onPressed: () => false, child: Text('cargando...'));
+                }
                 return TextButton.icon(
                   onPressed: () {
                     if (widget.listProd.facturar == '1') {
