@@ -14,6 +14,7 @@ import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/screens/escritorio_screen.dart';
 import 'package:factura_gozeri/screens/no_internet_screen.dart';
 import 'package:factura_gozeri/screens/view_tabs_facturacion_screen.dart';
+import 'package:factura_gozeri/widgets/itemCondicionesPago_widget.dart';
 import 'package:factura_gozeri/widgets/item_observacion_widget.dart';
 import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
 import 'package:factura_gozeri/screens/view_tabs_screen.dart';
@@ -510,9 +511,9 @@ class _PrintScreenState extends State<PrintScreen> {
                       physics: const BouncingScrollPhysics(),
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
-                      itemCount: 5,
+                      itemCount: 6,
                       itemBuilder: ((context, index) {
-                        if (index == 4) {
+                        if (index == 5) {
                           return Consumer<Facturacion>(
                               builder: (context, fact, child) {
                             return Container(
@@ -633,8 +634,10 @@ class _PrintScreenState extends State<PrintScreen> {
                                 : (index == 1)
                                     ? const Text('Datos de Cliente')
                                     : (index == 2)
-                                        ? const Text('Detalle de Pago')
-                                        : const Text('Observaciones'),
+                                        ? const Text('Condiciones de Pago')
+                                        : (index == 3)
+                                            ? const Text('Detalle de Pago')
+                                            : const Text('Observaciones'),
                             children: [
                               (index == 0)
                                   ? ItemsCart(
@@ -646,16 +649,20 @@ class _PrintScreenState extends State<PrintScreen> {
                                           colorPrimary: widget.colorPrimary,
                                           tmp: widget.id_tmp)
                                       : (index == 2)
-                                          ? RegistroMetodoPago(
-                                              colorPrimary: widget.colorPrimary,
-                                              id_tmp: widget.id_tmp,
-                                              estado: 'tmp',
-                                            )
-                                          : ItemObservacion(
-                                              colorPrimary: widget.colorPrimary,
-                                              id: widget.id_tmp,
-                                              tmp: 'tmp',
-                                            ),
+                                          ? ItemCondicionesPago()
+                                          : (index == 3)
+                                              ? RegistroMetodoPago(
+                                                  colorPrimary:
+                                                      widget.colorPrimary,
+                                                  id_tmp: widget.id_tmp,
+                                                  estado: 'tmp',
+                                                )
+                                              : ItemObservacion(
+                                                  colorPrimary:
+                                                      widget.colorPrimary,
+                                                  id: widget.id_tmp,
+                                                  tmp: 'tmp',
+                                                ),
                               Row(
                                 mainAxisAlignment: (index == 0)
                                     ? MainAxisAlignment.spaceBetween
@@ -696,7 +703,7 @@ class _PrintScreenState extends State<PrintScreen> {
                                       : Text(''),
                                   Container(
                                     alignment: Alignment.centerRight,
-                                    child: (index == 3)
+                                    child: (index == 4)
                                         ? const Text('')
                                         : ElevatedButton.icon(
                                             label: const Icon(
@@ -712,6 +719,8 @@ class _PrintScreenState extends State<PrintScreen> {
                                                   open = 2;
                                                 } else if (index == 2) {
                                                   open = 3;
+                                                } else if (index == 3) {
+                                                  open = 4;
                                                 } else {
                                                   open = 1;
                                                 }
