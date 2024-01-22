@@ -649,7 +649,11 @@ class _PrintScreenState extends State<PrintScreen> {
                                           colorPrimary: widget.colorPrimary,
                                           tmp: widget.id_tmp)
                                       : (index == 2)
-                                          ? ItemCondicionesPago()
+                                          ? ItemCondicionesPago(
+                                              colorPrimary: widget.colorPrimary,
+                                              id: widget.id_tmp,
+                                              tmp: 'tmp',
+                                            )
                                           : (index == 3)
                                               ? RegistroMetodoPago(
                                                   colorPrimary:

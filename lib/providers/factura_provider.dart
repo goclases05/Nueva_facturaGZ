@@ -24,7 +24,9 @@ class Facturacion extends ChangeNotifier {
   late List<ClassListCart> list_det = [];
 
   bool loadMetodo = true;
+  bool loadCondicionP = true;
   List<MetodosPago> list_metodoPago = [];
+  List<CondicionPago> list_condicionPago = [];
 
   //bancos
   bool loadBancos = true;
@@ -46,6 +48,7 @@ class Facturacion extends ChangeNotifier {
 
   Facturacion() {
     metodoPago();
+    condicionPago();
   }
 
   Future serie(String tmp, String accion, String serie) async {
@@ -422,6 +425,31 @@ class Facturacion extends ChangeNotifier {
     final resp = await http.get(uri);
     print('se elimino: ' + resp.body);
     return resp.body;
+  }
+
+  Future condicionPago() async {
+    final id_usuario = Preferencias.data_id;
+    loadCondicionP = true;
+    notifyListeners();
+    print(
+        "https://app.gozeri.com/versiones/v1.5.5/condiciones_pagos.php?usuario=${id_usuario}");
+    final Uri uri = Uri.parse(
+        "https://app.gozeri.com/versiones/v1.5.5/condiciones_pagos.php?usuario=${id_usuario}");
+
+    final resp = await http.get(uri);
+    var js = json.decode(resp.body);
+    final len = js.length;
+    //final sucursales_http = sucursalesDataFromJson(resp.body);
+    list_condicionPago.clear();
+    var result;
+    for (int o = 0; o < len; o++) {
+      result = CondicionPago.fromJson(js[o]);
+      /*list_det.addAll(result);*/
+      print(list_condicionPago);
+      list_condicionPago.add(result);
+    }
+    loadCondicionP = false;
+    return notifyListeners();
   }
 
   Future<dynamic> get_Sat(String tmp, String nit) async {

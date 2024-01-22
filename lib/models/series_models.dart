@@ -40,3 +40,22 @@ class MetodosPago {
       };
 }
 
+class CondicionPago {
+  CondicionPago({
+    required this.idMetodo,
+    required this.nombre,
+  });
+
+  String idMetodo;
+  String nombre;
+
+  factory CondicionPago.fromJson(Map<String, dynamic> json) => CondicionPago(
+        idMetodo: json["ID_PAGO_PRED"],
+        nombre: json["FORMA"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "ID_PAGO_PRED": idMetodo,
+        "FORMA": nombre,
+      };
+}
