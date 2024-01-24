@@ -407,7 +407,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                     colorPrimary:
                                                         widget.colorPrimary,
                                                     serie: _facturacion
-                                                        .initialSerie,
+                                                        .initialSerie, condicionPagoVal: list_tmp[index].terminos,
                                                   )));
                                     },
                                     child: Container(

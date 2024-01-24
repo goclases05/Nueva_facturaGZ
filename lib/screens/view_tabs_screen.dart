@@ -178,7 +178,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                                   builder: (_) => PrintScreen(
                                         id_tmp: widget.id_tmp,
                                         colorPrimary: widget.colorPrimary,
-                                        serie: _facturacion.initialSerie,
+                                        serie: _facturacion.initialSerie, condicionPagoVal: '0',
                                       )));
                         },
                         icon: Icon(
@@ -231,7 +231,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                               builder: (_) => PrintScreen(
                                     id_tmp: widget.id_tmp,
                                     colorPrimary: widget.colorPrimary,
-                                    serie: _facturacion.initialSerie,
+                                    serie: _facturacion.initialSerie, condicionPagoVal: '0',
                                   )));
                     },
                     icon: const Icon(Icons.receipt_long),

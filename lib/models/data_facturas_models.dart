@@ -15,6 +15,7 @@ class DataFacturas {
     required this.nit,
     required this.no,
     required this.fecha,
+    required this.terminos,
     required this.estado
   });
 
@@ -24,6 +25,7 @@ class DataFacturas {
   String apellidos;
   String nit;
   String no;
+  String terminos;
   String fecha;
   String estado;
 
@@ -35,6 +37,7 @@ class DataFacturas {
         nit: json["NIT"],
         no: json["NO"],
         fecha: json["FECHA"],
+        terminos: json["TERMINOS"],
         estado: json["ESTADO"],
       );
 
@@ -46,6 +49,7 @@ class DataFacturas {
         "NIT": nit,
         "NO": no,
         "FECHA": fecha,
+        "TERMINOS": terminos,
         "ESTADO": estado,
       };
 }

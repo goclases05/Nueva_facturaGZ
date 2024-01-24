@@ -54,11 +54,13 @@ class PrintScreen extends StatefulWidget {
   String id_tmp;
   Color colorPrimary;
   String serie;
+  String condicionPagoVal;
   PrintScreen(
       {Key? key,
       required this.id_tmp,
       required this.colorPrimary,
-      required this.serie})
+      required this.serie,
+      required this.condicionPagoVal})
       : super(key: key);
 
   @override

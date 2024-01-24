@@ -1,6 +1,5 @@
+import 'package:date_time_picker/date_time_picker.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,6 +19,8 @@ class ItemCondicionesPago extends StatefulWidget {
 
 class _ItemCondicionesPago extends State<ItemCondicionesPago> {
   String initialSerie = '14';
+  DateTime? selectedDate;
+  TextEditingController date = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +94,40 @@ class _ItemCondicionesPago extends State<ItemCondicionesPago> {
             ),
           ],
         ),
+        SizedBox(
+          height: 10,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: DateTimePicker(
+            enabled: false,
+            type: DateTimePickerType.date,
+            dateMask: 'd/MM/yyyy',
+            initialValue: DateTime.now().toString(),
+            firstDate: DateTime(2024),
+            lastDate: DateTime(2030),
+            icon: Icon(Icons.event),
+            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'día/mes/año',
+                              label: Text('Fecha')),
+            dateLabelText: 'Fecha',
+            selectableDayPredicate: (date) {
+              // Disable weekend days to select from the calendar
+              if (date.weekday == 6 || date.weekday == 7) {
+                return false;
+              }
+        
+              return true;
+            },
+            onChanged: (val) => print(val),
+            validator: (val) {
+              print(val);
+              return null;
+            },
+            onSaved: (val) => print(val),
+          ),
+        )
       ],
     );
   }
