@@ -18,9 +18,19 @@ class ItemCondicionesPago extends StatefulWidget {
 }
 
 class _ItemCondicionesPago extends State<ItemCondicionesPago> {
-  String initialSerie = '14';
+  String initialCodicion = '14';
   DateTime? selectedDate;
   TextEditingController date = TextEditingController();
+  late TextEditingController _controlFecha;
+  late TextEditingController _controlFechaV;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _controlFechaV = TextEditingController(text: DateTime.now().toString());
+    _controlFecha = TextEditingController(text: DateTime.now().toString());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +79,7 @@ class _ItemCondicionesPago extends State<ItemCondicionesPago> {
               ),
               child: DropdownButton(
                 itemHeight: null,
-                value: initialSerie,
+                value: (initialCodicion == '0') ? '14' : initialCodicion,
                 isExpanded: true,
                 dropdownColor: Color.fromARGB(255, 241, 238, 241),
                 onChanged: (String? newValue) async {
@@ -77,7 +87,12 @@ class _ItemCondicionesPago extends State<ItemCondicionesPago> {
                     Metodo.bancos();
                   }*/
                   setState(() {
-                    initialSerie = newValue!;
+                    if (newValue == '0' || newValue == '14') {
+                      initialCodicion = newValue.toString();
+                      _controlFechaV.text = DateTime.now().toString();
+                    } else {
+                      initialCodicion = newValue.toString();
+                    }
                   });
                 },
                 items: menuItems,
@@ -100,30 +115,69 @@ class _ItemCondicionesPago extends State<ItemCondicionesPago> {
         Padding(
           padding: const EdgeInsets.all(5.0),
           child: DateTimePicker(
-            enabled: false,
+            enabled: true,
             type: DateTimePickerType.date,
             dateMask: 'd/MM/yyyy',
-            initialValue: DateTime.now().toString(),
             firstDate: DateTime(2024),
             lastDate: DateTime(2030),
+            controller: _controlFecha,
             icon: Icon(Icons.event),
             decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              hintText: 'día/mes/año',
-                              label: Text('Fecha')),
+                border: OutlineInputBorder(),
+                hintText: 'día/mes/año',
+                label: Text('Fecha')),
             dateLabelText: 'Fecha',
             selectableDayPredicate: (date) {
-              // Disable weekend days to select from the calendar
-              if (date.weekday == 6 || date.weekday == 7) {
+              /*if (date.day < DateTime.now().add(Duration(days: -5)).day) {
                 return false;
-              }
-        
+              }*/
               return true;
             },
-            onChanged: (val) => print(val),
-            validator: (val) {
-              print(val);
-              return null;
+            onChanged: (val) {
+              _controlFecha.text = val;
+              _controlFechaV.text = val;
+              setState(() {});
+            },
+            onSaved: (val) => print(val),
+          ),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: DateTimePicker(
+            enabled: (initialCodicion == '0' || initialCodicion == '14')
+                ? false
+                : true,
+            type: DateTimePickerType.date,
+            dateMask: 'd/MM/yyyy',
+            controller: _controlFechaV,
+            firstDate: DateTime(2023),
+            lastDate: DateTime(2100),
+            icon: Icon(Icons.event),
+            decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'día/mes/año',
+                label: Text('Fecha Vencimiento')),
+            dateLabelText: 'Fecha Vencimiento',
+            selectableDayPredicate: (date) {
+              if (date.year >= DateTime.parse(_controlFecha.text).year) {
+                if (date.month >= DateTime.parse(_controlFecha.text).month ||
+                    date.year > DateTime.parse(_controlFecha.text).year) {
+                  if (date.day >= DateTime.parse(_controlFecha.text).day ||
+                      date.month > DateTime.parse(_controlFecha.text).month ||
+                      date.year > DateTime.parse(_controlFecha.text).year) {
+                    return true;
+                  }
+                }
+              }
+
+              return false;
+            },
+            onChanged: (val) {
+              _controlFechaV.text = val;
+              setState(() {});
             },
             onSaved: (val) => print(val),
           ),
