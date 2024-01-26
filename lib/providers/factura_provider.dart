@@ -14,6 +14,8 @@ class Facturacion extends ChangeNotifier {
   //observación
   String ob = '';
 
+  Map<String, dynamic> lista_datosFacturaTermino = {};
+
   //serie
   String initialSerie = '0';
   bool cargainiSerie = true;
@@ -38,6 +40,9 @@ class Facturacion extends ChangeNotifier {
   String total_fac = '0';
   String saldo = '0';
   String abonosi2 = '0';
+
+  //condicion pago
+  bool loadTerminos = true;
 
   //variables para cliente
   String cliente = '';
@@ -450,6 +455,42 @@ class Facturacion extends ChangeNotifier {
     }
     loadCondicionP = false;
     return notifyListeners();
+  }
+
+  Future condicionPagoShowSave(
+      String accion, String clave, String valor, String tmp) async {
+    final id_usuario = Preferencias.data_id;
+    final empresa = Preferencias.data_empresa;
+    if (accion != '1') {
+      //va mostrar los registros de termino y fechas previamente guardados
+
+      print(
+          "https://app.gozeri.com/versiones/v1.5.5/factura/showsave_condicionespago.php?accion=${accion}&clave=${clave}&valor=${valor}&tmp=${tmp}&idempresa=${empresa}&idusuario=${id_usuario}&usuario=${id_usuario}");
+      final Uri uri = Uri.parse(
+          "https://app.gozeri.com/versiones/v1.5.5/factura/showsave_condicionespago.php?accion=${accion}&clave=${clave}&valor=${valor}&tmp=${tmp}&idempresa=${empresa}&idusuario=${id_usuario}&usuario=${id_usuario}");
+
+      final resp = await http.get(uri);
+      Map<String, dynamic> js = await json.decode(resp.body);
+      loadTerminos = false;
+      print(js);
+      lista_datosFacturaTermino.clear();
+      lista_datosFacturaTermino.addAll(js);
+      notifyListeners();
+    } else {
+      //registrara los datos
+      print(
+          "https://app.gozeri.com/versiones/v1.5.5/factura/showsave_condicionespago.php?accion=${accion}&clave=${clave}&valor=${valor}&tmp=${tmp}&idempresa=${empresa}&idusuario=${id_usuario}&usuario=${id_usuario}");
+      final Uri uri = Uri.parse(
+          "https://app.gozeri.com/versiones/v1.5.5/factura/showsave_condicionespago.php?accion=${accion}&clave=${clave}&valor=${valor}&tmp=${tmp}&idempresa=${empresa}&idusuario=${id_usuario}&usuario=${id_usuario}");
+
+      final resp = await http.get(uri);
+      Map<String, dynamic> js = await json.decode(resp.body);
+      if (js['MENSAJE'] == 'OK') {
+        return 'OK';
+      } else {
+        return 'Error: no se aplico los cambios';
+      }
+    }
   }
 
   Future<dynamic> get_Sat(String tmp, String nit) async {
