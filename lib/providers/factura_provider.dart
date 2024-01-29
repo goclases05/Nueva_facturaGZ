@@ -43,6 +43,8 @@ class Facturacion extends ChangeNotifier {
 
   //condicion pago
   bool loadTerminos = true;
+  bool variables_condiciones = false;
+  int vuelta = 0;
 
   //variables para cliente
   String cliente = '';
@@ -53,7 +55,6 @@ class Facturacion extends ChangeNotifier {
 
   Facturacion() {
     metodoPago();
-    condicionPago();
   }
 
   Future serie(String tmp, String accion, String serie) async {
@@ -434,8 +435,6 @@ class Facturacion extends ChangeNotifier {
 
   Future condicionPago() async {
     final id_usuario = Preferencias.data_id;
-    loadCondicionP = true;
-    notifyListeners();
     print(
         "https://app.gozeri.com/versiones/v1.5.5/condiciones_pagos.php?usuario=${id_usuario}");
     final Uri uri = Uri.parse(
@@ -463,7 +462,7 @@ class Facturacion extends ChangeNotifier {
     final empresa = Preferencias.data_empresa;
     if (accion != '1') {
       //va mostrar los registros de termino y fechas previamente guardados
-
+      lista_datosFacturaTermino.clear();
       print(
           "https://app.gozeri.com/versiones/v1.5.5/factura/showsave_condicionespago.php?accion=${accion}&clave=${clave}&valor=${valor}&tmp=${tmp}&idempresa=${empresa}&idusuario=${id_usuario}&usuario=${id_usuario}");
       final Uri uri = Uri.parse(
@@ -471,10 +470,9 @@ class Facturacion extends ChangeNotifier {
 
       final resp = await http.get(uri);
       Map<String, dynamic> js = await json.decode(resp.body);
-      loadTerminos = false;
-      print(js);
-      lista_datosFacturaTermino.clear();
+
       lista_datosFacturaTermino.addAll(js);
+      loadTerminos = false;
       notifyListeners();
     } else {
       //registrara los datos

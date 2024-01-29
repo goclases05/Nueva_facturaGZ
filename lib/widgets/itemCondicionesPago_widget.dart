@@ -1,4 +1,5 @@
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:factura_gozeri/models/series_models.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +24,7 @@ class _ItemCondicionesPago extends State<ItemCondicionesPago> {
   TextEditingController date = TextEditingController();
   late TextEditingController _controlFecha;
   late TextEditingController _controlFechaV;
+  int vuelta = 0;
 
   @override
   void initState() {
@@ -30,7 +32,22 @@ class _ItemCondicionesPago extends State<ItemCondicionesPago> {
 
     _controlFechaV = TextEditingController(text: DateTime.now().toString());
     _controlFecha = TextEditingController(text: DateTime.now().toString());
+
+    final cpago = Provider.of<Facturacion>(context, listen: false);
+    //cpago.condicionPagoShowSave('0', '', '', widget.id);
+    cpago.loadCondicionP = true;
+    cpago.loadTerminos = true;
+    cpago.condicionPago();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    final cpago = Provider.of<Facturacion>(context, listen: false);
+    cpago.loadCondicionP = true;
+    cpago.loadTerminos = true;
+    super.dispose();
   }
 
   @override
@@ -40,28 +57,41 @@ class _ItemCondicionesPago extends State<ItemCondicionesPago> {
 
     List<DropdownMenuItem<String>> menuItems = [];
 
-    menuItems.clear();
-    for (var i = 0; i < cpago.list_condicionPago.length; i++) {
-      menuItems.add(DropdownMenuItem(
-          value: cpago.list_condicionPago[i].idMetodo,
-          child: Text(
-            cpago.list_condicionPago[i].nombre,
-            textAlign: TextAlign.start,
-          )));
-    }
-
+    //print('la condicion ${}}');
     return Consumer<Facturacion>(builder: (context, condiciones, child) {
       print(
-          'los datos de la peticionson :${condiciones.lista_datosFacturaTermino["FECHA"]}');
-      if (cpago.loadTerminos == true) {
+          'los datos de la peticionson :${condiciones.lista_datosFacturaTermino["TERMINOS"]}');
+
+      if (condiciones.loadTerminos == true &&
+          condiciones.loadCondicionP == true) {
+        //verifica si aun esta cargando la lista de condiciones
         return Container(
           child: CircularProgressIndicator(),
         );
       }
-      initialCodicion = condiciones.lista_datosFacturaTermino["TERMINOS"];
-      _controlFecha.text = condiciones.lista_datosFacturaTermino["FECHA"];
-      _controlFechaV.text = condiciones.lista_datosFacturaTermino["FECHA_V"];
+      initialCodicion =
+          condiciones.lista_datosFacturaTermino["TERMINOS"].toString();
 
+      _controlFecha.text =
+          condiciones.lista_datosFacturaTermino["FECHA"].toString();
+      _controlFechaV.text =
+          condiciones.lista_datosFacturaTermino["FECHA_V"].toString();
+
+      menuItems.clear();
+
+      for (var i = 0; i < condiciones.list_condicionPago.length; i++) {
+        print(condiciones.list_condicionPago[i].nombre);
+        print(initialCodicion);
+        menuItems.add(DropdownMenuItem(
+            value: condiciones.list_condicionPago[i].idMetodo,
+            child: Text(
+              condiciones.list_condicionPago[i].nombre,
+              textAlign: TextAlign.start,
+            )));
+      }
+
+      //relleno variables
+      print('condicion ${initialCodicion}');
       return Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,24 +112,30 @@ class _ItemCondicionesPago extends State<ItemCondicionesPago> {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: DropdownButton(
-                  itemHeight: null,
-                  value: (initialCodicion == '0') ? '14' : initialCodicion,
                   isExpanded: true,
                   dropdownColor: Color.fromARGB(255, 241, 238, 241),
                   onChanged: (String? newValue) async {
                     /*if (newValue != '1' && newValue != '6' && newValue != '15') {
                         Metodo.bancos();
                       }*/
+                    await condiciones.condicionPagoShowSave(
+                        "1", "TERMINOS", newValue!, widget.id);
+                    await condiciones.condicionPagoShowSave(
+                        "1", "FECHA_V", DateTime.now().toString(), widget.id);
+
                     setState(() {
-                      if (newValue == '0' || newValue == '14') {
-                        initialCodicion = newValue.toString();
-                        _controlFechaV.text = DateTime.now().toString();
-                      } else {
-                        initialCodicion = newValue.toString();
-                      }
+                      print('se actualizo');
+                      condiciones.lista_datosFacturaTermino['TERMINOS'] =
+                          newValue.toString();
+                      condiciones.lista_datosFacturaTermino['FECHA_V'] =
+                          DateTime.now().toString();
+
+                      initialCodicion = newValue;
+                      _controlFechaV.text = DateTime.now().toString();
                     });
                   },
                   items: menuItems,
+                  value: (initialCodicion.isNotEmpty) ? initialCodicion : '14',
                   elevation: 0,
                   style: const TextStyle(
                       color: Colors.black54,
@@ -137,9 +173,17 @@ class _ItemCondicionesPago extends State<ItemCondicionesPago> {
                   }*/
                 return true;
               },
-              onChanged: (val) {
+              onChanged: (val) async {
                 _controlFecha.text = val;
                 _controlFechaV.text = val;
+
+                await condiciones.condicionPagoShowSave(
+                    "1", "FECHA", val, widget.id);
+                await condiciones.condicionPagoShowSave(
+                    "1", "FECHA_V", val, widget.id);
+
+                condiciones.lista_datosFacturaTermino['FECHA_V'] = val;
+                condiciones.lista_datosFacturaTermino['FECHA'] = val;
                 setState(() {});
               },
               onSaved: (val) => print(val),
@@ -179,8 +223,12 @@ class _ItemCondicionesPago extends State<ItemCondicionesPago> {
 
                 return false;
               },
-              onChanged: (val) {
+              onChanged: (val) async {
                 _controlFechaV.text = val;
+
+                await condiciones.condicionPagoShowSave(
+                    "1", "FECHA_V", val, widget.id);
+                condiciones.lista_datosFacturaTermino['FECHA_V'] = val;
                 setState(() {});
               },
               onSaved: (val) => print(val),

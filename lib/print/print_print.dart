@@ -779,14 +779,15 @@ class _PrintScreenState extends State<PrintScreen> {
                                 description: 'Error: Seleccióne un cliente',
                                 gravity: Gravity.top,
                                 backgroundColor: Colors.redAccent);
-                          } else if (double.parse(facturaService.saldo) >=
+                          } /*else if (double.parse(facturaService.saldo) >=
                               double.parse(facturaService.total_fac)) {
                             //no se aplico el pago
                             edgeAlert(context,
                                 description: 'Error: Aplicar pago',
                                 gravity: Gravity.top,
                                 backgroundColor: Colors.redAccent);
-                          } else {
+                          }*/
+                          else {
                             //FACTURANDO
                             var facturar =
                                 await facturaService.facturar(widget.id_tmp);
