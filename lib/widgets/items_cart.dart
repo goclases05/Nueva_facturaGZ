@@ -193,7 +193,7 @@ class _ItemsCart extends State<ItemsCart> {
                 onPressed: () async {
                   print('adios articulo');
                   await ListDet.delete_producto(widget.id_tmp, item_id);
-                  ListDet.transacciones(widget.id_tmp);
+                  ListDet.transacciones(widget.id_tmp, 'tmp');
                   print('listo');
                 },
               ),

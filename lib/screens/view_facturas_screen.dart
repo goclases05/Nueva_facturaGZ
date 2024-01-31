@@ -396,7 +396,7 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                           'read',
                                           '');
                                       _facturacion.transacciones(
-                                          list_tmp[index].idFactTmp);
+                                          list_tmp[index].idFactTmp, 'tmp');
                                       // ignore: use_build_context_synchronously
                                       Navigator.push(
                                           context,
@@ -407,7 +407,10 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                                     colorPrimary:
                                                         widget.colorPrimary,
                                                     serie: _facturacion
-                                                        .initialSerie, condicionPagoVal: list_tmp[index].terminos,
+                                                        .initialSerie,
+                                                    condicionPagoVal:
+                                                        list_tmp[index]
+                                                            .terminos,
                                                   )));
                                     },
                                     child: Container(
@@ -612,8 +615,16 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                     final printProvider =
                                         Provider.of<PrintProvider>(context,
                                             listen: false);
+                                    final _facturacion =
+                                        Provider.of<Facturacion>(context,
+                                            listen: false);
+
+                                    _facturacion.transacciones(
+                                        list_emi[index].idFactTmp, 'emitida');
+
                                     printProvider
                                         .dataFac(list_emi[index].idFactTmp);
+
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(

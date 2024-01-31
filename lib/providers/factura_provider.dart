@@ -14,8 +14,6 @@ class Facturacion extends ChangeNotifier {
   //observación
   String ob = '';
 
-  Map<String, dynamic> lista_datosFacturaTermino = {};
-
   //serie
   String initialSerie = '0';
   bool cargainiSerie = true;
@@ -26,9 +24,7 @@ class Facturacion extends ChangeNotifier {
   late List<ClassListCart> list_det = [];
 
   bool loadMetodo = true;
-  bool loadCondicionP = true;
   List<MetodosPago> list_metodoPago = [];
-  List<CondicionPago> list_condicionPago = [];
 
   //bancos
   bool loadBancos = true;
@@ -42,9 +38,12 @@ class Facturacion extends ChangeNotifier {
   String abonosi2 = '0';
 
   //condicion pago
-  bool loadTerminos = true;
-  bool variables_condiciones = false;
-  int vuelta = 0;
+  bool loadCondicionesTMP = false; //inicia cargando
+  Map<String, dynamic> condiciones_registradas =
+      {}; //condiciones registradas en la tabla temporal
+
+  bool load_condicionespagos = false; //inicia cargando
+  List<CondicionPago> list_condicionPago = []; //condiciones de pago
 
   //variables para cliente
   String cliente = '';
@@ -149,16 +148,15 @@ class Facturacion extends ChangeNotifier {
     return notifyListeners();
   }
 
-  Future transacciones(String tmp) async {
+  Future transacciones(String tmp, String accion) async {
     loadTransaccion = true;
     final id_usuario = Preferencias.data_id;
     saldo = '0';
 
-    notifyListeners();
     print(
-        "https://app.gozeri.com/versiones/v1.5.5/factura/transacciones.php?id=${tmp}&usuario=${id_usuario}");
+        "https://app.gozeri.com/versiones/v1.5.5/factura/transacciones.php?id=${tmp}&usuario=${id_usuario}&estado=${accion}");
     final Uri uri = Uri.parse(
-        "https://app.gozeri.com/versiones/v1.5.5/factura/transacciones.php?id=${tmp}&usuario=${id_usuario}");
+        "https://app.gozeri.com/versiones/v1.5.5/factura/transacciones.php?id=${tmp}&usuario=${id_usuario}&estado=${accion}");
 
     final resp = await http.get(uri);
     var js = json.decode(resp.body);
@@ -187,21 +185,15 @@ class Facturacion extends ChangeNotifier {
     return notifyListeners();
   }
 
-  Future accionesMetodoPAgo(
-    String accion,
-    String tmp,
-    String abono,
-    String metodo,
-    String cuenta,
-    String referencia,
-  ) async {
+  Future accionesMetodoPAgo(String accion, String tmp, String abono,
+      String metodo, String cuenta, String referencia, String estado) async {
     final usuario = Preferencias.data_id;
     final empresa = Preferencias.data_empresa;
     if (accion == 'add') {
       print(
-          "https://app.gozeri.com/versiones/v1.5.5/factura/fac_metodoPago.php?accion=${accion}&tmp=${tmp}&abono=${abono}&id_usuario=${usuario}&metodo=${metodo}&cuenta=${cuenta}&referencia=${referencia}&empresa=${empresa}&usuario=${usuario}");
+          "https://app.gozeri.com/versiones/v1.5.5/factura/fac_metodoPago.php?accion=${accion}&tmp=${tmp}&abono=${abono}&id_usuario=${usuario}&metodo=${metodo}&cuenta=${cuenta}&referencia=${referencia}&empresa=${empresa}&usuario=${usuario}&estado=${estado}");
       final Uri uri = Uri.parse(
-          "https://app.gozeri.com/versiones/v1.5.5/factura/fac_metodoPago.php?accion=${accion}&tmp=${tmp}&abono=${abono}&id_usuario=${usuario}&metodo=${metodo}&cuenta=${cuenta}&referencia=${referencia}&empresa=${empresa}&usuario=${usuario}");
+          "https://app.gozeri.com/versiones/v1.5.5/factura/fac_metodoPago.php?accion=${accion}&tmp=${tmp}&abono=${abono}&id_usuario=${usuario}&metodo=${metodo}&cuenta=${cuenta}&referencia=${referencia}&empresa=${empresa}&usuario=${usuario}&estado=${estado}");
 
       final resp = await http.get(uri);
       return resp.body;
@@ -433,8 +425,12 @@ class Facturacion extends ChangeNotifier {
     return resp.body;
   }
 
-  Future condicionPago() async {
+  Future condicionesPagos(String id) async {
     final id_usuario = Preferencias.data_id;
+
+    load_condicionespagos = true;
+    notifyListeners();
+
     print(
         "https://app.gozeri.com/versiones/v1.5.5/condiciones_pagos.php?usuario=${id_usuario}");
     final Uri uri = Uri.parse(
@@ -443,26 +439,29 @@ class Facturacion extends ChangeNotifier {
     final resp = await http.get(uri);
     var js = json.decode(resp.body);
     final len = js.length;
-    //final sucursales_http = sucursalesDataFromJson(resp.body);
+
     list_condicionPago.clear();
+
     var result;
     for (int o = 0; o < len; o++) {
       result = CondicionPago.fromJson(js[o]);
-      /*list_det.addAll(result);*/
-      print(list_condicionPago);
       list_condicionPago.add(result);
     }
-    loadCondicionP = false;
+
+    await queryCondicionesPagoTM('0', '', '', id);
+    load_condicionespagos = false;
     return notifyListeners();
   }
 
-  Future condicionPagoShowSave(
+  Future queryCondicionesPagoTM(
       String accion, String clave, String valor, String tmp) async {
     final id_usuario = Preferencias.data_id;
     final empresa = Preferencias.data_empresa;
     if (accion != '1') {
+      loadCondicionesTMP = true;
+      notifyListeners();
       //va mostrar los registros de termino y fechas previamente guardados
-      lista_datosFacturaTermino.clear();
+      condiciones_registradas.clear();
       print(
           "https://app.gozeri.com/versiones/v1.5.5/factura/showsave_condicionespago.php?accion=${accion}&clave=${clave}&valor=${valor}&tmp=${tmp}&idempresa=${empresa}&idusuario=${id_usuario}&usuario=${id_usuario}");
       final Uri uri = Uri.parse(
@@ -471,9 +470,10 @@ class Facturacion extends ChangeNotifier {
       final resp = await http.get(uri);
       Map<String, dynamic> js = await json.decode(resp.body);
 
-      lista_datosFacturaTermino.addAll(js);
-      loadTerminos = false;
-      notifyListeners();
+      condiciones_registradas.addAll(js);
+
+      loadCondicionesTMP = false;
+      return notifyListeners();
     } else {
       //registrara los datos
       print(
@@ -484,7 +484,8 @@ class Facturacion extends ChangeNotifier {
       final resp = await http.get(uri);
       Map<String, dynamic> js = await json.decode(resp.body);
       if (js['MENSAJE'] == 'OK') {
-        return 'OK';
+        condiciones_registradas[clave] = valor;
+        return notifyListeners();
       } else {
         return 'Error: no se aplico los cambios';
       }

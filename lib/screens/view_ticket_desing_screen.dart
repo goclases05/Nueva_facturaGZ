@@ -812,6 +812,7 @@ class _ViewTicketState extends State<ViewTicket> {
                           onPressed: () {
                             showDialog(
                               context: context,
+                              barrierDismissible: false,
                               builder: (_) => AlertDialog(
                                 content: RegistroMetodoPagoListas(
                                     colorPrimary: widget.colorPrimary,

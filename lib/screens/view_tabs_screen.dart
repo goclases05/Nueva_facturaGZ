@@ -151,7 +151,6 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                 CircleAvatar(
                   backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
                   child: Consumer<Cart>(builder: (context, cart, child) {
-
                     return badges.Badge(
                       showBadge: (cart.count == 0) ? false : true,
                       badgeContent: Text(
@@ -169,7 +168,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
 
                           _facturacion.serie(widget.id_tmp, 'read', '');
 
-                          _facturacion.transacciones(widget.id_tmp);
+                          _facturacion.transacciones(widget.id_tmp, 'tmp');
 
                           // ignore: use_build_context_synchronously
                           Navigator.push(
@@ -178,7 +177,8 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                                   builder: (_) => PrintScreen(
                                         id_tmp: widget.id_tmp,
                                         colorPrimary: widget.colorPrimary,
-                                        serie: _facturacion.initialSerie, condicionPagoVal: '0',
+                                        serie: _facturacion.initialSerie,
+                                        condicionPagoVal: '0',
                                       )));
                         },
                         icon: Icon(
@@ -222,7 +222,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                       _facturacion.list_cart(widget.id_tmp);
                       _facturacion.read_cliente('read', '0', widget.id_tmp);
                       _facturacion.serie(widget.id_tmp, 'read', '');
-                      _facturacion.transacciones(widget.id_tmp);
+                      _facturacion.transacciones(widget.id_tmp, 'tmp');
 
                       // ignore: use_build_context_synchronously
                       Navigator.push(
@@ -231,7 +231,8 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
                               builder: (_) => PrintScreen(
                                     id_tmp: widget.id_tmp,
                                     colorPrimary: widget.colorPrimary,
-                                    serie: _facturacion.initialSerie, condicionPagoVal: '0',
+                                    serie: _facturacion.initialSerie,
+                                    condicionPagoVal: '0',
                                   )));
                     },
                     icon: const Icon(Icons.receipt_long),

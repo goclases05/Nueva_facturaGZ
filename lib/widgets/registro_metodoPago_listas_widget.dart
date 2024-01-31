@@ -1,18 +1,25 @@
+import 'dart:ffi';
+
 import 'package:edge_alerts/edge_alerts.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
+import 'package:factura_gozeri/screens/view_ticket_desing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class RegistroMetodoPagoListas extends StatefulWidget {
   RegistroMetodoPagoListas(
-      {Key? key, required this.colorPrimary, required this.id_f, required this.estado})
+      {Key? key,
+      required this.colorPrimary,
+      required this.id_f,
+      required this.estado})
       : super(key: key);
   Color colorPrimary;
   String id_f;
   String estado;
 
   @override
-  State<RegistroMetodoPagoListas> createState() => _RegistroMetodoPagoListasState();
+  State<RegistroMetodoPagoListas> createState() =>
+      _RegistroMetodoPagoListasState();
 }
 
 class _RegistroMetodoPagoListasState extends State<RegistroMetodoPagoListas> {
@@ -26,20 +33,19 @@ class _RegistroMetodoPagoListasState extends State<RegistroMetodoPagoListas> {
     // TODO: implement initState
     _controlPago = TextEditingController();
     _controlReferencia = TextEditingController();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    
-      final Metodo = Provider.of<Facturacion>(context);
-    
-    
-    if(widget.estado=='tmp'){
-    _controlPago.text = Metodo.total_fac;
-    }else{
-    _controlPago.text='100';
-    }
+    final Metodo = Provider.of<Facturacion>(context);
+
+    //if(widget.estado=='tmp'){
+    _controlPago.text = Metodo.saldo;
+    /*}else{
+      _controlPago.text='100';
+    }*/
 
     List<DropdownMenuItem<String>> menuItems = [];
     List<DropdownMenuItem<String>> bancosItems = [];
@@ -85,27 +91,35 @@ class _RegistroMetodoPagoListasState extends State<RegistroMetodoPagoListas> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-        width: double.infinity,
-        alignment: Alignment.center,
-        padding: EdgeInsets.all(10),
-        child: Text(
-          'Realizar Pago ',
-          style: TextStyle(color: widget.colorPrimary,fontWeight: FontWeight.bold,fontSize: 18),
-        )),
+            width: double.infinity,
+            alignment: Alignment.center,
+            padding: EdgeInsets.all(10),
+            child: Text(
+              'Realizar Pago ',
+              style: TextStyle(
+                  color: widget.colorPrimary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
+            )),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(child: Container(
-              padding: EdgeInsets.all(3),
-              decoration: BoxDecoration(border: Border.all(color: widget.colorPrimary),borderRadius:BorderRadius.circular(10)),
-              child: DropdownButton(
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                    border: Border.all(color: widget.colorPrimary),
+                    borderRadius: BorderRadius.circular(10)),
+                child: DropdownButton(
                   itemHeight: null,
                   value: initialSerie,
                   isExpanded: true,
                   dropdownColor: Color.fromARGB(255, 241, 238, 241),
                   onChanged: (String? newValue) async {
-                    if (newValue != '1' && newValue != '6' && newValue != '15') {
+                    if (newValue != '1' &&
+                        newValue != '6' &&
+                        newValue != '15') {
                       Metodo.bancos();
                     }
                     setState(() {
@@ -126,7 +140,8 @@ class _RegistroMetodoPagoListasState extends State<RegistroMetodoPagoListas> {
                   iconEnabledColor: widget.colorPrimary,
                   underline: SizedBox(),
                 ),
-            ),)
+              ),
+            )
           ],
         ),
         const SizedBox(
@@ -137,18 +152,18 @@ class _RegistroMetodoPagoListasState extends State<RegistroMetodoPagoListas> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              flex: 1,
+                flex: 1,
                 child: TextField(
-              controller: _controlPago,
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                print(_controlPago.text);
-              },
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Pago',
-              ),
-            )),
+                  controller: _controlPago,
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    print(_controlPago.text);
+                  },
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Pago',
+                  ),
+                )),
           ],
         ),
         (initialSerie != '1' && initialSerie != '6' && initialSerie != '15')
@@ -156,7 +171,6 @@ class _RegistroMetodoPagoListasState extends State<RegistroMetodoPagoListas> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  
                   const SizedBox(
                     height: 20,
                   ),
@@ -229,49 +243,57 @@ class _RegistroMetodoPagoListasState extends State<RegistroMetodoPagoListas> {
                       )),
                     ],
                   ),
-                  SizedBox(height: 15,)
+                  SizedBox(
+                    height: 15,
+                  )
                 ],
               )
             : const Text(''),
         Container(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                  label: const Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 20, horizontal: 5),
-                      child: Text("Aplicar Pago")),
-                  onPressed: () async {
-                    if (_controlPago.text == '') {
-                      /*SnackBar snackBar = const SnackBar(
-                        padding: EdgeInsets.all(20),
-                        content: Text(
-                          'Inserta cantidad a pagar',
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        backgroundColor: Color.fromARGB(255, 224, 96, 113),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
-                      edgeAlert(context,
-                          description: 'Inserta cantidad a pagar',
-                          gravity: Gravity.top,
-                          backgroundColor: Colors.redAccent);
-                    } else {
-                      /*var insert = await Metodo.accionesMetodoPAgo(
-                          'add',
-                          widget.id_f,
-                          _controlPago.text,
-                          initialSerie,
-                          initialBanco,
-                          _controlReferencia.text);
-                      if (insert == '1') {
-                        _controlPago.text = '';
-                        _controlReferencia.text = '';
-                        initialSerie = '1';
-                        initialBanco = '0';
-                        Metodo.transacciones(widget.id_f);
-                        setState(() {});
-                      } else {
-                        /*SnackBar snackBar = SnackBar(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+              label: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 5),
+                  child: Text("Aplicar Pago")),
+              onPressed: () async {
+                if (_controlPago.text == '') {
+                  edgeAlert(context,
+                      description: 'Inserta cantidad a pagar',
+                      gravity: Gravity.top,
+                      backgroundColor: Colors.redAccent);
+                } else {
+                  double sal_accion = double.parse(Metodo.saldo) -
+                      double.parse(_controlPago.text);
+                  Metodo.saldo = (sal_accion).toString();
+                  if (double.parse(Metodo.saldo) < 1) {
+                    widget.estado = '2';
+                  }
+                  setState(() {});
+
+                  var insert = await Metodo.accionesMetodoPAgo(
+                      'add',
+                      widget.id_f,
+                      _controlPago.text,
+                      initialSerie,
+                      initialBanco,
+                      _controlReferencia.text,
+                      '');
+
+                  if (insert == '1') {
+                    Navigator.of(context).pop();
+                    Navigator.pushReplacement<void, void>(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (BuildContext context) {
+                          return ViewTicket(
+                              colorPrimary: widget.colorPrimary,
+                              estado: widget.estado,
+                              factura: widget.id_f);
+                        },
+                      ),
+                    ).then((value) => setState(() {}));
+                  } else {
+                    /*SnackBar snackBar = SnackBar(
                           padding: const EdgeInsets.all(20),
                           content: Text(
                             '${insert}',
@@ -281,20 +303,19 @@ class _RegistroMetodoPagoListasState extends State<RegistroMetodoPagoListas> {
                               const Color.fromARGB(255, 224, 96, 113),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
-                        edgeAlert(context,
-                            description: '${insert}',
-                            gravity: Gravity.top,
-                            backgroundColor: Colors.redAccent);
-                      }*/
-                    }
+                    edgeAlert(context,
+                        description: '${insert}',
+                        gravity: Gravity.top,
+                        backgroundColor: Colors.redAccent);
+                  }
+                }
 
-                    FocusScope.of(context).requestFocus(FocusNode());
-                  },
-                  style: TextButton.styleFrom(
-                      primary: Colors.white,
-                      backgroundColor: widget.colorPrimary),
-                  icon: const Text("")),
-            ),
+                FocusScope.of(context).requestFocus(FocusNode());
+              },
+              style: TextButton.styleFrom(
+                  primary: Colors.white, backgroundColor: widget.colorPrimary),
+              icon: const Text("")),
+        ),
       ],
     );
   }

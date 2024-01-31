@@ -563,7 +563,8 @@ class _PrintScreenState extends State<PrintScreen> {
                                                   if (dele.toString() == 'OK') {
                                                     facturaService
                                                         .transacciones(
-                                                            widget.id_tmp);
+                                                            widget.id_tmp,
+                                                            'tmp');
                                                   } else {
                                                     print('error');
                                                   }

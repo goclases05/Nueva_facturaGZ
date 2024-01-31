@@ -5,7 +5,10 @@ import 'package:provider/provider.dart';
 
 class RegistroMetodoPago extends StatefulWidget {
   RegistroMetodoPago(
-      {Key? key, required this.colorPrimary, required this.id_tmp, required this.estado})
+      {Key? key,
+      required this.colorPrimary,
+      required this.id_tmp,
+      required this.estado})
       : super(key: key);
   Color colorPrimary;
   String id_tmp;
@@ -31,14 +34,12 @@ class _RegistroMetodoPagoState extends State<RegistroMetodoPago> {
 
   @override
   Widget build(BuildContext context) {
-    
-      final Metodo = Provider.of<Facturacion>(context);
-    
-    
-    if(widget.estado=='tmp'){
-    _controlPago.text = Metodo.total_fac;
-    }else{
-    _controlPago.text='100';
+    final Metodo = Provider.of<Facturacion>(context);
+
+    if (widget.estado == 'tmp') {
+      _controlPago.text = Metodo.saldo;
+    } else {
+      _controlPago.text = '100';
     }
 
     List<DropdownMenuItem<String>> menuItems = [];
@@ -173,13 +174,14 @@ class _RegistroMetodoPagoState extends State<RegistroMetodoPago> {
                           _controlPago.text,
                           initialSerie,
                           initialBanco,
-                          _controlReferencia.text);
+                          _controlReferencia.text,
+                          'tmp');
                       if (insert == '1') {
                         _controlPago.text = '';
                         _controlReferencia.text = '';
                         initialSerie = '1';
                         initialBanco = '0';
-                        Metodo.transacciones(widget.id_tmp);
+                        Metodo.transacciones(widget.id_tmp, 'tmp');
                         setState(() {});
                       } else {
                         /*SnackBar snackBar = SnackBar(
