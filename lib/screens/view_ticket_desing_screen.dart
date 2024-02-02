@@ -122,7 +122,7 @@ class _ViewTicketState extends State<ViewTicket> {
     super.initState();
   }
 
-  void bt_initPrinter(String accion) async {
+  void bt_initPrinter(String accion, [String asunto = '']) async {
     _printerManager.stopScan();
     await Permission.bluetoothConnect.request();
     await Permission.bluetoothScan.request();
@@ -186,7 +186,8 @@ class _ViewTicketState extends State<ViewTicket> {
                     if (impresoras.devices[y].address == Preferencias.mac) {
                       //store the element.
                       print('esta es');
-                      _startPrint(impresoras.devices[y], widget.factura);
+                      _startPrint(
+                          impresoras.devices[y], widget.factura, asunto);
                     }
                   }
 
@@ -242,7 +243,7 @@ class _ViewTicketState extends State<ViewTicket> {
                                           GestureDetector(
                                             onTap: () async {
                                               _startPrint(impresoras.devices[i],
-                                                  widget.factura);
+                                                  widget.factura, asunto);
                                             },
                                             child: Container(
                                               margin: const EdgeInsets.all(5),
@@ -438,6 +439,7 @@ class _ViewTicketState extends State<ViewTicket> {
 
               List<Encabezado> encabezado = printProvider.list;
               List<Detalle> detalle = printProvider.list_detalle;
+              List<Trans> trans = printProvider.list_trans;
 
               List<Widget> frases = [];
               //frases del certificador
@@ -704,6 +706,13 @@ class _ViewTicketState extends State<ViewTicket> {
                           claveValor(encabezado[0].forma, '',
                               MainAxisAlignment.center),
 
+                          (encabezado[0].forma != "Contado")
+                              ? claveValor(
+                                  'Fecha Vence: ',
+                                  encabezado[0].fechaV,
+                                  MainAxisAlignment.center)
+                              : Text(''),
+
                           const SizedBox(
                             height: 20,
                           ),
@@ -785,7 +794,90 @@ class _ViewTicketState extends State<ViewTicket> {
                     ),
                   ),
                   const SizedBox(
-                    height: 100,
+                    height: 20,
+                  ),
+                  Card(
+                      margin: EdgeInsets.all(15),
+                      elevation: 8,
+                      color: Colors.white,
+                      child: Container(
+                          padding: EdgeInsets.all(10),
+                          width: MediaQuery.of(context).size.width * 1,
+                          child: Column(
+                            children: [
+                              Text(
+                                'Transacciones',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20),
+                              ),
+                              ListView.separated(
+                                separatorBuilder: (c, i) {
+                                  return Divider(color: Colors.grey);
+                                },
+                                scrollDirection: Axis.vertical,
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: trans.length,
+                                itemBuilder: (c, i) {
+                                  return ListTile(
+                                    subtitle: Text("${trans[i].fecha}"),
+                                    title: Text("${trans[i].forma}"),
+                                    trailing: Text("${trans[i].abono}"),
+                                  );
+                                },
+                              ),
+                              Container(
+                                  color: const Color.fromRGBO(246, 243, 244, 1),
+                                  width: MediaQuery.of(context).size.width * 1,
+                                  child: TextButton.icon(
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: Colors.grey,
+                                      ),
+                                      label: const Text(
+                                        'Imprimir Transacciones',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      icon: const Icon(
+                                        Icons.print,
+                                        color: Colors.white,
+                                      ),
+                                      onPressed: () {
+                                        if (Preferencias.sunmi_preferencia) {
+                                          print_sunmi(
+                                              context, widget.factura, 'trans');
+                                        } else {
+                                          if (Preferencias.sunmi_preferencia) {
+                                            print_sunmi(context, widget.factura,
+                                                'trans');
+                                          } else {
+                                            if (state_bluetooth == true) {
+                                              //escaneo
+                                              bt_initPrinter('f', 'trans');
+                                              //escaneo
+                                            } else {
+                                              print('off');
+                                              showDialog(
+                                                context: context,
+                                                builder: (_) =>
+                                                    const AlertDialog(
+                                                  backgroundColor:
+                                                      Color.fromARGB(
+                                                          255, 224, 140, 31),
+                                                  content: Text(
+                                                    'Bluetooth sin Conexión',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        }
+                                      }))
+                            ],
+                          ))),
+                  const SizedBox(
+                    height: 200,
                   ),
                 ]),
               );
@@ -812,7 +904,7 @@ class _ViewTicketState extends State<ViewTicket> {
                           onPressed: () {
                             showDialog(
                               context: context,
-                              barrierDismissible: false,
+                              //barrierDismissible: false,
                               builder: (_) => AlertDialog(
                                 content: RegistroMetodoPagoListas(
                                     colorPrimary: widget.colorPrimary,
@@ -1180,7 +1272,8 @@ class _ViewTicketState extends State<ViewTicket> {
     );
   }
 
-  Future<void> _startPrint(PrinterBluetooth printer, String id_factura) async {
+  Future<void> _startPrint(PrinterBluetooth printer, String id_factura,
+      [String asunto = '']) async {
     _printerManager.selectPrinter(printer);
     showDialog(
       context: context,
@@ -1193,7 +1286,7 @@ class _ViewTicketState extends State<ViewTicket> {
       ),
     );
     final result =
-        await _printerManager.printTicket(await testTicket(id_factura));
+        await _printerManager.printTicket(await testTicket(id_factura, asunto));
     Navigator.of(context, rootNavigator: true).pop(result);
     showDialog(
       context: context,
@@ -1209,10 +1302,11 @@ class _ViewTicketState extends State<ViewTicket> {
     );
   }
 
-  Future<List<int>> testTicket(String id_factura) async {
+  Future<List<int>> testTicket(String id_factura, [String asunto = '']) async {
     final print_data = Provider.of<PrintProvider>(context, listen: false);
     List<Encabezado> encabezado = print_data.list;
     List<Detalle> detalle = print_data.list_detalle;
+    List<Trans> trans = print_data.list_trans;
 
     int sede = 0;
     //0= empresa
@@ -1232,368 +1326,510 @@ class _ViewTicketState extends State<ViewTicket> {
     bytess += generatorr.setGlobalCodeTable('CP1252');
 
     //nombre de la empresa
-    (sede == 1)
-        ? bytess += generatorr.text(encabezado[0].nombreEmpresaSucu,
-            styles: const PosStyles(
-                codeTable: 'CP1252',
-                align: PosAlign.center,
-                bold: true,
-                width: PosTextSize.size1))
-        : bytess += generatorr.text(encabezado[0].nombreEmpresa,
-            styles: const PosStyles(
-                codeTable: 'CP1252',
-                align: PosAlign.center,
-                bold: true,
-                width: PosTextSize.size1));
+    if (asunto == 'trans') {
+      ///impresion de transacciones
+      (sede == 1)
+          ? bytess += generatorr.text(encabezado[0].nombreEmpresaSucu,
+              styles: const PosStyles(
+                  codeTable: 'CP1252',
+                  align: PosAlign.center,
+                  bold: true,
+                  width: PosTextSize.size1))
+          : bytess += generatorr.text(encabezado[0].nombreEmpresa,
+              styles: const PosStyles(
+                  codeTable: 'CP1252',
+                  align: PosAlign.center,
+                  bold: true,
+                  width: PosTextSize.size1));
 
-    //DIreccion empresa
-    (sede == 1)
-        ? bytess += generatorr.text(encabezado[0].direccionSucu,
-            styles: const PosStyles(
-                    width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
-                .copyWith(align: PosAlign.center))
-        : bytess += generatorr.text(encabezado[0].direccion,
+      //CLIENTE
+      bytess += generatorr.text(
+          'Recibi de: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              codeTable: 'CP1252'));
+
+      //fact
+      bytess += generatorr.text(
+          'FACT: ${encabezado[0].serie} ${encabezado[0].no}',
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              codeTable: 'CP1252'));
+
+      //Total Factura
+      bytess += generatorr.text('Total Factura: ${encabezado[0].total}',
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              codeTable: 'CP1252'));
+
+      bytess += generatorr.feed(1);
+
+      //TABLA PRODUCTOS
+      bytess += generatorr.row([
+        PosColumn(
+          text: 'Descripción',
+          width: 9,
+          styles: const PosStyles(align: PosAlign.left, bold: true),
+        ),
+        PosColumn(
+          text: 'Subtotal',
+          width: 3,
+          styles: const PosStyles(align: PosAlign.right, bold: true),
+        ),
+      ]);
+
+      //Detalle productos
+      double tota = 0.0;
+      for (int al = 0; al < trans.length; al++) {
+        tota = tota + double.parse(trans[al].abono);
+        bytess += generatorr.row([
+          PosColumn(
+            text: '${trans[al].forma}',
+            width: 9,
+            styles: const PosStyles(align: PosAlign.left),
+          ),
+          PosColumn(
+            text: '',
+            width: 3,
+            styles: const PosStyles(align: PosAlign.right),
+          ),
+        ]);
+        bytess += generatorr.row([
+          PosColumn(
+            text: '${trans[al].fecha}',
+            width: 9,
+            styles: const PosStyles(align: PosAlign.left),
+          ),
+          PosColumn(
+            text: '${trans[al].abono}',
+            width: 3,
+            styles: const PosStyles(align: PosAlign.right),
+          ),
+        ]);
+      }
+      bytess += generatorr.feed(1);
+      bytess += generatorr.feed(1);
+      tota = double.parse(encabezado[0].total) - tota;
+      bytess += generatorr.row([
+        PosColumn(
+          text: 'Saldo Actual: ',
+          width: 9,
+          styles: const PosStyles(align: PosAlign.left),
+        ),
+        PosColumn(
+          text: '${tota}',
+          width: 3,
+          styles: const PosStyles(align: PosAlign.right),
+        ),
+      ]);
+
+      bytess += generatorr.feed(2);
+      bytess += generatorr.feed(1);
+      bytess += generatorr.feed(1);
+
+      ///impresion de transacciones
+    } else {
+      (sede == 1)
+          ? bytess += generatorr.text(encabezado[0].nombreEmpresaSucu,
+              styles: const PosStyles(
+                  codeTable: 'CP1252',
+                  align: PosAlign.center,
+                  bold: true,
+                  width: PosTextSize.size1))
+          : bytess += generatorr.text(encabezado[0].nombreEmpresa,
+              styles: const PosStyles(
+                  codeTable: 'CP1252',
+                  align: PosAlign.center,
+                  bold: true,
+                  width: PosTextSize.size1));
+
+      //DIreccion empresa
+      (sede == 1)
+          ? bytess += generatorr.text(encabezado[0].direccionSucu,
+              styles: const PosStyles(
+                      width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+                  .copyWith(align: PosAlign.center))
+          : bytess += generatorr.text(encabezado[0].direccion,
+              styles: const PosStyles(
+                      width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
+                  .copyWith(align: PosAlign.center));
+
+      //NIT EMPRESA
+      if (encabezado[0].nit_emisor != '') {
+        bytess += generatorr.text('NIT: ${encabezado[0].nit_emisor}',
             styles: const PosStyles(
                     width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
                 .copyWith(align: PosAlign.center));
+      }
 
-    //NIT EMPRESA
-    if (encabezado[0].nit_emisor != '') {
-      bytess += generatorr.text('NIT: ${encabezado[0].nit_emisor}',
-          styles: const PosStyles(
-                  width: PosTextSize.size1, bold: true, codeTable: 'CP1252')
-              .copyWith(align: PosAlign.center));
-    }
-
-    //TELEFONO EMPRESA
-    if (sede == 1) {
-      if (encabezado[0].teleSucu != '') {
-        bytess += generatorr.text('Teléfono: ${encabezado[0].teleSucu}',
+      //TELEFONO EMPRESA
+      if (sede == 1) {
+        if (encabezado[0].teleSucu != '') {
+          bytess += generatorr.text('Teléfono: ${encabezado[0].teleSucu}',
+              styles: const PosStyles(
+                  align: PosAlign.center,
+                  width: PosTextSize.size1,
+                  bold: true,
+                  codeTable: 'CP1252'));
+        }
+      } else if (encabezado[0].telefono != '') {
+        bytess += generatorr.text('Teléfono: ${encabezado[0].telefono}',
             styles: const PosStyles(
                 align: PosAlign.center,
                 width: PosTextSize.size1,
                 bold: true,
                 codeTable: 'CP1252'));
       }
-    } else if (encabezado[0].telefono != '') {
-      bytess += generatorr.text('Teléfono: ${encabezado[0].telefono}',
-          styles: const PosStyles(
-              align: PosAlign.center,
-              width: PosTextSize.size1,
-              bold: true,
-              codeTable: 'CP1252'));
-    }
 
-    //espacio
-    bytess += generatorr.feed(1);
-
-    //NOMBRE COMERCIAL
-    if (sede == 1) {
-      if (encabezado[0].nombre_comercial_sucu != '') {
-        bytess += generatorr.text(encabezado[0].nombre_comercial_sucu,
-            styles: const PosStyles(
-                align: PosAlign.center,
-                width: PosTextSize.size1,
-                bold: true,
-                codeTable: 'CP1252'));
-      }
-    } else if (encabezado[0].nombre_comercial_emp != '') {
-      bytess += generatorr.text(encabezado[0].nombre_comercial_emp,
-          styles: const PosStyles(
-              align: PosAlign.center,
-              width: PosTextSize.size1,
-              bold: true,
-              codeTable: 'CP1252'));
-    }
-
-    //espacio
-    bytess += generatorr.feed(1);
-
-    //FEL
-    if (encabezado[0].dte != '') {
-      bytess += generatorr.text('Factura Electrónica Documento Tributario',
-          styles: const PosStyles(
-              align: PosAlign.center,
-              width: PosTextSize.size1,
-              bold: true,
-              codeTable: 'CP1252'));
-    }
-
-    //espacio
-    bytess += generatorr.feed(1);
-
-    //FECHA EMITIDA
-    bytess += generatorr.text(encabezado[0].fecha_letras,
-        styles: const PosStyles(
-            align: PosAlign.right,
-            width: PosTextSize.size1,
-            codeTable: 'CP1252'));
-
-    //espacio
-    bytess += generatorr.feed(1);
-
-    //AUTORIZACION
-    if (encabezado[0].dte != '') {
-      bytess += generatorr.text('Número de Autorización:',
-          styles: const PosStyles(
-              align: PosAlign.center,
-              width: PosTextSize.size1,
-              bold: true,
-              codeTable: 'CP1252'));
-
-      bytess += generatorr.text(encabezado[0].dte,
-          styles: const PosStyles(
-              align: PosAlign.center,
-              width: PosTextSize.size1,
-              bold: true,
-              codeTable: 'CP1252'));
-
-      bytess += generatorr.text('Serie: ${encabezado[0].serieDte}',
-          styles: const PosStyles(
-              align: PosAlign.center,
-              width: PosTextSize.size1,
-              bold: true,
-              codeTable: 'CP1252'));
-
-      bytess += generatorr.text('Número de DTE: ${encabezado[0].noDte}',
-          styles: const PosStyles(
-              align: PosAlign.center,
-              width: PosTextSize.size1,
-              bold: true,
-              codeTable: 'CP1252'));
-    }
-
-    //espacio
-    bytess += generatorr.feed(1);
-
-    //No
-    bytess += generatorr.text('No: ${encabezado[0].no}',
-        styles: const PosStyles(
-            align: PosAlign.right,
-            width: PosTextSize.size1,
-            codeTable: 'CP1252'));
-
-    //espacio
-    bytess += generatorr.feed(1);
-
-    //SERIE
-    bytess += generatorr.text('Serie: ${encabezado[0].serie}',
-        styles: const PosStyles(
-            align: PosAlign.left,
-            width: PosTextSize.size1,
-            codeTable: 'CP1252'));
-
-    //VENDEDOR
-    bytess += generatorr.text(
-        'Vendedor : ${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
-        styles: const PosStyles(
-            align: PosAlign.left,
-            width: PosTextSize.size1,
-            codeTable: 'CP1252'));
-
-    //CLIENTE
-    bytess += generatorr.text(
-        'Cliente: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
-        styles: const PosStyles(
-            align: PosAlign.left,
-            width: PosTextSize.size1,
-            codeTable: 'CP1252'));
-
-    //NIT CLIENTE
-    bytess += generatorr.text('NIT: ${encabezado[0].nit}',
-        styles: const PosStyles(
-            align: PosAlign.left,
-            width: PosTextSize.size1,
-            bold: true,
-            codeTable: 'CP1252'));
-
-    //DIRECCION CLIENTE
-    if (encabezado[0].direccionCli != '') {
-      bytess += generatorr.text('Dirección: ${encabezado[0].direccionCli}',
-          styles: const PosStyles(
-              align: PosAlign.left,
-              width: PosTextSize.size1,
-              codeTable: 'CP1252'));
-    }
-
-    //espacio
-    bytess += generatorr.feed(1);
-
-    //CONDICIONES DE PAGO
-    bytess += generatorr.text('Condiciónes de pago:',
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            bold: true,
-            codeTable: 'CP1252'));
-
-    bytess += generatorr.text('${encabezado[0].forma}',
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            bold: true,
-            codeTable: 'CP1252'));
-
-    //espacio
-    bytess += generatorr.feed(1);
-
-    //TABLA PRODUCTOS
-    bytess += generatorr.row([
-      PosColumn(
-        text: 'Descripción',
-        width: 9,
-        styles: const PosStyles(align: PosAlign.left, bold: true),
-      ),
-      PosColumn(
-        text: 'Subtotal',
-        width: 3,
-        styles: const PosStyles(align: PosAlign.right, bold: true),
-      ),
-    ]);
-
-    //Detalle productos
-    for (int al = 0; al < detalle.length; al++) {
-      double tota =
-          double.parse(detalle[al].cantidad) * double.parse(detalle[al].precio);
-      bytess += generatorr.row([
-        PosColumn(
-          text: '${detalle[al].producto}',
-          width: 9,
-          styles: const PosStyles(align: PosAlign.left),
-        ),
-        PosColumn(
-          text: '',
-          width: 3,
-          styles: const PosStyles(align: PosAlign.right),
-        ),
-      ]);
-      bytess += generatorr.row([
-        PosColumn(
-          text:
-              '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
-          width: 9,
-          styles: const PosStyles(align: PosAlign.left),
-        ),
-        PosColumn(
-          text: '${detalle[al].contenido}${tota}',
-          width: 3,
-          styles: const PosStyles(align: PosAlign.right),
-        ),
-      ]);
-    }
-
-    //DESCUENTOS
-    bytess += generatorr.row([
-      PosColumn(
-        text: 'Descuento(-):',
-        width: 9,
-        styles: const PosStyles(align: PosAlign.right, bold: true),
-      ),
-      PosColumn(
-        text: encabezado[0].contenido + encabezado[0].descuento,
-        width: 3,
-        styles: const PosStyles(align: PosAlign.right, bold: true),
-      ),
-    ]);
-
-    //TOTAL PRODUCTOS
-    bytess += generatorr.row([
-      PosColumn(
-        text: 'Total:',
-        width: 9,
-        styles: const PosStyles(align: PosAlign.right, bold: true),
-      ),
-      PosColumn(
-        text: encabezado[0].contenido + encabezado[0].total,
-        width: 3,
-        styles: const PosStyles(align: PosAlign.right, bold: true),
-      ),
-    ]);
-
-    //espacio
-    bytess += generatorr.feed(1);
-
-    //TOTAL LETRAS
-    bytess += generatorr.text('${encabezado[0].totalLetas}',
-        styles: const PosStyles(
-            align: PosAlign.left,
-            width: PosTextSize.size1,
-            bold: true,
-            codeTable: 'CP1252'));
-
-    String ob = encabezado[0].obser;
-
-    if (ob.length > 0) {
+      //espacio
       bytess += generatorr.feed(1);
-      bytess += generatorr.text('Observación:',
+
+      //NOMBRE COMERCIAL
+      if (sede == 1) {
+        if (encabezado[0].nombre_comercial_sucu != '') {
+          bytess += generatorr.text(encabezado[0].nombre_comercial_sucu,
+              styles: const PosStyles(
+                  align: PosAlign.center,
+                  width: PosTextSize.size1,
+                  bold: true,
+                  codeTable: 'CP1252'));
+        }
+      } else if (encabezado[0].nombre_comercial_emp != '') {
+        bytess += generatorr.text(encabezado[0].nombre_comercial_emp,
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
+      }
+
+      //espacio
+      bytess += generatorr.feed(1);
+
+      //FEL
+      if (encabezado[0].dte != '') {
+        bytess += generatorr.text('Factura Electrónica Documento Tributario',
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
+      }
+
+      //espacio
+      bytess += generatorr.feed(1);
+
+      //FECHA EMITIDA
+      bytess += generatorr.text(encabezado[0].fecha_letras,
+          styles: const PosStyles(
+              align: PosAlign.right,
+              width: PosTextSize.size1,
+              codeTable: 'CP1252'));
+
+      //espacio
+      bytess += generatorr.feed(1);
+
+      //AUTORIZACION
+      if (encabezado[0].dte != '') {
+        bytess += generatorr.text('Número de Autorización:',
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
+
+        bytess += generatorr.text(encabezado[0].dte,
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
+
+        bytess += generatorr.text('Serie: ${encabezado[0].serieDte}',
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
+
+        bytess += generatorr.text('Número de DTE: ${encabezado[0].noDte}',
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
+      }
+
+      //estado factura
+      if (encabezado[0].estado == '1') {
+        bytess += generatorr.text('PENDIENTE DE PAGO',
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
+      } else if (encabezado[0].estado == '2') {
+        bytess += generatorr.text('PAGADA',
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
+      } else {
+        bytess += generatorr.text('ANULADA',
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
+      }
+
+      //espacio
+      bytess += generatorr.feed(1);
+
+      //No
+      bytess += generatorr.text('No: ${encabezado[0].no}',
+          styles: const PosStyles(
+              align: PosAlign.right,
+              width: PosTextSize.size1,
+              codeTable: 'CP1252'));
+
+      //espacio
+      bytess += generatorr.feed(1);
+
+      //SERIE
+      bytess += generatorr.text('Serie: ${encabezado[0].serie}',
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              codeTable: 'CP1252'));
+
+      //VENDEDOR
+      bytess += generatorr.text(
+          'Vendedor : ${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              codeTable: 'CP1252'));
+
+      //CLIENTE
+      bytess += generatorr.text(
+          'Cliente: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
+          styles: const PosStyles(
+              align: PosAlign.left,
+              width: PosTextSize.size1,
+              codeTable: 'CP1252'));
+
+      //NIT CLIENTE
+      bytess += generatorr.text('NIT: ${encabezado[0].nit}',
           styles: const PosStyles(
               align: PosAlign.left,
               width: PosTextSize.size1,
               bold: true,
               codeTable: 'CP1252'));
-      bytess += generatorr.text('${ob}',
+
+      //DIRECCION CLIENTE
+      if (encabezado[0].direccionCli != '') {
+        bytess += generatorr.text('Dirección: ${encabezado[0].direccionCli}',
+            styles: const PosStyles(
+                align: PosAlign.left,
+                width: PosTextSize.size1,
+                codeTable: 'CP1252'));
+      }
+
+      //espacio
+      bytess += generatorr.feed(1);
+
+      //CONDICIONES DE PAGO
+      bytess += generatorr.text('Condiciónes de pago:',
+          styles: const PosStyles(
+              align: PosAlign.center,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
+
+      bytess += generatorr.text('${encabezado[0].forma}',
+          styles: const PosStyles(
+              align: PosAlign.center,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
+
+      if (encabezado[0].forma != 'Contado') {
+        bytess += generatorr.text('Fecha Vence: ${encabezado[0].fechaV}',
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
+      }
+
+      //espacio
+      bytess += generatorr.feed(1);
+
+      //TABLA PRODUCTOS
+      bytess += generatorr.row([
+        PosColumn(
+          text: 'Descripción',
+          width: 9,
+          styles: const PosStyles(align: PosAlign.left, bold: true),
+        ),
+        PosColumn(
+          text: 'Subtotal',
+          width: 3,
+          styles: const PosStyles(align: PosAlign.right, bold: true),
+        ),
+      ]);
+
+      //Detalle productos
+      for (int al = 0; al < detalle.length; al++) {
+        double tota = double.parse(detalle[al].cantidad) *
+            double.parse(detalle[al].precio);
+        bytess += generatorr.row([
+          PosColumn(
+            text: '${detalle[al].producto}',
+            width: 9,
+            styles: const PosStyles(align: PosAlign.left),
+          ),
+          PosColumn(
+            text: '',
+            width: 3,
+            styles: const PosStyles(align: PosAlign.right),
+          ),
+        ]);
+        bytess += generatorr.row([
+          PosColumn(
+            text:
+                '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
+            width: 9,
+            styles: const PosStyles(align: PosAlign.left),
+          ),
+          PosColumn(
+            text: '${detalle[al].contenido}${tota}',
+            width: 3,
+            styles: const PosStyles(align: PosAlign.right),
+          ),
+        ]);
+      }
+
+      //DESCUENTOS
+      bytess += generatorr.row([
+        PosColumn(
+          text: 'Descuento(-):',
+          width: 9,
+          styles: const PosStyles(align: PosAlign.right, bold: true),
+        ),
+        PosColumn(
+          text: encabezado[0].contenido + encabezado[0].descuento,
+          width: 3,
+          styles: const PosStyles(align: PosAlign.right, bold: true),
+        ),
+      ]);
+
+      //TOTAL PRODUCTOS
+      bytess += generatorr.row([
+        PosColumn(
+          text: 'Total:',
+          width: 9,
+          styles: const PosStyles(align: PosAlign.right, bold: true),
+        ),
+        PosColumn(
+          text: encabezado[0].contenido + encabezado[0].total,
+          width: 3,
+          styles: const PosStyles(align: PosAlign.right, bold: true),
+        ),
+      ]);
+
+      //espacio
+      bytess += generatorr.feed(1);
+
+      //TOTAL LETRAS
+      bytess += generatorr.text('${encabezado[0].totalLetas}',
           styles: const PosStyles(
               align: PosAlign.left,
               width: PosTextSize.size1,
               bold: true,
               codeTable: 'CP1252'));
-    }
 
-    //espacio
-    bytess += generatorr.feed(1);
+      String ob = encabezado[0].obser;
 
-    //Frases
-    for (int rl = 0; rl < encabezado[0].frases.length; rl++) {
-      bytess += generatorr.text(encabezado[0].frases[rl],
+      if (ob.length > 0) {
+        bytess += generatorr.feed(1);
+        bytess += generatorr.text('Observación:',
+            styles: const PosStyles(
+                align: PosAlign.left,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
+        bytess += generatorr.text('${ob}',
+            styles: const PosStyles(
+                align: PosAlign.left,
+                width: PosTextSize.size1,
+                bold: true,
+                codeTable: 'CP1252'));
+      }
+
+      //espacio
+      bytess += generatorr.feed(1);
+
+      //Frases
+      for (int rl = 0; rl < encabezado[0].frases.length; rl++) {
+        bytess += generatorr.text(encabezado[0].frases[rl],
+            styles: const PosStyles(
+                align: PosAlign.center,
+                width: PosTextSize.size1,
+                codeTable: 'CP1252'));
+      }
+
+      //espacio
+      bytess += generatorr.feed(1);
+
+      //DATOS DE CERTIFICADOR
+      if (encabezado[0].dte != '') {
+        bytess += generatorr.text('Certificador: ${encabezado[0].certificador}',
+            styles: const PosStyles(
+                align: PosAlign.left,
+                width: PosTextSize.size1,
+                codeTable: 'CP1252'));
+
+        bytess += generatorr.text('NIT: ${encabezado[0].nitCert}',
+            styles: const PosStyles(
+                align: PosAlign.left,
+                width: PosTextSize.size1,
+                codeTable: 'CP1252'));
+
+        bytess += generatorr.text('Fecha: ${encabezado[0].fechaCert}',
+            styles: const PosStyles(
+                align: PosAlign.left,
+                width: PosTextSize.size1,
+                codeTable: 'CP1252'));
+      }
+
+      //espacio
+      bytess += generatorr.feed(1);
+
+      //datos del sistema
+      bytess += generatorr.text('Realizado en www.gozeri.com',
           styles: const PosStyles(
               align: PosAlign.center,
               width: PosTextSize.size1,
               codeTable: 'CP1252'));
+
+      bytess += generatorr.cut();
     }
-
-    //espacio
-    bytess += generatorr.feed(1);
-
-    //DATOS DE CERTIFICADOR
-    if (encabezado[0].dte != '') {
-      bytess += generatorr.text('Certificador: ${encabezado[0].certificador}',
-          styles: const PosStyles(
-              align: PosAlign.left,
-              width: PosTextSize.size1,
-              codeTable: 'CP1252'));
-
-      bytess += generatorr.text('NIT: ${encabezado[0].nitCert}',
-          styles: const PosStyles(
-              align: PosAlign.left,
-              width: PosTextSize.size1,
-              codeTable: 'CP1252'));
-
-      bytess += generatorr.text('Fecha: ${encabezado[0].fechaCert}',
-          styles: const PosStyles(
-              align: PosAlign.left,
-              width: PosTextSize.size1,
-              codeTable: 'CP1252'));
-    }
-
-    //espacio
-    bytess += generatorr.feed(1);
-
-    //datos del sistema
-    bytess += generatorr.text('Realizado en www.gozeri.com',
-        styles: const PosStyles(
-            align: PosAlign.center,
-            width: PosTextSize.size1,
-            codeTable: 'CP1252'));
-
-    bytess += generatorr.cut();
     return bytess;
   }
 }
 
-print_sunmi(BuildContext context, String id_factura) async {
+print_sunmi(BuildContext context, String id_factura,
+    [String asunto = '']) async {
   final print_data = Provider.of<PrintProvider>(context, listen: false);
   List<Encabezado> encabezado = print_data.list;
   List<Detalle> detalle = print_data.list_detalle;
+  List<Trans> trans = print_data.list_trans;
 
   int sede = 0;
   //0= empresa
@@ -1644,293 +1880,399 @@ print_sunmi(BuildContext context, String id_factura) async {
   //await SunmiPrinter.lineWrap(2);
 
   //nombre de empresa
-  await SunmiPrinter.printText(
-      (sede == 1)
-          ? '${encabezado[0].nombreEmpresaSucu}'
-          : '${encabezado[0].nombreEmpresa}',
-      style: SunmiStyle(
-        bold: true,
-        align: SunmiPrintAlign.CENTER,
-      ));
+  if (asunto == 'trans') {
+    await SunmiPrinter.lineWrap(1);
 
-  //Direccion de empresa
-  await SunmiPrinter.printText(
-      (sede == 1)
-          ? '${encabezado[0].direccionSucu}'
-          : '${encabezado[0].direccion}',
-      style: SunmiStyle(
-        bold: true,
-        align: SunmiPrintAlign.CENTER,
-      ));
-
-  //nit emisor
-  if (encabezado[0].nit_emisor != '') {
-    await SunmiPrinter.printText('NIT: ${encabezado[0].nit_emisor}',
+    //impresion transacciones
+    await SunmiPrinter.printText(
+        (sede == 1)
+            ? '${encabezado[0].nombreEmpresaSucu}'
+            : '${encabezado[0].nombreEmpresa}',
         style: SunmiStyle(
           bold: true,
           align: SunmiPrintAlign.CENTER,
         ));
-  }
 
-  //telefono emisor
-  if (sede == 1) {
-    if (encabezado[0].teleSucu != '') {
-      await SunmiPrinter.printText('Tel: ${encabezado[0].teleSucu}',
-          style: SunmiStyle(
-            bold: true,
-            align: SunmiPrintAlign.CENTER,
-          ));
-    }
-  } else {
-    if (encabezado[0].telefono != '') {
-      await SunmiPrinter.printText('Tel: ${encabezado[0].telefono}',
-          style: SunmiStyle(
-            bold: true,
-            align: SunmiPrintAlign.CENTER,
-          ));
-    }
-  }
-
-  //await SunmiPrinter.lineWrap(1);
-
-  //nombre comercial
-  if (sede == 1) {
-    if (encabezado[0].nombre_comercial_sucu != '') {
-      await SunmiPrinter.printText('${encabezado[0].nombre_comercial_sucu}',
-          style: SunmiStyle(
-            bold: true,
-            align: SunmiPrintAlign.CENTER,
-          ));
-    }
-  } else {
-    if (encabezado[0].nombre_comercial_emp != '') {
-      await SunmiPrinter.printText('${encabezado[0].nombre_comercial_emp}',
-          style: SunmiStyle(
-            bold: true,
-            align: SunmiPrintAlign.CENTER,
-          ));
-    }
-  }
-
-  //await SunmiPrinter.lineWrap(1);
-  //FEL
-  if (encabezado[0].dte != '') {
-    await SunmiPrinter.printText('Factura Electrónica Documento Tributario',
-        style: SunmiStyle(
-          bold: true,
-          align: SunmiPrintAlign.CENTER,
-        ));
-  }
-
-  //await SunmiPrinter.lineWrap(1);
-
-  //FECHA EN LETRAS
-  await SunmiPrinter.printText('${encabezado[0].fecha_letras}',
-      style: SunmiStyle(
-        bold: false,
-        align: SunmiPrintAlign.RIGHT,
-      ));
-
-  //await SunmiPrinter.lineWrap(1);
-
-  if (encabezado[0].dte != '') {
-    await SunmiPrinter.printText('Número de Autorización:',
-        style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.CENTER,
-        ));
-    await SunmiPrinter.printText('${encabezado[0].dte}',
-        style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.CENTER,
-        ));
-    await SunmiPrinter.printText('Serie: ${encabezado[0].serieDte}',
-        style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.CENTER,
-        ));
-    await SunmiPrinter.printText('Número de DTE: ${encabezado[0].noDte}',
-        style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.CENTER,
-        ));
-  }
-
-  //await SunmiPrinter.lineWrap(1);
-
-  //No
-  await SunmiPrinter.printText('No: ${encabezado[0].no}',
-      style: SunmiStyle(
-        bold: false,
-        align: SunmiPrintAlign.RIGHT,
-      ));
-
-  //await SunmiPrinter.lineWrap(1);
-
-  //serie
-  await SunmiPrinter.printText('Serie: ${encabezado[0].serie}',
-      style: SunmiStyle(
-        bold: false,
-        align: SunmiPrintAlign.LEFT,
-      ));
-
-  //vendedor
-  await SunmiPrinter.printText(
-      'Vendedor : ${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
-      style: SunmiStyle(
-        bold: false,
-        align: SunmiPrintAlign.LEFT,
-      ));
-  //cliente
-  await SunmiPrinter.printText(
-      'Cliente: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
-      style: SunmiStyle(
-        bold: false,
-        align: SunmiPrintAlign.LEFT,
-      ));
-  //nit cliente
-  await SunmiPrinter.printText('NIT: ${encabezado[0].nit}',
-      style: SunmiStyle(
-        bold: false,
-        align: SunmiPrintAlign.LEFT,
-      ));
-
-  //direccion cliente
-  if (encabezado[0].direccionCli != '') {
-    await SunmiPrinter.printText('Dirección: ${encabezado[0].direccionCli}',
+    //cliente
+    await SunmiPrinter.printText(
+        'Recibi de: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
         style: SunmiStyle(
           bold: false,
           align: SunmiPrintAlign.LEFT,
         ));
-  }
 
-  await SunmiPrinter.lineWrap(1);
+    //No
+    await SunmiPrinter.printText(
+        'FACT: ${encabezado[0].serie} ${encabezado[0].no}',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
 
-  //condiciones de pago
-  await SunmiPrinter.printText('Condiciones de pago:',
-      style: SunmiStyle(
-        bold: true,
-        align: SunmiPrintAlign.CENTER,
-      ));
-  //forma
-  await SunmiPrinter.printText('${encabezado[0].forma}',
-      style: SunmiStyle(
-        bold: true,
-        align: SunmiPrintAlign.CENTER,
-      ));
+    await SunmiPrinter.printText('Total Factura: ${encabezado[0].total}',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
 
-  //await SunmiPrinter.lineWrap(1);
+    await SunmiPrinter.line();
 
-  await SunmiPrinter.line();
-  await SunmiPrinter.printRow(cols: [
-    ColumnMaker(text: 'Descripción', width: 20, align: SunmiPrintAlign.LEFT),
-    ColumnMaker(text: 'Subtotal', width: 10, align: SunmiPrintAlign.CENTER),
-  ]);
-  await SunmiPrinter.line();
+    await SunmiPrinter.printRow(cols: [
+      ColumnMaker(text: 'Descripción', width: 20, align: SunmiPrintAlign.LEFT),
+      ColumnMaker(text: 'Subtotal', width: 10, align: SunmiPrintAlign.CENTER),
+    ]);
+    await SunmiPrinter.line();
 
-  //DETALLES
-  for (int al = 0; al < detalle.length; al++) {
-    double tota =
-        double.parse(detalle[al].cantidad) * double.parse(detalle[al].precio);
+    //DETALLES
+    double tota = 0.0;
+    for (int al = 0; al < trans.length; al++) {
+      tota = double.parse(trans[al].abono);
+
+      await SunmiPrinter.printRow(cols: [
+        ColumnMaker(
+            text: '${trans[al].forma}', width: 24, align: SunmiPrintAlign.LEFT),
+        ColumnMaker(text: '', width: 6, align: SunmiPrintAlign.CENTER),
+      ]);
+
+      await SunmiPrinter.printRow(cols: [
+        ColumnMaker(
+            text: '${trans[al].fecha}', width: 20, align: SunmiPrintAlign.LEFT),
+        ColumnMaker(
+            text: '${trans[al].abono}',
+            width: 10,
+            align: SunmiPrintAlign.RIGHT),
+      ]);
+    }
+    await SunmiPrinter.line();
+    tota = double.parse(encabezado[0].total) - tota;
     await SunmiPrinter.printRow(cols: [
       ColumnMaker(
-          text: '${detalle[al].producto}',
-          width: 24,
-          align: SunmiPrintAlign.LEFT),
-      ColumnMaker(text: '', width: 6, align: SunmiPrintAlign.CENTER),
+          text: 'Saldo Actual:', width: 20, align: SunmiPrintAlign.RIGHT),
+      ColumnMaker(text: '${tota}', width: 10, align: SunmiPrintAlign.CENTER),
     ]);
 
+    await SunmiPrinter.lineWrap(1);
+
+    //impresion transacciones
+  } else {
+    await SunmiPrinter.printText(
+        (sede == 1)
+            ? '${encabezado[0].nombreEmpresaSucu}'
+            : '${encabezado[0].nombreEmpresa}',
+        style: SunmiStyle(
+          bold: true,
+          align: SunmiPrintAlign.CENTER,
+        ));
+
+    //Direccion de empresa
+    await SunmiPrinter.printText(
+        (sede == 1)
+            ? '${encabezado[0].direccionSucu}'
+            : '${encabezado[0].direccion}',
+        style: SunmiStyle(
+          bold: true,
+          align: SunmiPrintAlign.CENTER,
+        ));
+
+    //nit emisor
+    if (encabezado[0].nit_emisor != '') {
+      await SunmiPrinter.printText('NIT: ${encabezado[0].nit_emisor}',
+          style: SunmiStyle(
+            bold: true,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    }
+
+    //telefono emisor
+    if (sede == 1) {
+      if (encabezado[0].teleSucu != '') {
+        await SunmiPrinter.printText('Tel: ${encabezado[0].teleSucu}',
+            style: SunmiStyle(
+              bold: true,
+              align: SunmiPrintAlign.CENTER,
+            ));
+      }
+    } else {
+      if (encabezado[0].telefono != '') {
+        await SunmiPrinter.printText('Tel: ${encabezado[0].telefono}',
+            style: SunmiStyle(
+              bold: true,
+              align: SunmiPrintAlign.CENTER,
+            ));
+      }
+    }
+
+    //await SunmiPrinter.lineWrap(1);
+
+    //nombre comercial
+    if (sede == 1) {
+      if (encabezado[0].nombre_comercial_sucu != '') {
+        await SunmiPrinter.printText('${encabezado[0].nombre_comercial_sucu}',
+            style: SunmiStyle(
+              bold: true,
+              align: SunmiPrintAlign.CENTER,
+            ));
+      }
+    } else {
+      if (encabezado[0].nombre_comercial_emp != '') {
+        await SunmiPrinter.printText('${encabezado[0].nombre_comercial_emp}',
+            style: SunmiStyle(
+              bold: true,
+              align: SunmiPrintAlign.CENTER,
+            ));
+      }
+    }
+
+    //await SunmiPrinter.lineWrap(1);
+    //FEL
+    if (encabezado[0].dte != '') {
+      await SunmiPrinter.printText('Factura Electrónica Documento Tributario',
+          style: SunmiStyle(
+            bold: true,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    }
+
+    //await SunmiPrinter.lineWrap(1);
+
+    //FECHA EN LETRAS
+    await SunmiPrinter.printText('${encabezado[0].fecha_letras}',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.RIGHT,
+        ));
+
+    //await SunmiPrinter.lineWrap(1);
+
+    if (encabezado[0].dte != '') {
+      await SunmiPrinter.printText('Número de Autorización:',
+          style: SunmiStyle(
+            bold: false,
+            align: SunmiPrintAlign.CENTER,
+          ));
+      await SunmiPrinter.printText('${encabezado[0].dte}',
+          style: SunmiStyle(
+            bold: false,
+            align: SunmiPrintAlign.CENTER,
+          ));
+      await SunmiPrinter.printText('Serie: ${encabezado[0].serieDte}',
+          style: SunmiStyle(
+            bold: false,
+            align: SunmiPrintAlign.CENTER,
+          ));
+      await SunmiPrinter.printText('Número de DTE: ${encabezado[0].noDte}',
+          style: SunmiStyle(
+            bold: false,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    }
+
+    //await SunmiPrinter.lineWrap(1);
+    //estado factura
+    if (encabezado[0].estado == '1') {
+      await SunmiPrinter.printText('PENDIENTE DE PAGO',
+          style: SunmiStyle(
+            bold: false,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    } else if (encabezado[0].estado == '2') {
+      await SunmiPrinter.printText('PAGADA',
+          style: SunmiStyle(
+            bold: false,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    } else {
+      await SunmiPrinter.printText('ANULADA',
+          style: SunmiStyle(
+            bold: false,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    }
+
+    //No
+    await SunmiPrinter.printText('No: ${encabezado[0].no}',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.RIGHT,
+        ));
+
+    //await SunmiPrinter.lineWrap(1);
+
+    //serie
+    await SunmiPrinter.printText('Serie: ${encabezado[0].serie}',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
+
+    //vendedor
+    await SunmiPrinter.printText(
+        'Vendedor : ${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
+    //cliente
+    await SunmiPrinter.printText(
+        'Cliente: ${encabezado[0].nombre} ${encabezado[0].apellidos}',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
+    //nit cliente
+    await SunmiPrinter.printText('NIT: ${encabezado[0].nit}',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.LEFT,
+        ));
+
+    //direccion cliente
+    if (encabezado[0].direccionCli != '') {
+      await SunmiPrinter.printText('Dirección: ${encabezado[0].direccionCli}',
+          style: SunmiStyle(
+            bold: false,
+            align: SunmiPrintAlign.LEFT,
+          ));
+    }
+
+    await SunmiPrinter.lineWrap(1);
+
+    //condiciones de pago
+    await SunmiPrinter.printText('Condiciones de pago:',
+        style: SunmiStyle(
+          bold: true,
+          align: SunmiPrintAlign.CENTER,
+        ));
+    //forma
+    await SunmiPrinter.printText('${encabezado[0].forma}',
+        style: SunmiStyle(
+          bold: true,
+          align: SunmiPrintAlign.CENTER,
+        ));
+    //condiciones pago
+    if (encabezado[0].forma != 'Contado') {
+      await SunmiPrinter.printText('Fecha Vence: ${encabezado[0].fechaV}',
+          style: SunmiStyle(
+            bold: true,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    }
+
+    //await SunmiPrinter.lineWrap(1);
+
+    await SunmiPrinter.line();
+    await SunmiPrinter.printRow(cols: [
+      ColumnMaker(text: 'Descripción', width: 20, align: SunmiPrintAlign.LEFT),
+      ColumnMaker(text: 'Subtotal', width: 10, align: SunmiPrintAlign.CENTER),
+    ]);
+    await SunmiPrinter.line();
+
+    //DETALLES
+    for (int al = 0; al < detalle.length; al++) {
+      double tota =
+          double.parse(detalle[al].cantidad) * double.parse(detalle[al].precio);
+      await SunmiPrinter.printRow(cols: [
+        ColumnMaker(
+            text: '${detalle[al].producto}',
+            width: 24,
+            align: SunmiPrintAlign.LEFT),
+        ColumnMaker(text: '', width: 6, align: SunmiPrintAlign.CENTER),
+      ]);
+
+      await SunmiPrinter.printRow(cols: [
+        ColumnMaker(
+            text:
+                '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
+            width: 20,
+            align: SunmiPrintAlign.LEFT),
+        ColumnMaker(
+            text: '${detalle[al].contenido}${tota}',
+            width: 10,
+            align: SunmiPrintAlign.RIGHT),
+      ]);
+    }
+    await SunmiPrinter.line();
     await SunmiPrinter.printRow(cols: [
       ColumnMaker(
-          text:
-              '${detalle[al].cantidad} * ${detalle[al].contenido}${detalle[al].precio}',
-          width: 20,
-          align: SunmiPrintAlign.LEFT),
+          text: 'Descuento(-):', width: 20, align: SunmiPrintAlign.RIGHT),
       ColumnMaker(
-          text: '${detalle[al].contenido}${tota}',
+          text: encabezado[0].contenido + encabezado[0].descuento,
           width: 10,
-          align: SunmiPrintAlign.RIGHT),
+          align: SunmiPrintAlign.CENTER),
     ]);
-  }
-  await SunmiPrinter.line();
-  await SunmiPrinter.printRow(cols: [
-    ColumnMaker(text: 'Descuento(-):', width: 20, align: SunmiPrintAlign.RIGHT),
-    ColumnMaker(
-        text: encabezado[0].contenido + encabezado[0].descuento,
-        width: 10,
-        align: SunmiPrintAlign.CENTER),
-  ]);
-  await SunmiPrinter.printRow(cols: [
-    ColumnMaker(text: 'Total:', width: 20, align: SunmiPrintAlign.RIGHT),
-    ColumnMaker(
-        text: encabezado[0].contenido + encabezado[0].total,
-        width: 10,
-        align: SunmiPrintAlign.CENTER),
-  ]);
-  //await SunmiPrinter.lineWrap(1);
+    await SunmiPrinter.printRow(cols: [
+      ColumnMaker(text: 'Total:', width: 20, align: SunmiPrintAlign.RIGHT),
+      ColumnMaker(
+          text: encabezado[0].contenido + encabezado[0].total,
+          width: 10,
+          align: SunmiPrintAlign.CENTER),
+    ]);
+    //await SunmiPrinter.lineWrap(1);
 
-  //total en letras
-  await SunmiPrinter.printText('${encabezado[0].totalLetas}',
-      style: SunmiStyle(
-        bold: true,
-        align: SunmiPrintAlign.CENTER,
-      ));
-
-  String ob = encabezado[0].obser;
-
-  if (ob.length > 0) {
-    await SunmiPrinter.lineWrap(1);
-    await SunmiPrinter.printText('Observación:',
+    //total en letras
+    await SunmiPrinter.printText('${encabezado[0].totalLetas}',
         style: SunmiStyle(
           bold: true,
-          align: SunmiPrintAlign.LEFT,
+          align: SunmiPrintAlign.CENTER,
         ));
-    await SunmiPrinter.printText('${ob}',
-        style: SunmiStyle(
-          align: SunmiPrintAlign.LEFT,
-        ));
-    await SunmiPrinter.lineWrap(1);
-  }
 
-  //frases
-  for (int rl = 0; rl < encabezado[0].frases.length; rl++) {
-    await SunmiPrinter.printText('${encabezado[0].frases[rl]}',
+    String ob = encabezado[0].obser;
+
+    if (ob.length > 0) {
+      await SunmiPrinter.lineWrap(1);
+      await SunmiPrinter.printText('Observación:',
+          style: SunmiStyle(
+            bold: true,
+            align: SunmiPrintAlign.LEFT,
+          ));
+      await SunmiPrinter.printText('${ob}',
+          style: SunmiStyle(
+            align: SunmiPrintAlign.LEFT,
+          ));
+      await SunmiPrinter.lineWrap(1);
+    }
+
+    //frases
+    for (int rl = 0; rl < encabezado[0].frases.length; rl++) {
+      await SunmiPrinter.printText('${encabezado[0].frases[rl]}',
+          style: SunmiStyle(
+            bold: false,
+            align: SunmiPrintAlign.CENTER,
+          ));
+    }
+
+    //datos certificador
+    if (encabezado[0].dte != '') {
+      await SunmiPrinter.lineWrap(1);
+      await SunmiPrinter.printText(
+          'Certificador: ${encabezado[0].certificador}',
+          style: SunmiStyle(
+            bold: false,
+            align: SunmiPrintAlign.LEFT,
+          ));
+      await SunmiPrinter.printText('NIT: ${encabezado[0].nitCert}',
+          style: SunmiStyle(
+            bold: false,
+            align: SunmiPrintAlign.LEFT,
+          ));
+      await SunmiPrinter.printText('Fecha: ${encabezado[0].fechaCert}',
+          style: SunmiStyle(
+            bold: false,
+            align: SunmiPrintAlign.LEFT,
+          ));
+    }
+
+    //await SunmiPrinter.lineWrap(1);
+    await SunmiPrinter.printText('Realizado en www.gozeri.com',
         style: SunmiStyle(
           bold: false,
           align: SunmiPrintAlign.CENTER,
         ));
-  }
 
-  //datos certificador
-  if (encabezado[0].dte != '') {
-    await SunmiPrinter.lineWrap(1);
-    await SunmiPrinter.printText('Certificador: ${encabezado[0].certificador}',
-        style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.LEFT,
-        ));
-    await SunmiPrinter.printText('NIT: ${encabezado[0].nitCert}',
-        style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.LEFT,
-        ));
-    await SunmiPrinter.printText('Fecha: ${encabezado[0].fechaCert}',
-        style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.LEFT,
-        ));
-  }
-
-  //await SunmiPrinter.lineWrap(1);
-  await SunmiPrinter.printText('Realizado en www.gozeri.com',
-      style: SunmiStyle(
-        bold: false,
-        align: SunmiPrintAlign.CENTER,
-      ));
-
-  /*await SunmiPrinter.printQRCode('https://github.com/brasizza/sunmi_printer');
+    /*await SunmiPrinter.printQRCode('https://github.com/brasizza/sunmi_printer');
   await SunmiPrinter.printText('Normal font',
       style: SunmiStyle(fontSize: SunmiFontSize.MD));*/
-  await SunmiPrinter.lineWrap(2);
-  await SunmiPrinter.exitTransactionPrint(true);
+    await SunmiPrinter.lineWrap(2);
+    await SunmiPrinter.exitTransactionPrint(true);
+  }
 }

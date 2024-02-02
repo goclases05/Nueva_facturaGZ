@@ -954,6 +954,30 @@ class _ViewFacturasState extends State<ViewFacturas> {
               codeTable: 'CP1252'));
     }
 
+    //estado factura
+    if (encabezado[0].estado == '1') {
+      bytess += generatorr.text('PENDIENTE DE PAGO',
+          styles: const PosStyles(
+              align: PosAlign.center,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
+    } else if (encabezado[0].estado == '2') {
+      bytess += generatorr.text('PAGADA',
+          styles: const PosStyles(
+              align: PosAlign.center,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
+    } else {
+      bytess += generatorr.text('ANULADA',
+          styles: const PosStyles(
+              align: PosAlign.center,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
+    }
+
     //espacio
     bytess += generatorr.feed(1);
 
@@ -1024,6 +1048,16 @@ class _ViewFacturasState extends State<ViewFacturas> {
             width: PosTextSize.size1,
             bold: true,
             codeTable: 'CP1252'));
+
+    //fecha vencimiento
+    if (encabezado[0].forma != 'Contado') {
+      bytess += generatorr.text('Fecha Vence: ${encabezado[0].fechaV}',
+          styles: const PosStyles(
+              align: PosAlign.center,
+              width: PosTextSize.size1,
+              bold: true,
+              codeTable: 'CP1252'));
+    }
 
     //espacio
     bytess += generatorr.feed(1);
@@ -1348,6 +1382,26 @@ print_sunmi(BuildContext context, String id_factura) async {
             fontSize: SunmiFontSize.MD));
   }
 
+  //estado factura
+  if (encabezado[0].estado == '1') {
+    await SunmiPrinter.printText('PENDIENTE DE PAGO',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+        ));
+  } else if (encabezado[0].estado == '2') {
+    await SunmiPrinter.printText('PAGADA',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+        ));
+  } else {
+    await SunmiPrinter.printText('ANULADA',
+        style: SunmiStyle(
+          bold: false,
+          align: SunmiPrintAlign.CENTER,
+        ));
+  }
   //await SunmiPrinter.lineWrap(1);
 
   //No
@@ -1410,6 +1464,15 @@ print_sunmi(BuildContext context, String id_factura) async {
           bold: true,
           align: SunmiPrintAlign.CENTER,
           fontSize: SunmiFontSize.MD));
+
+  //fecha vence
+  if (encabezado[0].forma != 'Contado') {
+    await SunmiPrinter.printText('Fecha Vence: ${encabezado[0].fechaV}',
+        style: SunmiStyle(
+          bold: true,
+          align: SunmiPrintAlign.CENTER,
+        ));
+  }
 
   //await SunmiPrinter.lineWrap(1);
 

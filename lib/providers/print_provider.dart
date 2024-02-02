@@ -7,6 +7,7 @@ import 'dart:convert';
 class PrintProvider extends ChangeNotifier {
   List<Encabezado> list = [];
   List<Detalle> list_detalle = [];
+  List<Trans> list_trans = [];
   bool loading = true;
 
   PrintProvider() {}
@@ -44,6 +45,7 @@ class PrintProvider extends ChangeNotifier {
   Future dataFac(String factura) async {
     list.clear();
     list_detalle.clear();
+    list_trans.clear();
     loading = true;
     notifyListeners();
 
@@ -67,6 +69,12 @@ class PrintProvider extends ChangeNotifier {
     for (int d = 0; d < co; d++) {
       var re = Detalle.fromJson(js['DETALLE'][d]);
       list_detalle.add(re);
+    }
+
+    int ci = js['TRANS'].length;
+    for (int d = 0; d < ci; d++) {
+      var re = Trans.fromJson(js['TRANS'][d]);
+      list_trans.add(re);
     }
     //list_detalle.add(result_detalle);
 

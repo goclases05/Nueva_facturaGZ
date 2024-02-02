@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:edge_alerts/edge_alerts.dart';
 import 'package:factura_gozeri/providers/factura_provider.dart';
+import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/screens/view_ticket_desing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -263,7 +264,7 @@ class _RegistroMetodoPagoListasState extends State<RegistroMetodoPagoListas> {
                       backgroundColor: Colors.redAccent);
                 } else {
                   double sal_accion = double.parse(Metodo.saldo) -
-                  double.parse(_controlPago.text);
+                      double.parse(_controlPago.text);
                   Metodo.saldo = (sal_accion).toString();
                   if (double.parse(Metodo.saldo) < 1) {
                     widget.estado = '2';
@@ -279,6 +280,14 @@ class _RegistroMetodoPagoListasState extends State<RegistroMetodoPagoListas> {
                       '');
 
                   if (insert == '1') {
+                    final printProvider =
+                        Provider.of<PrintProvider>(context, listen: false);
+                    final _facturacion =
+                        Provider.of<Facturacion>(context, listen: false);
+
+                    _facturacion.transacciones(widget.id_f, 'emitida');
+
+                    printProvider.dataFac(widget.id_f);
                     Navigator.of(context).pop();
                     Navigator.pushReplacement<void, void>(
                       context,

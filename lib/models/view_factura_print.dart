@@ -7,24 +7,25 @@ String viewFacturaPrintToJson(ViewFacturaPrint data) =>
     json.encode(data.toJson());
 
 class ViewFacturaPrint {
-  ViewFacturaPrint({
-    required this.encabezado,
-    required this.detalle,
-  });
+  ViewFacturaPrint(
+      {required this.encabezado, required this.detalle, required this.trans});
 
   Encabezado encabezado;
   List<Detalle> detalle;
+  List<Trans> trans;
 
   factory ViewFacturaPrint.fromJson(Map<String, dynamic> json) =>
       ViewFacturaPrint(
         encabezado: Encabezado.fromJson(json["ENCABEZADO"]),
         detalle:
             List<Detalle>.from(json["DETALLE"].map((x) => Detalle.fromJson(x))),
+        trans: List<Trans>.from(json["TRANS"].map((x) => Trans.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
         "ENCABEZADO": encabezado.toJson(),
         "DETALLE": List<dynamic>.from(detalle.map((x) => x.toJson())),
+        "TRANS": List<dynamic>.from(trans.map((x) => x.toJson())),
       };
 }
 
@@ -314,5 +315,33 @@ class Detalle {
         "PRODUCTO": producto,
         "CANTIDAD": cantidad,
         "PRECIO": precio,
+      };
+}
+
+class Trans {
+  Trans({
+    required this.idtrans,
+    required this.abono,
+    required this.fecha,
+    required this.forma,
+  });
+
+  String idtrans;
+  String abono;
+  String fecha;
+  String forma;
+
+  factory Trans.fromJson(Map<String, dynamic> json) => Trans(
+        idtrans: json["ID_TRANS"],
+        abono: json["ABONO"],
+        fecha: json["FECHA"],
+        forma: json["FORMA"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "ID_TRANS": idtrans,
+        "ABONO": abono,
+        "FECHA": fecha,
+        "FORMA": forma,
       };
 }
