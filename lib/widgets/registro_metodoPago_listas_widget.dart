@@ -263,12 +263,11 @@ class _RegistroMetodoPagoListasState extends State<RegistroMetodoPagoListas> {
                       backgroundColor: Colors.redAccent);
                 } else {
                   double sal_accion = double.parse(Metodo.saldo) -
-                      double.parse(_controlPago.text);
+                  double.parse(_controlPago.text);
                   Metodo.saldo = (sal_accion).toString();
                   if (double.parse(Metodo.saldo) < 1) {
                     widget.estado = '2';
                   }
-                  setState(() {});
 
                   var insert = await Metodo.accionesMetodoPAgo(
                       'add',
