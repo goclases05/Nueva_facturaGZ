@@ -266,7 +266,7 @@ class _RegistroMetodoPagoListasState extends State<RegistroMetodoPagoListas> {
                   double sal_accion = double.parse(Metodo.saldo) -
                       double.parse(_controlPago.text);
                   Metodo.saldo = (sal_accion).toString();
-                  if (double.parse(Metodo.saldo) < 1) {
+                  if (double.parse(Metodo.saldo) <= 0.00) {
                     widget.estado = '2';
                   }
 
