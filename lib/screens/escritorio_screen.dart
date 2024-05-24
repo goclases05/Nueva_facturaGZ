@@ -92,7 +92,7 @@ class _EscritorioScreenState extends State<EscritorioScreen> {
               title: Image.asset(
                 'assets/gozeri_blanco2.png',
                 color: colorPrimary,
-                width: size.width * 0.25,
+                width: size.width * 0.15,
               ),
               backgroundColor: Colors.white,
               elevation: 0,

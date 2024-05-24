@@ -1877,6 +1877,12 @@ print_sunmi(BuildContext context, String id_factura) async {
   await SunmiPrinter.printText('Normal font',
       style: SunmiStyle(fontSize: SunmiFontSize.MD));*/
   await SunmiPrinter.lineWrap(2);
+
+  await SunmiPrinter.drawerStatus(); //check if the cash drawer is connect or disconnect
+
+  await SunmiPrinter.openDrawer(); //open de cash drawer
+
+  await SunmiPrinter.drawerTimesOpen();
   await SunmiPrinter.exitTransactionPrint(true);
 }
 
@@ -1976,5 +1982,16 @@ print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
   await SunmiPrinter.printText('Normal font',
       style: SunmiStyle(fontSize: SunmiFontSize.MD));*/
   await SunmiPrinter.lineWrap(2);
+  await SunmiPrinter.drawerStatus(); //check if the cash drawer is connect or disconnect
+
+  await SunmiPrinter.openDrawer(); //open de cash drawer
+
+  await SunmiPrinter.drawerTimesOpen();
   await SunmiPrinter.exitTransactionPrint(true);
+  
+  /*await SunmiPrinter.drawerStatus(); //check if the cash drawer is connect or disconnect
+
+  await SunmiPrinter.openDrawer(); //open de cash drawer
+
+  await SunmiPrinter.drawerTimesOpen();*/
 }
