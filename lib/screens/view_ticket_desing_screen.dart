@@ -1952,6 +1952,11 @@ print_sunmi(BuildContext context, String id_factura,
     ]);
 
     await SunmiPrinter.lineWrap(1);
+    await SunmiPrinter.drawerStatus(); //check if the cash drawer is connect or disconnect
+
+    await SunmiPrinter.openDrawer(); //open de cash drawer
+
+    await SunmiPrinter.drawerTimesOpen();
 
     //impresion transacciones
   } else {
@@ -2263,11 +2268,17 @@ print_sunmi(BuildContext context, String id_factura,
     }
 
     //await SunmiPrinter.lineWrap(1);
+    await SunmiPrinter.drawerStatus(); //check if the cash drawer is connect or disconnect
+
+    await SunmiPrinter.openDrawer(); //open de cash drawer
+
+    await SunmiPrinter.drawerTimesOpen();
+    
     await SunmiPrinter.printText('Realizado en www.gozeri.com',
-        style: SunmiStyle(
-          bold: false,
-          align: SunmiPrintAlign.CENTER,
-        ));
+      style: SunmiStyle(
+        bold: false,
+        align: SunmiPrintAlign.CENTER,
+      ));
 
     /*await SunmiPrinter.printQRCode('https://github.com/brasizza/sunmi_printer');
   await SunmiPrinter.printText('Normal font',
