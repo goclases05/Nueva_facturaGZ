@@ -126,7 +126,7 @@ class _ViewTabsScreen extends State<ViewTabsScreen> {
               title: Image.asset(
                 'assets/gozeri_blanco2.png',
                 color: widget.colorPrimary,
-                width: size.width * 0.25,
+                height: getScreenSize(context, 0.05,0.08,'h'),
               ),
               actions: [
                 const SizedBox(

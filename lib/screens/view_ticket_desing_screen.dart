@@ -50,6 +50,28 @@ class _ViewTicketState extends State<ViewTicket> {
   bool state_bluetooth = false;
   //SUNMIN
 
+  double getScreenSize(BuildContext context, double t1, double t2, String area) {
+      // Obtenemos el tamaño de la pantalla utilizando MediaQuery
+    Orientation orientation = MediaQuery.of(context).orientation;
+    Size size = MediaQuery.of(context).size;
+
+    if(orientation == Orientation.portrait){
+      //vertical
+      if(area=='h'){
+        return size.height * t1;
+      }else{
+        return size.width*t1;
+      }
+      
+    }else{
+      if(area=='h'){
+        return size.height * t2;
+      }else{
+        return size.width*t2;
+      }
+    }
+  }
+
   @override
   void initState() {
     estado = widget.estado;
@@ -458,424 +480,428 @@ class _ViewTicketState extends State<ViewTicket> {
                   encabezado[0].felSucu == '0') {
                 sede = 0;
               }
-
+              double fuente=getScreenSize(context, 0.05 ,0.02,'w');
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 scrollDirection: Axis.vertical,
                 child: Column(children: [
-                  Card(
-                    margin: EdgeInsets.all(15),
-                    elevation: 8,
-                    color: Colors.white,
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      width: MediaQuery.of(context).size.width * 1,
-                      child: Column(
-                        children: [
-                          (sede == 1)
-                              ?
-                              //sucursal
-                              FadeInImage(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.25,
-                                  placeholder:
-                                      AssetImage('assets/productos_gz.jpg'),
-                                  image: NetworkImage(encabezado[0].rutaSucu +
-                                      encabezado[0].foto))
-                              :
-                              //empresa
-                              FadeInImage(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.25,
-                                  placeholder:
-                                      AssetImage('assets/productos_gz.jpg'),
-                                  image: NetworkImage(encabezado[0].logoUrl +
-                                      encabezado[0].logoNom)),
-
-                          const SizedBox(
-                            height: 10,
-                          ),
-
-                          //Nombre de empresa
-                          (sede == 1)
-                              ? TitleText(encabezado[0].nombreEmpresaSucu, 18,
-                                  TextAlign.center)
-                              : TitleText(encabezado[0].nombreEmpresa, 18,
-                                  TextAlign.center),
-
-                          //Direccion de empresa
-                          (sede == 1)
-                              ? SimpleText(encabezado[0].direccionSucu, 15,
-                                  TextAlign.center)
-                              : SimpleText(encabezado[0].direccion, 15,
-                                  TextAlign.center),
-
-                          const SizedBox(
-                            height: 10,
-                          ),
-
-                          //NIT de la empresa
-                          (encabezado[0].nit_emisor != '')
-                              ? claveValor('NIT: ', encabezado[0].nit_emisor,
-                                  MainAxisAlignment.center)
-                              : Container(),
-
-                          //Telefono de la empresa
-                          (sede == 1)
-                              ? (encabezado[0].teleSucu != '')
-                                  ? claveValor(
-                                      'Teléfono: ',
-                                      encabezado[0].teleSucu,
-                                      MainAxisAlignment.center)
-                                  : Container()
-                              : (encabezado[0].telefono != '')
-                                  ? claveValor(
-                                      'Teléfono: ',
-                                      encabezado[0].telefono,
-                                      MainAxisAlignment.center)
-                                  : Container(),
-
-                          const SizedBox(
-                            height: 10,
-                          ),
-
-                          //nombre comercial
-                          (sede == 1)
-                              ? (encabezado[0].nombre_comercial_sucu != '')
-                                  ? SimpleText(
-                                      encabezado[0].nombre_comercial_sucu,
-                                      15,
-                                      TextAlign.center)
-                                  : Container()
-                              : (encabezado[0].nombre_comercial_emp != '')
-                                  ? SimpleText(
-                                      encabezado[0].nombre_comercial_emp,
-                                      15,
-                                      TextAlign.center)
-                                  : Container(),
-
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          //facturada
-                          (encabezado[0].dte != '')
-                              ? TitleText(
-                                  'Factura Electrónica Documento Tributario Electrónico',
-                                  18,
-                                  TextAlign.center)
-                              : Container(),
-
-                          //fecha
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          (estado != '2' && estado != '1')
-                              ? Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.red),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  margin: EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 5),
-                                  child: Text(
-                                    'Anulada',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red,
-                                        fontSize: 25),
-                                  ),
-                                )
-                              : Text(''),
-
-                          Text(
-                            encabezado[0].fecha_letras,
-                            textAlign: TextAlign.end,
-                            style: const TextStyle(
-                              fontSize: 11,
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal:getScreenSize(context, 0.01, 0.2, 'w')),
+                    child: Card(
+                      margin: EdgeInsets.all(15),
+                      elevation: 8,
+                      color: Colors.white,
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        width: MediaQuery.of(context).size.width * 1,
+                        child: Column(
+                          children: [
+                            (sede == 1)
+                                ?
+                                //sucursal
+                                FadeInImage(
+                                    height:getScreenSize(context,0.1,0.15,'h'),
+                                    placeholder:
+                                        AssetImage('assets/productos_gz.jpg'),
+                                    image: NetworkImage(encabezado[0].rutaSucu +
+                                        encabezado[0].foto))
+                                :
+                                //empresa
+                                FadeInImage(
+                                    height: getScreenSize(context, 0.1, 0.15, 'h'),
+                                    placeholder:
+                                        AssetImage('assets/productos_gz.jpg'),
+                                    image: NetworkImage(encabezado[0].logoUrl +
+                                        encabezado[0].logoNom)),
+                    
+                            const SizedBox(
+                              height: 10,
                             ),
-                          ),
-
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          //n autorizacion
-                          (encabezado[0].dte != '')
-                              ? Container(
-                                  padding: const EdgeInsets.all(0),
-                                  child: Column(
-                                    children: [
-                                      TitleText('Número de Autorización:', 13,
-                                          TextAlign.center),
-                                      SimpleText(encabezado[0].dte, 13,
-                                          TextAlign.center),
-                                      claveValor(
-                                          'Serie: ',
-                                          encabezado[0].serieDte,
-                                          MainAxisAlignment.center),
-                                      claveValor(
-                                          'Número de DTE: ',
-                                          encabezado[0].noDte,
-                                          MainAxisAlignment.center),
-                                    ],
-                                  ))
-                              : Container(
-                                  padding: const EdgeInsets.all(0),
-                                ),
-
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          //serie y no
-                          Row(
-                            children: [
-                              Expanded(
-                                  child: claveValor(
-                                      'Serie: ',
-                                      encabezado[0].serie,
-                                      MainAxisAlignment.start)),
-                              Expanded(
-                                  child: claveValor('No:  ', encabezado[0].no,
-                                      MainAxisAlignment.end))
-                            ],
-                          ),
-                          //vendedor
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Vendedor: ',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15)),
-                              Expanded(
-                                child: Text(
-                                  '${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
-                                  style: TextStyle(fontSize: 15),
-                                  maxLines: 3,
-                                ),
+                    
+                            //Nombre de empresa
+                            (sede == 1)
+                                ? TitleText(encabezado[0].nombreEmpresaSucu, fuente,
+                                    TextAlign.center)
+                                : TitleText(encabezado[0].nombreEmpresa, fuente,
+                                    TextAlign.center),
+                    
+                            //Direccion de empresa
+                            (sede == 1)
+                                ? SimpleText(encabezado[0].direccionSucu, fuente,
+                                    TextAlign.center)
+                                : SimpleText(encabezado[0].direccion, fuente,
+                                    TextAlign.center),
+                    
+                            const SizedBox(
+                              height: 10,
+                            ),
+                    
+                            //NIT de la empresa
+                            (encabezado[0].nit_emisor != '')
+                                ? claveValor('NIT: ', encabezado[0].nit_emisor,
+                                    MainAxisAlignment.center)
+                                : Container(),
+                    
+                            //Telefono de la empresa
+                            (sede == 1)
+                                ? (encabezado[0].teleSucu != '')
+                                    ? claveValor(
+                                        'Teléfono: ',
+                                        encabezado[0].teleSucu,
+                                        MainAxisAlignment.center)
+                                    : Container()
+                                : (encabezado[0].telefono != '')
+                                    ? claveValor(
+                                        'Teléfono: ',
+                                        encabezado[0].telefono,
+                                        MainAxisAlignment.center)
+                                    : Container(),
+                    
+                            const SizedBox(
+                              height: 10,
+                            ),
+                    
+                            //nombre comercial
+                            (sede == 1)
+                                ? (encabezado[0].nombre_comercial_sucu != '')
+                                    ? SimpleText(
+                                        encabezado[0].nombre_comercial_sucu,
+                                        fuente,
+                                        TextAlign.center)
+                                    : Container()
+                                : (encabezado[0].nombre_comercial_emp != '')
+                                    ? SimpleText(
+                                        encabezado[0].nombre_comercial_emp,
+                                        fuente,
+                                        TextAlign.center)
+                                    : Container(),
+                    
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            //facturada
+                            (encabezado[0].dte != '')
+                                ? TitleText(
+                                    'Factura Electrónica Documento Tributario Electrónico',
+                                    fuente,
+                                    TextAlign.center)
+                                : Container(),
+                    
+                            //fecha
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            (estado != '2' && estado != '1')
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.red),
+                                    ),
+                                    padding: EdgeInsets.all(10),
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: 5, horizontal: 5),
+                                    child: Text(
+                                      'Anulada',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.red,
+                                          fontSize: fuente),
+                                    ),
+                                  )
+                                : Text(''),
+                    
+                            Text(
+                              encabezado[0].fecha_letras,
+                              textAlign: TextAlign.end,
+                              style:  TextStyle(
+                                fontSize: fuente,
                               ),
-                            ],
-                          ),
-                          //cliente
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Cliente: ',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15)),
-                              Expanded(
-                                child: Text(
-                                  '${encabezado[0].nombre} ${encabezado[0].apellidos}',
-                                  style: const TextStyle(fontSize: 15),
-                                  maxLines: 3,
-                                ),
-                              ),
-                            ],
-                          ),
-                          claveValor('NIT: ', encabezado[0].nit,
-                              MainAxisAlignment.start),
-                          //direccion
-                          if (encabezado[0].direccionCli != '')
+                            ),
+                    
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            //n autorizacion
+                            (encabezado[0].dte != '')
+                                ? Container(
+                                    padding: const EdgeInsets.all(0),
+                                    child: Column(
+                                      children: [
+                                        TitleText('Número de Autorización:', fuente,
+                                            TextAlign.center),
+                                        SimpleText(encabezado[0].dte, fuente,
+                                            TextAlign.center),
+                                        /*claveValor(
+                                            'Serie: ',
+                                            encabezado[0].serieDte,
+                                            MainAxisAlignment.center),*/
+                                        claveValor(
+                                            'Número de DTE: ',
+                                            encabezado[0].noDte,
+                                            MainAxisAlignment.center),
+                                      ],
+                                    ))
+                                : Container(
+                                    padding: const EdgeInsets.all(0),
+                                  ),
+                    
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            //serie y no
+                            Row(
+                              children: [
+                                Expanded(
+                                    child: claveValor(
+                                        'Serie: ',
+                                        encabezado[0].serie,
+                                        MainAxisAlignment.start)),
+                                Expanded(
+                                    child: claveValor('No:  ', encabezado[0].no,
+                                        MainAxisAlignment.end))
+                              ],
+                            ),
+                            //vendedor
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('Dirección: ',
+                                 Text('Vendedor: ',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 15)),
+                                        fontSize: fuente)),
                                 Expanded(
                                   child: Text(
-                                    encabezado[0].direccionCli,
-                                    style: const TextStyle(fontSize: 15),
+                                    '${encabezado[0].nombreV} ${encabezado[0].apellidosV}',
+                                    style: TextStyle(fontSize: fuente),
                                     maxLines: 3,
                                   ),
                                 ),
                               ],
                             ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-
-                          //condicion de pago
-                          TitleText(
-                              'Condiciones de pago:', 15, TextAlign.center),
-
-                          claveValor(encabezado[0].forma, '',
-                              MainAxisAlignment.center),
-
-                          (encabezado[0].forma != "Contado")
-                              ? claveValor(
-                                  'Fecha Vence: ',
-                                  encabezado[0].fechaV,
-                                  MainAxisAlignment.center)
-                              : Text(''),
-
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          ListTile(
-                            title:
-                                TitleText('Descripción', 16, TextAlign.start),
-                            trailing: TitleText('Subtotal', 16, TextAlign.end),
-                          ),
-                          Listdata(encabezado[0].contenido, detalle),
-                          //descuento
-                          Container(
-                              margin: EdgeInsets.only(right: 20),
-                              child: claveValor(
-                                  'Descuentos (-) :  ',
-                                  encabezado[0].contenido +
-                                      encabezado[0].descuento,
-                                  MainAxisAlignment.end)),
-                          //total
-                          Container(
-                              margin: EdgeInsets.only(right: 20),
-                              child: claveValor(
-                                  'Total :  ',
-                                  encabezado[0].contenido + encabezado[0].total,
-                                  MainAxisAlignment.end)),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          //total letra
-                          claveValor(encabezado[0].totalLetas, '',
-                              MainAxisAlignment.start),
-                          //isr
-                          const SizedBox(
-                            height: 15,
-                          ),
-
-                          (encabezado[0].obser.length > 0)
-                              ? Column(
-                                  children: [
-                                    claveValor('Observación', '',
-                                        MainAxisAlignment.start),
-                                    claveValor('', '${encabezado[0].obser}',
-                                        MainAxisAlignment.start)
-                                  ],
-                                )
-                              : Text(''),
-                          Column(
-                            children: frases,
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          (encabezado[0].dte != '')
-                              ? Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    claveValor(
-                                        'Certificador: ',
-                                        encabezado[0].certificador,
-                                        MainAxisAlignment.start),
-                                    claveValor('NIT: ', encabezado[0].nitCert,
-                                        MainAxisAlignment.start),
-                                    claveValor(
-                                        'Fecha: ',
-                                        encabezado[0].fechaCert,
-                                        MainAxisAlignment.start),
-                                  ],
-                                )
-                              : Container(),
-
-                          //creditos xd
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          SimpleText('Factura realizada en www.gozeri.com', 15,
-                              TextAlign.center)
-                        ],
+                            //cliente
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                 Text('Cliente: ',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: fuente)),
+                                Expanded(
+                                  child: Text(
+                                    '${encabezado[0].nombre} ${encabezado[0].apellidos}',
+                                    style: TextStyle(fontSize: fuente),
+                                    maxLines: 3,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            claveValor('NIT: ', encabezado[0].nit,
+                                MainAxisAlignment.start),
+                            //direccion
+                            if (encabezado[0].direccionCli != '')
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                   Text('Dirección: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: fuente)),
+                                  Expanded(
+                                    child: Text(
+                                      encabezado[0].direccionCli,
+                                      style:  TextStyle(fontSize: fuente),
+                                      maxLines: 3,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                    
+                            //condicion de pago
+                            TitleText(
+                                'Condiciones de pago:', fuente, TextAlign.center),
+                    
+                            claveValor(encabezado[0].forma, '',
+                                MainAxisAlignment.center),
+                    
+                            (encabezado[0].forma != "Contado")
+                                ? claveValor(
+                                    'Fecha Vence: ',
+                                    encabezado[0].fechaV,
+                                    MainAxisAlignment.center)
+                                : Text(''),
+                    
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            ListTile(
+                              title:
+                                  TitleText('Descripción', fuente, TextAlign.start),
+                              trailing: TitleText('Subtotal', fuente, TextAlign.end),
+                            ),
+                            Listdata(encabezado[0].contenido, detalle),
+                            //descuento
+                            Container(
+                                margin: EdgeInsets.only(right: 20),
+                                child: claveValor(
+                                    'Descuentos (-) :  ',
+                                    encabezado[0].contenido +
+                                        encabezado[0].descuento,
+                                    MainAxisAlignment.end)),
+                            //total
+                            Container(
+                                margin: EdgeInsets.only(right: 20),
+                                child: claveValor(
+                                    'Total :  ',
+                                    encabezado[0].contenido + encabezado[0].total,
+                                    MainAxisAlignment.end)),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            //total letra
+                            claveValor(encabezado[0].totalLetas, '',
+                                MainAxisAlignment.start),
+                            //isr
+                            const SizedBox(
+                              height: 15,
+                            ),
+                    
+                            (encabezado[0].obser.length > 0)
+                                ? Column(
+                                    children: [
+                                      claveValor('Observación', '',
+                                          MainAxisAlignment.start),
+                                      claveValor('', '${encabezado[0].obser}',
+                                          MainAxisAlignment.start)
+                                    ],
+                                  )
+                                : Text(''),
+                            Column(
+                              children: frases,
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            (encabezado[0].dte != '')
+                                ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      claveValor(
+                                          'Certificador: ',
+                                          encabezado[0].certificador,
+                                          MainAxisAlignment.start),
+                                      claveValor('NIT: ', encabezado[0].nitCert,
+                                          MainAxisAlignment.start),
+                                      claveValor(
+                                          'Fecha: ',
+                                          encabezado[0].fechaCert,
+                                          MainAxisAlignment.start),
+                                    ],
+                                  )
+                                : Container(),
+                    
+                            //creditos xd
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            SimpleText('Factura realizada en www.gozeri.com', 15,
+                                TextAlign.center)
+                          ],
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  Card(
-                      margin: EdgeInsets.all(15),
-                      elevation: 8,
-                      color: Colors.white,
-                      child: Container(
-                          padding: EdgeInsets.all(10),
-                          width: MediaQuery.of(context).size.width * 1,
-                          child: Column(
-                            children: [
-                              Text(
-                                'Transacciones',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20),
-                              ),
-                              ListView.separated(
-                                separatorBuilder: (c, i) {
-                                  return Divider(color: Colors.grey);
-                                },
-                                scrollDirection: Axis.vertical,
-                                physics: NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: trans.length,
-                                itemBuilder: (c, i) {
-                                  return ListTile(
-                                    subtitle: Text("${trans[i].fecha}"),
-                                    title: Text("${trans[i].forma}"),
-                                    trailing: Text("${trans[i].abono}"),
-                                  );
-                                },
-                              ),
-                              Container(
-                                  color: const Color.fromRGBO(246, 243, 244, 1),
-                                  width: MediaQuery.of(context).size.width * 1,
-                                  child: TextButton.icon(
-                                      style: TextButton.styleFrom(
-                                        backgroundColor: Colors.grey,
-                                      ),
-                                      label: const Text(
-                                        'Imprimir Transacciones',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      icon: const Icon(
-                                        Icons.print,
-                                        color: Colors.white,
-                                      ),
-                                      onPressed: () {
-                                        if (Preferencias.sunmi_preferencia) {
-                                          print_sunmi(
-                                              context, widget.factura, 'trans');
-                                        } else {
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: getScreenSize(context, 0.01, 0.1, 'w')),
+                    child: Card(
+                        margin: EdgeInsets.all(15),
+                        elevation: 8,
+                        color: Colors.white,
+                        child: Container(
+                            padding: EdgeInsets.all(10),
+                            width: MediaQuery.of(context).size.width * 1,
+                            child: Column(
+                              children: [
+                                Text(
+                                  'Transacciones',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: fuente),
+                                ),
+                                ListView.separated(
+                                  separatorBuilder: (c, i) {
+                                    return Divider(color: Colors.grey);
+                                  },
+                                  scrollDirection: Axis.vertical,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: trans.length,
+                                  itemBuilder: (c, i) {
+                                    return ListTile(
+                                      subtitle: Text("${trans[i].fecha}",style: TextStyle(fontSize: getScreenSize(context,0.05 ,0.017,'w')),),
+                                      title: Text("${trans[i].forma}",style: TextStyle(fontSize: getScreenSize(context,0.05 ,0.017,'w'))),
+                                      trailing: Text("${trans[i].abono}",style: TextStyle(fontSize: getScreenSize(context,0.05 ,0.017,'w'))),
+                                    );
+                                  },
+                                ),
+                                Container(
+                                    color: const Color.fromRGBO(246, 243, 244, 1),
+                                    width: MediaQuery.of(context).size.width * 1,
+                                    child: TextButton.icon(
+                                        style: TextButton.styleFrom(
+                                          backgroundColor: Colors.grey,
+                                        ),
+                                        label: const Text(
+                                          'Imprimir Transacciones',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        icon: const Icon(
+                                          Icons.print,
+                                          color: Colors.white,
+                                        ),
+                                        onPressed: () {
                                           if (Preferencias.sunmi_preferencia) {
-                                            print_sunmi(context, widget.factura,
-                                                'trans');
+                                            print_sunmi(
+                                                context, widget.factura, 'trans');
                                           } else {
-                                            if (state_bluetooth == true) {
-                                              //escaneo
-                                              bt_initPrinter('f', 'trans');
-                                              //escaneo
+                                            if (Preferencias.sunmi_preferencia) {
+                                              print_sunmi(context, widget.factura,
+                                                  'trans');
                                             } else {
-                                              print('off');
-                                              showDialog(
-                                                context: context,
-                                                builder: (_) =>
-                                                    const AlertDialog(
-                                                  backgroundColor:
-                                                      Color.fromARGB(
-                                                          255, 224, 140, 31),
-                                                  content: Text(
-                                                    'Bluetooth sin Conexión',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
+                                              if (state_bluetooth == true) {
+                                                //escaneo
+                                                bt_initPrinter('f', 'trans');
+                                                //escaneo
+                                              } else {
+                                                print('off');
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (_) =>
+                                                      const AlertDialog(
+                                                    backgroundColor:
+                                                        Color.fromARGB(
+                                                            255, 224, 140, 31),
+                                                    content: Text(
+                                                      'Bluetooth sin Conexión',
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
                                                   ),
-                                                ),
-                                              );
+                                                );
+                                              }
                                             }
                                           }
-                                        }
-                                      }))
-                            ],
-                          ))),
+                                        }))
+                              ],
+                            ))),
+                  ),
                   const SizedBox(
                     height: 200,
                   ),
@@ -1202,6 +1228,7 @@ class _ViewTicketState extends State<ViewTicket> {
   }
 
   ListView Listdata(String moneda, List<Detalle> detalle) {
+    double fuente=getScreenSize(context, 0.05 ,0.02,'w');
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,
@@ -1219,10 +1246,10 @@ class _ViewTicketState extends State<ViewTicket> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SimpleText(detalle[index].producto, 16, TextAlign.start),
+                  SimpleText(detalle[index].producto, getScreenSize(context,0.05 ,0.017,'w'), TextAlign.start),
                   SimpleText(
                       '${detalle[index].cantidad} * ${moneda}${detalle[index].precio}',
-                      12,
+                      getScreenSize(context,0.05 ,0.017,'w'),
                       TextAlign.start),
                   const SizedBox(
                     height: 10,
@@ -1232,7 +1259,7 @@ class _ViewTicketState extends State<ViewTicket> {
             ),
             Container(
                 margin: const EdgeInsets.only(right: 20),
-                child: SimpleText('${moneda}${tota}', 16, TextAlign.end))
+                child: SimpleText('${moneda}${tota}', getScreenSize(context,0.05 ,0.017,'w'), TextAlign.end))
           ],
         );
       },
@@ -1257,15 +1284,16 @@ class _ViewTicketState extends State<ViewTicket> {
   }
 
   Row claveValor(String clave, String valor, MainAxisAlignment align) {
+    double fuente=getScreenSize(context, 0.05 ,0.02,'w');
     return Row(
       mainAxisAlignment: align,
       children: [
         Text(clave,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 15, wordSpacing: 0)),
+            style:  TextStyle(
+                fontWeight: FontWeight.bold, fontSize: fuente, wordSpacing: 0)),
         Text(
           valor,
-          style: const TextStyle(fontSize: 15, wordSpacing: 0),
+          style:  TextStyle(fontSize: fuente, wordSpacing: 0),
           maxLines: 3,
         ),
       ],

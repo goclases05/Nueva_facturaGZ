@@ -40,6 +40,28 @@ class _HeaderDrawerState extends State<HeaderDrawer> {
     super.dispose();
   }
 
+  double getScreenSize(BuildContext context, double t1, double t2, String area) {
+      // Obtenemos el tamaño de la pantalla utilizando MediaQuery
+    Orientation orientation = MediaQuery.of(context).orientation;
+    Size size = MediaQuery.of(context).size;
+
+    if(orientation == Orientation.portrait){
+      //vertical
+      if(area=='h'){
+        return size.height * t1;
+      }else{
+        return size.width*t1;
+      }
+      
+    }else{
+      if(area=='h'){
+        return size.height * t2;
+      }else{
+        return size.width*t2;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
@@ -79,7 +101,7 @@ class _HeaderDrawerState extends State<HeaderDrawer> {
             height: 50,
           ),
           Container(
-              height: MediaQuery.of(context).size.width * 0.25,
+              height: getScreenSize(context, 0.25,0.15,'h'),
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                   color: Colors.white,

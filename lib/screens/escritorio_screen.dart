@@ -77,7 +77,7 @@ class _EscritorioScreenState extends State<EscritorioScreen> {
         _connectionStatus.name != 'mobile') {
       return NoInternet();
     }
-    Size size = MediaQuery.of(context).size;
+    //Size size = MediaQuery.of(context).size;
     final settings = Provider.of<settingsProvider>(context, listen: false);
     final authService = Provider.of<AuthService>(context, listen: false);
 
@@ -92,7 +92,8 @@ class _EscritorioScreenState extends State<EscritorioScreen> {
               title: Image.asset(
                 'assets/gozeri_blanco2.png',
                 color: colorPrimary,
-                width: size.width * 0.15,
+                //width: size.width * 0.25,
+                height: getScreenSize(context, 0.05,0.08,'h'),
               ),
               backgroundColor: Colors.white,
               elevation: 0,
@@ -344,3 +345,24 @@ Future<bool> _onback(BuildContext context) async {
 
   return exitApp ?? false;
 }
+double getScreenSize(BuildContext context, double t1, double t2, String area) {
+      // Obtenemos el tamaño de la pantalla utilizando MediaQuery
+    Orientation orientation = MediaQuery.of(context).orientation;
+    Size size = MediaQuery.of(context).size;
+
+    if(orientation == Orientation.portrait){
+      //vertical
+      if(area=='h'){
+        return size.height * t1;
+      }else{
+        return size.width*t1;
+      }
+      
+    }else{
+      if(area=='h'){
+        return size.height * t2;
+      }else{
+        return size.width*t2;
+      }
+    }
+  }

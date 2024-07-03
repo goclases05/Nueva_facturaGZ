@@ -166,6 +166,28 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
     return 2020;
   }
 
+  double getScreenSize(BuildContext context, double t1, double t2, String area) {
+      // Obtenemos el tamaño de la pantalla utilizando MediaQuery
+    Orientation orientation = MediaQuery.of(context).orientation;
+    Size size = MediaQuery.of(context).size;
+
+    if(orientation == Orientation.portrait){
+      //vertical
+      if(area=='h'){
+        return size.height * t1;
+      }else{
+        return size.width*t1;
+      }
+      
+    }else{
+      if(area=='h'){
+        return size.height * t2;
+      }else{
+        return size.width*t2;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     List<String> _do = []; //= ['One', 'Two', 'Free', 'Four'];
@@ -192,11 +214,15 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
     _controller.selection = TextSelection.fromPosition(
         TextPosition(offset: _controller.text.length));
 
+    
+
     return Card(
       elevation: 2,
-      margin: const EdgeInsets.symmetric(horizontal: 10),
+      color: Colors.white,
+      
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       child: Column(
+        mainAxisSize:MainAxisSize.min,
         children: [
           Stack(children: [
             Padding(
@@ -215,6 +241,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                     );*/
                 },
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const SizedBox(
                       height: 15,
@@ -228,8 +255,8 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                                     const AssetImage('assets/productos_gz.jpg'),
                                 image: NetworkImage(
                                     widget.listProd.url + widget.listProd.foto),
-                                width:
-                                    MediaQuery.of(context).size.width * 0.25)),
+                                //width:MediaQuery.of(context).size.width * 0.25)),
+                                height:getScreenSize(context,0.1,0.18,'h'))),
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(8),

@@ -47,6 +47,8 @@ class _ViewFacturasState extends State<ViewFacturas> {
   final RefreshController refreshController =
       RefreshController(initialRefresh: true);
 
+  
+
   //SUNMIN
   bool printBinded = false;
   int paperSize = 0;
@@ -324,6 +326,8 @@ class _ViewFacturasState extends State<ViewFacturas> {
   @override
   Widget build(BuildContext context) {
     final facturaService = Provider.of<Facturacion>(context, listen: false);
+    double fuente=getScreenSize(context, 0.033,0.016,'w');
+
     return Container(
         padding: const EdgeInsets.all(0),
         child: Scaffold(
@@ -508,15 +512,15 @@ class _ViewFacturasState extends State<ViewFacturas> {
                               ),
                               title: Text(
                                 '${list_tmp[index].nombre} ${list_tmp[index].apellidos}',
-                                style: const TextStyle(
-                                    fontSize: 12,
+                                style: TextStyle(
+                                    fontSize: fuente,
                                     fontWeight: FontWeight.bold,
                                     color: Color.fromARGB(167, 0, 0, 0)),
                               ),
                               subtitle: Text(
                                 '${list_tmp[index].fecha}',
-                                style: const TextStyle(
-                                    fontSize: 15,
+                                style: TextStyle(
+                                    fontSize: fuente,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black38),
                               ),
@@ -599,15 +603,15 @@ class _ViewFacturasState extends State<ViewFacturas> {
                                   ),
                                   title: Text(
                                     'No ${list_emi[index].no}: ${list_emi[index].nombre} ${list_emi[index].apellidos}',
-                                    style: const TextStyle(
-                                        fontSize: 13,
+                                    style: TextStyle(
+                                        fontSize: fuente,
                                         fontWeight: FontWeight.bold,
                                         color: Color.fromARGB(167, 0, 0, 0)),
                                   ),
                                   subtitle: Text(
                                     '${list_emi[index].fecha}',
-                                    style: const TextStyle(
-                                        fontSize: 15,
+                                    style: TextStyle(
+                                        fontSize: fuente,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black38),
                                   ),
@@ -1213,6 +1217,27 @@ class _ViewFacturasState extends State<ViewFacturas> {
     bytess += generatorr.cut();
     return bytess;
   }
+  double getScreenSize(BuildContext context, double t1, double t2, String area) {
+      // Obtenemos el tamaño de la pantalla utilizando MediaQuery
+    Orientation orientation = MediaQuery.of(context).orientation;
+    Size size = MediaQuery.of(context).size;
+
+    if(orientation == Orientation.portrait){
+      //vertical
+      if(area=='h'){
+        return size.height * t1;
+      }else{
+        return size.width*t1;
+      }
+      
+    }else{
+      if(area=='h'){
+        return size.height * t2;
+      }else{
+        return size.width*t2;
+      }
+    }
+  }
 }
 
 print_sunmi(BuildContext context, String id_factura) async {
@@ -1589,6 +1614,7 @@ print_sunmi(BuildContext context, String id_factura) async {
   await SunmiPrinter.lineWrap(2);
   await SunmiPrinter.exitTransactionPrint(true);
 }
+
 
 print_sunmi_comanda(BuildContext context, String id_f_tmp) async {
   final print_data = Provider.of<PrintProvider>(context, listen: false);

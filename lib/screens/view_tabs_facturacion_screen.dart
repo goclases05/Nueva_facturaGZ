@@ -38,6 +38,8 @@ class TabsFacturacion extends StatelessWidget {
       )
     ];
 
+    double fuente=getScreenSize(context, 0.05 ,0.02,'w');
+
     return Stack(children: [
       DefaultTabController(
         length: _tabs.length,
@@ -45,15 +47,17 @@ class TabsFacturacion extends StatelessWidget {
             appBar: AppBar(
               automaticallyImplyLeading: false,
               backgroundColor: Colors.white,
+              surfaceTintColor:Colors.transparent,
               elevation: 2,
               title: TabBar(
+                //dividerColor:Colors.white,
                 labelColor: colorPrimary,
                 indicatorColor: colorPrimary,
                 //indicatorSize: TabBarIndicatorSize.label,
                 unselectedLabelColor: Color.fromARGB(255, 206, 198, 198),
                 isScrollable: false,
-                labelStyle: const TextStyle(
-                  fontSize: 18,
+                labelStyle: TextStyle(
+                  fontSize: fuente,
                 ),
                 tabs: _tabs,
               ),
@@ -128,3 +132,24 @@ class TabsFacturacion extends StatelessWidget {
     ]);
   }
 }
+double getScreenSize(BuildContext context, double t1, double t2, String area) {
+      // Obtenemos el tamaño de la pantalla utilizando MediaQuery
+    Orientation orientation = MediaQuery.of(context).orientation;
+    Size size = MediaQuery.of(context).size;
+
+    if(orientation == Orientation.portrait){
+      //vertical
+      if(area=='h'){
+        return size.height * t1;
+      }else{
+        return size.width*t1;
+      }
+      
+    }else{
+      if(area=='h'){
+        return size.height * t2;
+      }else{
+        return size.width*t2;
+      }
+    }
+  }

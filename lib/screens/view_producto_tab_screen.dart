@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh_plus/pull_to_refresh_plus.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../models/producto_x_departamento_models.dart';
 
@@ -92,6 +93,36 @@ class _viewproductotab extends State<ViewProductoTab> {
     return initWidget(edit_precio);
   }
 
+  double getScreenSize(BuildContext context, double t1, double t2, String area) {
+      // Obtenemos el tamaño de la pantalla utilizando MediaQuery
+    Orientation orientation = MediaQuery.of(context).orientation;
+    Size size = MediaQuery.of(context).size;
+
+    if(orientation == Orientation.portrait){
+      //vertical
+      if(area=='h'){
+        return size.height * t1;
+      }else{
+        return size.width*t1;
+      }
+      
+    }else{
+      if(area=='h'){
+        return size.height * t2;
+      }else{
+        return size.width*t2;
+      }
+    }
+  }
+
+  double _calculateAspectRatio(BuildContext context) {
+    // Supongamos que queremos un aspect ratio basado en el tamaño de la pantalla
+    Size screenSize = MediaQuery.of(context).size;
+    double aspectRatio = screenSize.width / (screenSize.height *0.75); // Ejemplo de relación de aspecto 4:3
+
+    return aspectRatio;
+  }
+
   initWidget(String edit_precio) {
     return Container(
       /*decoration: const BoxDecoration(
@@ -136,6 +167,7 @@ class _viewproductotab extends State<ViewProductoTab> {
                 refreshController.loadFailed();
               }
             },
+
             child: (list_producto.length == 0)
                 ? Center(
                     child: Column(
@@ -146,8 +178,8 @@ class _viewproductotab extends State<ViewProductoTab> {
                           const Text("No se encontraron datos relacionados")
                         ]),
                   )
-                : ListView.builder(
-                    itemCount: list_producto.length,
+                : (MediaQuery.of(context).orientation==Orientation.portrait)?
+                  ListView.builder(itemCount: list_producto.length,
                     itemBuilder: (context, index) {
                       final producto = list_producto[index];
                       final List<String> list = [
@@ -157,15 +189,64 @@ class _viewproductotab extends State<ViewProductoTab> {
                         producto.precio_4,
                       ];
                       return Padding(
-                          padding: const EdgeInsets.all(5),
+                          padding: EdgeInsets.all(2) ,
                           child: ArticleHorizontal(
                             listProd: producto,
                             id_tmp: widget.id_tmp,
                             colorPrimary: widget.colPrimary,
                           ));
                     },
-                  ),
-          )),
+                  )
+                :StaggeredGrid.count(
+                  crossAxisCount: 2,
+                  children: List.generate(list_producto.length, (index){
+
+                    final producto = list_producto[index];
+                      final List<String> list = [
+                        producto.precio,
+                        producto.precio_2,
+                        producto.precio_3,
+                        producto.precio_4,
+                      ];
+                      return Padding(
+                          padding: EdgeInsets.all(0) ,
+                          child: ArticleHorizontal(
+                            listProd: producto,
+                            id_tmp: widget.id_tmp,
+                            colorPrimary: widget.colPrimary,
+                          ));
+
+                  }) ,
+                )
+                /*GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2, // Número de columnas
+                      crossAxisSpacing: 10.0, // Espaciado entre columnas
+                      mainAxisSpacing: 10.0, // Espaciado entre filas
+                      childAspectRatio: 8.0 / 4.0,
+                    ),
+                    itemCount: list_producto.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      final producto = list_producto[index];
+                      final List<String> list = [
+                        producto.precio,
+                        producto.precio_2,
+                        producto.precio_3,
+                        producto.precio_4,
+                      ];
+                      return Padding(
+                          padding: EdgeInsets.all(0) ,
+                          child: ArticleHorizontal(
+                            listProd: producto,
+                            id_tmp: widget.id_tmp,
+                            colorPrimary: widget.colPrimary,
+                          ));
+                    },
+                  ),*/
+          )
+          ),
     );
   }
+  
 }
