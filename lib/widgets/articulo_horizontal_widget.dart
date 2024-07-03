@@ -219,7 +219,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
     return Card(
       elevation: 2,
       color: Colors.white,
-      
+      surfaceTintColor:Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       child: Column(
         mainAxisSize:MainAxisSize.min,
@@ -237,7 +237,7 @@ class _ArticleHorizontalState extends State<ArticleHorizontal> {
                             list_Prod:widget.list_Prod
                           )
                         );
-                      })
+                      }) 
                     );*/
                 },
                 child: Column(

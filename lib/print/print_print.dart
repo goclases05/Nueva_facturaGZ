@@ -332,6 +332,29 @@ class _PrintScreenState extends State<PrintScreen> {
     super.dispose();
   }
 
+  double getScreenSize(BuildContext context, double t1, double t2, String area) {
+      // Obtenemos el tamaño de la pantalla utilizando MediaQuery
+    Orientation orientation = MediaQuery.of(context).orientation;
+    Size size = MediaQuery.of(context).size;
+
+    if(orientation == Orientation.portrait){
+      //vertical
+      if(area=='h'){
+        return size.height * t1;
+      }else{
+        return size.width*t1;
+      }
+      
+    }else{
+      if(area=='h'){
+        return size.height * t2;
+      }else{
+        return size.width*t2;
+      }
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     int _total = 0;
@@ -352,7 +375,7 @@ class _PrintScreenState extends State<PrintScreen> {
         _printerManager.stopScan();
         return true;
       },
-      child: Scaffold(
+      child: Scaffold(        
         appBar: AppBar(
           elevation: 2,
           foregroundColor: widget.colorPrimary,
@@ -361,7 +384,7 @@ class _PrintScreenState extends State<PrintScreen> {
               Text('Facturación', style: TextStyle(color: widget.colorPrimary)),
           actions: [
             CircleAvatar(
-              backgroundColor: const Color.fromRGBO(242, 242, 247, 1),
+              backgroundColor: Colors.white,
               child: IconButton(
                 onPressed: () {
                   Navigator.pushReplacement(
@@ -380,455 +403,449 @@ class _PrintScreenState extends State<PrintScreen> {
             ),
           ],
         ),
-        body: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.only(left: 30, right: 10, top: 10),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    "Serie: ",
-                    style: TextStyle(
-                        color: widget.colorPrimary,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  Expanded(
-                    child: Card(
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: getScreenSize(context, 0.01, 0.08, 'w')),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 30, right: 10, top: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Serie: ",
+                      style: TextStyle(
+                          color: widget.colorPrimary,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Expanded(
+                      child: Card(
+                        surfaceTintColor:Colors.transparent,
                         child: Container(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Consumer<Facturacion>(
-                          builder: ((context, serieProv, child) {
-                        List<DropdownMenuItem<String>> menuItems = [];
-
-                        menuItems.add(const DropdownMenuItem(
-                            value: '0',
-                            child: Text(
-                              'Selecciona una serie',
-                              textAlign: TextAlign.center,
-                            )));
-                        //print('valor de drop ' + serieProv.initialSerie);
-                        var si_existe = false;
-                        if (facturaService.initialSerie != '0') {
-                          Preferencias.serie = facturaService.initialSerie;
-                        }
-                        for (var i = 0;
-                            i < authService.list_serie.length;
-                            i++) {
-                          //print('item ' + authService.list_serie[i].idSerie);
-
-                          if (!Preferencias.serie.isEmpty) {
-                            if (Preferencias.serie ==
-                                authService.list_serie[i].idSerie) {
-                              si_existe = true;
-
-                              print('preferencia: ' +
-                                  Preferencias.serie +
-                                  ' id: ' +
-                                  authService.list_serie[i].idSerie);
-                              facturaService.serie(widget.id_tmp, 'add',
-                                  authService.list_serie[i].idSerie);
-                            }
-                          }
-
-                          menuItems.add(DropdownMenuItem(
-                              value: authService.list_serie[i].idSerie,
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Consumer<Facturacion>(
+                            builder: ((context, serieProv, child) {
+                          List<DropdownMenuItem<String>> menuItems = [];
+          
+                          menuItems.add(const DropdownMenuItem(
+                              value: '0',
                               child: Text(
-                                authService.list_serie[i].nombre,
+                                'Selecciona una serie',
                                 textAlign: TextAlign.center,
                               )));
-                        }
-
-                        if (serieProv.cargainiSerie == true) {
-                          return Center(
-                              child: LinearProgressIndicator(
-                            color: widget.colorPrimary,
-                            backgroundColor: Colors.white,
-                          ));
-                        }
-
-                        return DropdownButton(
-                          itemHeight: null,
-                          value: (si_existe == true)
-                              ? Preferencias.serie
-                              : '0', //facturaService.initialSerie,
-                          isExpanded: true,
-                          dropdownColor: Color.fromARGB(255, 241, 238, 241),
-                          onChanged: (String? newValue) async {
-                            var cambio = await facturaService.serie(
-                                widget.id_tmp, 'add', newValue!);
-                            Preferencias.serie = newValue;
-                            if (cambio != '1') {
-                              //Preferencias.serie = newValue!;
-                              /*SnackBar snackBar = SnackBar(
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                margin: const EdgeInsets.only(
-                                    bottom: 100, right: 20, left: 20),
-                                padding: EdgeInsets.all(20),
-                                content: Text(
-                                  '${cambio}',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                backgroundColor:
-                                    Color.fromARGB(255, 224, 96, 113),
-                              );
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(snackBar);*/
-                              edgeAlert(context,
-                                  description: '${cambio}',
-                                  gravity: Gravity.top,
-                                  backgroundColor: Colors.redAccent);
-                            } else {
-                              facturaService.initialSerie = newValue;
-                              setState(() {});
+                          //print('valor de drop ' + serieProv.initialSerie);
+                          var si_existe = false;
+                          if (facturaService.initialSerie != '0') {
+                            Preferencias.serie = facturaService.initialSerie;
+                          }
+                          for (var i = 0;
+                              i < authService.list_serie.length;
+                              i++) {
+                            //print('item ' + authService.list_serie[i].idSerie);
+          
+                            if (!Preferencias.serie.isEmpty) {
+                              if (Preferencias.serie ==
+                                  authService.list_serie[i].idSerie) {
+                                si_existe = true;
+          
+                                print('preferencia: ' +
+                                    Preferencias.serie +
+                                    ' id: ' +
+                                    authService.list_serie[i].idSerie);
+                                facturaService.serie(widget.id_tmp, 'add',
+                                    authService.list_serie[i].idSerie);
+                              }
                             }
-                          },
-                          items: menuItems,
-                          elevation: 0,
-                          style: const TextStyle(
-                              color: Colors.black54,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold),
-                          //icon: Icon(Icons.arrow_drop_down),
-                          iconDisabledColor: Colors.red,
-                          iconEnabledColor: widget.colorPrimary,
-                          underline: SizedBox(),
-                        );
-                      })),
-                    )),
-                  )
-                ],
+          
+                            menuItems.add(DropdownMenuItem(
+                                value: authService.list_serie[i].idSerie,
+                                child: Text(
+                                  authService.list_serie[i].nombre,
+                                  textAlign: TextAlign.center,
+                                )));
+                          }
+          
+                          if (serieProv.cargainiSerie == true) {
+                            return Center(
+                                child: LinearProgressIndicator(
+                              color: widget.colorPrimary,
+                              backgroundColor: Colors.white,
+                            ));
+                          }
+          
+                          return DropdownButton(
+                            itemHeight: null,
+                            value: (si_existe == true)
+                                ? Preferencias.serie
+                                : '0', //facturaService.initialSerie,
+                            isExpanded: true,
+                            dropdownColor: Color.fromARGB(255, 241, 238, 241),
+                            onChanged: (String? newValue) async {
+                              var cambio = await facturaService.serie(
+                                  widget.id_tmp, 'add', newValue!);
+                              Preferencias.serie = newValue;
+                              if (cambio != '1') {
+                                //Preferencias.serie = newValue!;
+                                /*SnackBar snackBar = SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  margin: const EdgeInsets.only(
+                                      bottom: 100, right: 20, left: 20),
+                                  padding: EdgeInsets.all(20),
+                                  content: Text(
+                                    '${cambio}',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  backgroundColor:
+                                      Color.fromARGB(255, 224, 96, 113),
+                                );
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);*/
+                                edgeAlert(context,
+                                    description: '${cambio}',
+                                    gravity: Gravity.top,
+                                    backgroundColor: Colors.redAccent);
+                              } else {
+                                facturaService.initialSerie = newValue;
+                                setState(() {});
+                              }
+                            },
+                            items: menuItems,
+                            elevation: 0,
+                            style: const TextStyle(
+                                color: Colors.black54,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold),
+                            //icon: Icon(Icons.arrow_drop_down),
+                            iconDisabledColor: Colors.red,
+                            iconEnabledColor: widget.colorPrimary,
+                            underline: SizedBox(),
+                          );
+                        })),
+                      )),
+                    )
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-                child: Container(
-                    color: Colors.white,
-                    child: ListView.builder(
-                      key: Key('builder ${open.toString()}'),
-                      physics: const BouncingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: 6,
-                      itemBuilder: ((context, index) {
-                        if (index == 5) {
-                          return Consumer<Facturacion>(
-                              builder: (context, fact, child) {
-                            return Container(
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 15),
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      width: 2,
-                                      style: BorderStyle.solid,
-                                      color:
-                                          Color.fromARGB(255, 199, 193, 197)),
-                                  borderRadius: BorderRadius.circular(8)),
-                              child: Column(children: [
-                                (fact.loadTransaccion)
-                                    ? Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.1,
-                                        padding: const EdgeInsets.all(0),
-                                        child: Center(
-                                          child: LinearProgressIndicator(
-                                            color: widget.colorPrimary,
-                                            backgroundColor: Colors.white,
-                                          ),
-                                        ))
-                                    : ListView.builder(
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        scrollDirection: Axis.vertical,
-                                        shrinkWrap: true,
-                                        itemCount: fact.list_transaccion.length,
-                                        itemBuilder: (context, index) {
-                                          return ListTile(
-                                            leading: IconButton(
-                                                onPressed: () async {
-                                                  final dele = await facturaService
-                                                      .delete_transaccion(
-                                                          widget.id_tmp,
-                                                          fact
-                                                              .list_transaccion[
-                                                                  index]
-                                                              .idTrans);
-                                                  if (dele.toString() == 'OK') {
-                                                    facturaService
-                                                        .transacciones(
-                                                            widget.id_tmp,
-                                                            'tmp');
-                                                  } else {
-                                                    print('error');
-                                                  }
-                                                },
-                                                icon: Icon(
-                                                  Icons.close,
-                                                  color: widget.colorPrimary,
-                                                )),
-                                            title: Text(fact
-                                                .list_transaccion[index].forma),
-                                            trailing: Text(Preferencias.moneda +
-                                                fact.list_transaccion[index]
-                                                    .abono),
-                                          );
-                                        },
-                                      ),
-                                ListTile(
-                                  title: const Text(
-                                    'Total: ',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  trailing: Text(
-                                    Preferencias.moneda + fact.total_fac,
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                ListTile(
-                                  title: Text(
-                                    (double.parse(fact.saldo) < 0)
-                                        ? 'Cambio: '
-                                        : 'Saldo: ',
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  trailing: Text(
-                                    (double.parse(fact.saldo) < 0)
-                                        ? '${Preferencias.moneda}${double.parse(fact.saldo) * (-1)}'
-                                        : Preferencias.moneda + fact.saldo,
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                )
-                              ]),
-                            );
-                          });
-                        }
-                        return Card(
-                          elevation: 3,
-                          margin: const EdgeInsets.all(10),
-                          child: ExpansionTile(
-                            key: Key(index.toString()),
-                            initiallyExpanded: open == index,
-                            leading: CircleAvatar(
-                              backgroundColor: widget.colorPrimary,
-                              child: Text(
-                                '${index + 1}',
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 25),
-                              ),
-                            ),
-                            childrenPadding: const EdgeInsets.all(5),
-                            title: (index == 0)
-                                ? const Text('Detalle del Pedido')
-                                : (index == 1)
-                                    ? const Text('Datos de Cliente')
-                                    : (index == 2)
-                                        ? const Text('Condiciones de Pago')
-                                        : (index == 3)
-                                            ? const Text('Detalle de Pago')
-                                            : const Text('Observaciones'),
-                            children: [
-                              (index == 0)
-                                  ? ItemsCart(
-                                      id_tmp: widget.id_tmp,
-                                      colorPrimary: widget.colorPrimary,
-                                    )
-                                  : (index == 1)
-                                      ? ItemCliente(
-                                          colorPrimary: widget.colorPrimary,
-                                          tmp: widget.id_tmp)
-                                      : (index == 2)
-                                          ? ItemCondicionesPago(
-                                              colorPrimary: widget.colorPrimary,
-                                              id: widget.id_tmp,
-                                              tmp: 'tmp',
-                                            )
-                                          : (index == 3)
-                                              ? RegistroMetodoPago(
-                                                  colorPrimary:
-                                                      widget.colorPrimary,
-                                                  id_tmp: widget.id_tmp,
-                                                  estado: 'tmp',
-                                                )
-                                              : ItemObservacion(
-                                                  colorPrimary:
-                                                      widget.colorPrimary,
-                                                  id: widget.id_tmp,
-                                                  tmp: 'tmp',
-                                                ),
-                              Row(
-                                mainAxisAlignment: (index == 0)
-                                    ? MainAxisAlignment.spaceBetween
-                                    : MainAxisAlignment.end,
-                                children: [
-                                  (index == 0)
+              Expanded(
+                  child: Container(
+                      color: Colors.white,
+                      child: ListView.builder(
+                        key: Key('builder ${open.toString()}'),
+                        physics: const BouncingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: 6,
+                        itemBuilder: ((context, index) {
+                          if (index == 5) {
+                            return Consumer<Facturacion>(
+                                builder: (context, fact, child) {
+                              return Container(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 15),
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        width: 2,
+                                        style: BorderStyle.solid,
+                                        color:
+                                            Color.fromARGB(255, 199, 193, 197)),
+                                    borderRadius: BorderRadius.circular(8)),
+                                child: Column(children: [
+                                  (fact.loadTransaccion)
                                       ? Container(
-                                          alignment: Alignment.center,
-                                          margin: EdgeInsets.symmetric(
-                                              vertical: 15),
-                                          child: ElevatedButton.icon(
+                                          height:
+                                              MediaQuery.of(context).size.height *
+                                                  0.1,
+                                          padding: const EdgeInsets.all(0),
+                                          child: Center(
+                                            child: LinearProgressIndicator(
+                                              color: widget.colorPrimary,
+                                              backgroundColor: Colors.white,
+                                            ),
+                                          ))
+                                      : ListView.builder(
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          scrollDirection: Axis.vertical,
+                                          shrinkWrap: true,
+                                          itemCount: fact.list_transaccion.length,
+                                          itemBuilder: (context, index) {
+                                            return ListTile(
+                                              leading: IconButton(
+                                                  onPressed: () async {
+                                                    final dele = await facturaService
+                                                        .delete_transaccion(
+                                                            widget.id_tmp,
+                                                            fact
+                                                                .list_transaccion[
+                                                                    index]
+                                                                .idTrans);
+                                                    if (dele.toString() == 'OK') {
+                                                      facturaService
+                                                          .transacciones(
+                                                              widget.id_tmp,
+                                                              'tmp');
+                                                    } else {
+                                                      print('error');
+                                                    }
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.close,
+                                                    color: widget.colorPrimary,
+                                                  )),
+                                              title: Text(fact
+                                                  .list_transaccion[index].forma),
+                                              trailing: Text(Preferencias.moneda +
+                                                  fact.list_transaccion[index]
+                                                      .abono),
+                                            );
+                                          },
+                                        ),
+                                  ListTile(
+                                    title: const Text(
+                                      'Total: ',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    trailing: Text(
+                                      Preferencias.moneda + fact.total_fac,
+                                      style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  ListTile(
+                                    title: Text(
+                                      (double.parse(fact.saldo) < 0)
+                                          ? 'Cambio: '
+                                          : 'Saldo: ',
+                                      style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    trailing: Text(
+                                      (double.parse(fact.saldo) < 0)
+                                          ? '${Preferencias.moneda}${double.parse(fact.saldo) * (-1)}'
+                                          : Preferencias.moneda + fact.saldo,
+                                      style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  )
+                                ]),
+                              );
+                            });
+                          }
+                          return Card(
+                            elevation: 3,
+                            margin: const EdgeInsets.all(10),
+                            surfaceTintColor:Colors.transparent,
+                            child: ExpansionTile(
+                              key: Key(index.toString()),
+                              shape: Border.all(color: Colors.transparent),
+                              initiallyExpanded: open == index,
+                              leading: CircleAvatar(
+                                backgroundColor: widget.colorPrimary,
+                                child: Text(
+                                  '${index + 1}',
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 25),
+                                ),
+                              ),
+                              childrenPadding: const EdgeInsets.all(5),
+                              title: (index == 0)
+                                  ? const Text('Detalle del Pedido')
+                                  : (index == 1)
+                                      ? const Text('Datos de Cliente')
+                                      : (index == 2)
+                                          ? const Text('Condiciones de Pago')
+                                          : (index == 3)
+                                              ? const Text('Detalle de Pago')
+                                              : const Text('Observaciones'),
+                              children: [
+                                (index == 0)
+                                    ? ItemsCart(
+                                        id_tmp: widget.id_tmp,
+                                        colorPrimary: widget.colorPrimary,
+                                      )
+                                    : (index == 1)
+                                        ? ItemCliente(
+                                            colorPrimary: widget.colorPrimary,
+                                            tmp: widget.id_tmp)
+                                        : (index == 2)
+                                            ? ItemCondicionesPago(
+                                                colorPrimary: widget.colorPrimary,
+                                                id: widget.id_tmp,
+                                                tmp: 'tmp',
+                                              )
+                                            : (index == 3)
+                                                ? RegistroMetodoPago(
+                                                    colorPrimary:
+                                                        widget.colorPrimary,
+                                                    id_tmp: widget.id_tmp,
+                                                    estado: 'tmp',
+                                                  )
+                                                : ItemObservacion(
+                                                    colorPrimary:
+                                                        widget.colorPrimary,
+                                                    id: widget.id_tmp,
+                                                    tmp: 'tmp',
+                                                  ),
+                                Row(
+                                  mainAxisAlignment: (index == 0)
+                                      ? MainAxisAlignment.spaceBetween
+                                      : MainAxisAlignment.end,
+                                  children: [
+                                    (index == 0)
+                                        ? Container(
+                                            alignment: Alignment.center,
+                                            margin: EdgeInsets.symmetric(
+                                                vertical: 15),
+                                            child: ElevatedButton.icon(
+                                                label: const Icon(
+                                                  Icons.add,
+                                                  size: 20,
+                                                  color: Colors.white,
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ViewTabsScreen(
+                                                              colorPrimary: widget
+                                                                  .colorPrimary,
+                                                              id_tmp:
+                                                                  widget.id_tmp,
+                                                              clave: '2321'),
+                                                    ),
+                                                  );
+                                                },
+                                                style: TextButton.styleFrom(
+                                                    primary: Colors.white,
+                                                    backgroundColor:
+                                                        Colors.green),
+                                                icon: const Text(
+                                                    "Agregar Articulos")),
+                                          )
+                                        : Text(''),
+                                    Container(
+                                      alignment: Alignment.centerRight,
+                                      child: (index == 4)
+                                          ? const Text('')
+                                          : ElevatedButton.icon(
                                               label: const Icon(
-                                                Icons.add,
+                                                Icons.arrow_forward,
                                                 size: 20,
                                                 color: Colors.white,
                                               ),
                                               onPressed: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ViewTabsScreen(
-                                                            colorPrimary: widget
-                                                                .colorPrimary,
-                                                            id_tmp:
-                                                                widget.id_tmp,
-                                                            clave: '2321'),
-                                                  ),
-                                                );
+                                                setState(() {
+                                                  if (index == 0) {
+                                                    open = 1;
+                                                  } else if (index == 1) {
+                                                    open = 2;
+                                                  } else if (index == 2) {
+                                                    open = 3;
+                                                  } else if (index == 3) {
+                                                    open = 4;
+                                                  } else {
+                                                    open = 1;
+                                                  }
+                                                });
+                                                print(open);
                                               },
                                               style: TextButton.styleFrom(
                                                   primary: Colors.white,
                                                   backgroundColor:
-                                                      Colors.green),
-                                              icon: const Text(
-                                                  "Agregar Articulos")),
-                                        )
-                                      : Text(''),
-                                  Container(
-                                    alignment: Alignment.centerRight,
-                                    child: (index == 4)
-                                        ? const Text('')
-                                        : ElevatedButton.icon(
-                                            label: const Icon(
-                                              Icons.arrow_forward,
-                                              size: 20,
-                                              color: Colors.white,
-                                            ),
-                                            onPressed: () {
-                                              setState(() {
-                                                if (index == 0) {
-                                                  open = 1;
-                                                } else if (index == 1) {
-                                                  open = 2;
-                                                } else if (index == 2) {
-                                                  open = 3;
-                                                } else if (index == 3) {
-                                                  open = 4;
-                                                } else {
-                                                  open = 1;
-                                                }
-                                              });
-                                              print(open);
-                                            },
-                                            style: TextButton.styleFrom(
-                                                primary: Colors.white,
-                                                backgroundColor:
-                                                    widget.colorPrimary),
-                                            icon: const Text("Continuar")),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        );
-                      }),
-                    ))),
-            Container(
-              color: Color.fromARGB(255, 233, 233, 233),
-              padding: EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  /*Text("Total: ${f.format(_total)}",
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(
-                    width: 80,
-                  ),*/
-                  Expanded(
-                      flex: 2,
-                      child: TextButton.icon(
-                        onPressed: () async {
-                          if (facturaService.list_det.length < 1) {
-                            //no tiene articulos la factyura
-                            edgeAlert(context,
-                                description:
-                                    'Error: Agrega articulos a la factura',
-                                gravity: Gravity.top,
-                                backgroundColor: Colors.redAccent);
-                          } else if (facturaService.initialSerie == '0') {
-                            //no se agrego serie a facturar
-                            edgeAlert(context,
-                                description: 'Error: Seleccióna una serie',
-                                gravity: Gravity.top,
-                                backgroundColor: Colors.redAccent);
-                          } else if (facturaService.id == '') {
-                            //no tiene cliente agregado la factura
-                            edgeAlert(context,
-                                description: 'Error: Seleccióne un cliente',
-                                gravity: Gravity.top,
-                                backgroundColor: Colors.redAccent);
-                          } /*else if (double.parse(facturaService.saldo) >=
-                              double.parse(facturaService.total_fac)) {
-                            //no se aplico el pago
-                            edgeAlert(context,
-                                description: 'Error: Aplicar pago',
-                                gravity: Gravity.top,
-                                backgroundColor: Colors.redAccent);
-                          }*/
-                          else {
-                            //FACTURANDO
-                            var facturar =
-                                await facturaService.facturar(widget.id_tmp);
-                            var js = json.decode(facturar);
-
-                            if (js['MENSAJE'] == 'OK') {
-                              //si se facturo
-                              edgeAlert(context,
-                                  description: 'Factura Realizada',
-                                  gravity: Gravity.top,
-                                  backgroundColor:
-                                      Color.fromARGB(255, 81, 131, 83));
-
-                              if (Preferencias.printfactura == false) {
-                                showDialog(
-                                  context: context,
-                                  builder: (_) => AlertDialog(
-                                    backgroundColor:
-                                        Color.fromARGB(255, 109, 224, 186),
-                                    content: Text(
-                                      'Listo...',
-                                      style:
-                                          const TextStyle(color: Colors.white),
+                                                      widget.colorPrimary),
+                                              icon: const Text("Continuar")),
                                     ),
-                                  ),
-                                );
-                                Navigator.of(context, rootNavigator: true)
-                                    .pop();
-
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) =>
-                                            const EscritorioScreen()),
-                                    (Route<dynamic> route) => false);
-                              } else {
-                                //imprimir factura
-                                if (Preferencias.sunmi_preferencia) {
-                                  //impresion sunmi
-                                  await print_sunmi(context, js['ID']);
+                                  ],
+                                )
+                              ],
+                            ),
+                          );
+                        }),
+                      ))),
+              Container(
+                color: Colors.white,
+                padding: EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    /*Text("Total: ${f.format(_total)}",
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(
+                      width: 80,
+                    ),*/
+                    Expanded(
+                        flex: 2,
+                        child: TextButton.icon(
+                          onPressed: () async {
+                            if (facturaService.list_det.length < 1) {
+                              //no tiene articulos la factyura
+                              edgeAlert(context,
+                                  description:
+                                      'Error: Agrega articulos a la factura',
+                                  gravity: Gravity.top,
+                                  backgroundColor: Colors.redAccent);
+                            } else if (facturaService.initialSerie == '0') {
+                              //no se agrego serie a facturar
+                              edgeAlert(context,
+                                  description: 'Error: Seleccióna una serie',
+                                  gravity: Gravity.top,
+                                  backgroundColor: Colors.redAccent);
+                            } else if (facturaService.id == '') {
+                              //no tiene cliente agregado la factura
+                              edgeAlert(context,
+                                  description: 'Error: Seleccióne un cliente',
+                                  gravity: Gravity.top,
+                                  backgroundColor: Colors.redAccent);
+                            } /*else if (double.parse(facturaService.saldo) >=
+                                double.parse(facturaService.total_fac)) {
+                              //no se aplico el pago
+                              edgeAlert(context,
+                                  description: 'Error: Aplicar pago',
+                                  gravity: Gravity.top,
+                                  backgroundColor: Colors.redAccent);
+                            }*/
+                            else {
+                              //FACTURANDO
+                              var facturar =
+                                  await facturaService.facturar(widget.id_tmp);
+                              var js = json.decode(facturar);
+          
+                              if (js['MENSAJE'] == 'OK') {
+                                //si se facturo
+                                edgeAlert(context,
+                                    description: 'Factura Realizada',
+                                    gravity: Gravity.top,
+                                    backgroundColor:
+                                        Color.fromARGB(255, 81, 131, 83));
+          
+                                if (Preferencias.printfactura == false) {
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => AlertDialog(
+                                      backgroundColor:
+                                          Color.fromARGB(255, 109, 224, 186),
+                                      content: Text(
+                                        'Listo...',
+                                        style:
+                                            const TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  );
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop();
+          
                                   Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
@@ -836,107 +853,119 @@ class _PrintScreenState extends State<PrintScreen> {
                                               const EscritorioScreen()),
                                       (Route<dynamic> route) => false);
                                 } else {
-                                  //impresion bluetooth
-                                  //PRINT NO SUNMIN
-                                  if (state_bluetooth == true) {
-                                    //escaneo
-                                    bt_initPrinter('f', js['ID']);
-                                    //escaneo
+                                  //imprimir factura
+                                  if (Preferencias.sunmi_preferencia) {
+                                    //impresion sunmi
+                                    await print_sunmi(context, js['ID']);
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) =>
+                                                const EscritorioScreen()),
+                                        (Route<dynamic> route) => false);
                                   } else {
-                                    print('off');
-                                    showDialog(
-                                      context: context,
-                                      builder: (_) => const AlertDialog(
-                                        backgroundColor:
-                                            Color.fromARGB(255, 224, 140, 31),
-                                        content: Text(
-                                          'Bluetooth sin Conexión',
-                                          style: TextStyle(color: Colors.white),
+                                    //impresion bluetooth
+                                    //PRINT NO SUNMIN
+                                    if (state_bluetooth == true) {
+                                      //escaneo
+                                      bt_initPrinter('f', js['ID']);
+                                      //escaneo
+                                    } else {
+                                      print('off');
+                                      showDialog(
+                                        context: context,
+                                        builder: (_) => const AlertDialog(
+                                          backgroundColor:
+                                              Color.fromARGB(255, 224, 140, 31),
+                                          content: Text(
+                                            'Bluetooth sin Conexión',
+                                            style: TextStyle(color: Colors.white),
+                                          ),
                                         ),
-                                      ),
-                                    );
+                                      );
+                                    }
+                                    //PRINT NO SUNMIN
+                                    print('salio');
                                   }
-                                  //PRINT NO SUNMIN
-                                  print('salio');
                                 }
+                                // ignore: use_build_context_synchronously
+                              } else {
+                                /*SnackBar snackBar = SnackBar(
+                              padding: const EdgeInsets.all(20),
+                              dismissDirection: DismissDirection.up,
+                              content: Text(
+                                '${facturar}',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              backgroundColor:
+                                  const Color.fromARGB(255, 224, 96, 113),
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
+                                edgeAlert(context,
+                                    title: '${facturar}',
+                                    gravity: Gravity.top,
+                                    backgroundColor: Colors.redAccent);
+                                print(facturar);
                               }
-                              // ignore: use_build_context_synchronously
-                            } else {
-                              /*SnackBar snackBar = SnackBar(
-                            padding: const EdgeInsets.all(20),
-                            dismissDirection: DismissDirection.up,
-                            content: Text(
-                              '${facturar}',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            backgroundColor:
-                                const Color.fromARGB(255, 224, 96, 113),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
-                              edgeAlert(context,
-                                  title: '${facturar}',
-                                  gravity: Gravity.top,
-                                  backgroundColor: Colors.redAccent);
-                              print(facturar);
                             }
-                          }
-                        },
-                        icon: const Icon(Icons.print),
-                        label: const Text('Facturar'),
-                        style: TextButton.styleFrom(
-                          primary: Colors.white,
-                          backgroundColor: Colors.green,
-                        ),
-                      )),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: TextButton.icon(
-                        style: TextButton.styleFrom(
-                          primary: Colors.white,
-                          backgroundColor: Colors.blue,
-                        ),
-                        onPressed: () async {
-                          if (Preferencias.sunmi_preferencia) {
-                            await print_sunmi_comanda(context, widget.id_tmp);
-                          } else {
-                            //PRINT NO SUNMIN
-                            if (state_bluetooth == true) {
-                              //escaneo
-                              bt_initPrinter('comanda', widget.id_tmp);
-                              //escaneo
-                            } else {
-                              print('off');
-                              showDialog(
-                                context: context,
-                                builder: (_) => const AlertDialog(
-                                  backgroundColor:
-                                      Color.fromARGB(255, 224, 140, 31),
-                                  content: Text(
-                                    'Bluetooth sin Conexión',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              );
-                            }
-                            //PRINT NO SUNMIN
-                          }
-                        },
-                        icon: Icon(
-                          Icons.newspaper,
-                          color: Colors.white,
-                        ),
-                        label: Text(
-                          'Comanda',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
+                          },
+                          icon: const Icon(Icons.print),
+                          label: const Text('Facturar'),
+                          style: TextButton.styleFrom(
+                            primary: Colors.white,
+                            backgroundColor: Colors.green,
+                          ),
                         )),
-                  )
-                ],
-              ),
-            )
-          ],
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: TextButton.icon(
+                          style: TextButton.styleFrom(
+                            primary: Colors.white,
+                            backgroundColor: Colors.blue,
+                          ),
+                          onPressed: () async {
+                            if (Preferencias.sunmi_preferencia) {
+                              await print_sunmi_comanda(context, widget.id_tmp);
+                            } else {
+                              //PRINT NO SUNMIN
+                              if (state_bluetooth == true) {
+                                //escaneo
+                                bt_initPrinter('comanda', widget.id_tmp);
+                                //escaneo
+                              } else {
+                                print('off');
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => const AlertDialog(
+                                    backgroundColor:
+                                        Color.fromARGB(255, 224, 140, 31),
+                                    content: Text(
+                                      'Bluetooth sin Conexión',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                );
+                              }
+                              //PRINT NO SUNMIN
+                            }
+                          },
+                          icon: Icon(
+                            Icons.newspaper,
+                            color: Colors.white,
+                          ),
+                          label: Text(
+                            'Comanda',
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          )),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

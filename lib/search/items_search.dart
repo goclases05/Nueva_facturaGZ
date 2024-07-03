@@ -48,6 +48,28 @@ class ItemsSearch extends SearchDelegate {
     // TODO: implement buildResults
     return buildSuggestions(context);
   }
+  double getScreenSize(BuildContext context, double t1, double t2, String area) {
+      // Obtenemos el tamaño de la pantalla utilizando MediaQuery
+    Orientation orientation = MediaQuery.of(context).orientation;
+    Size size = MediaQuery.of(context).size;
+
+    if(orientation == Orientation.portrait){
+      //vertical
+      if(area=='h'){
+        return size.height * t1;
+      }else{
+        return size.width*t1;
+      }
+      
+    }else{
+      if(area=='h'){
+        return size.height * t2;
+      }else{
+        return size.width*t2;
+      }
+    }
+  }
+
 
   @override
   Widget buildSuggestions(BuildContext context) {
@@ -113,7 +135,7 @@ class ItemsSearch extends SearchDelegate {
             itemBuilder: (context, index) {
               final producto = list_items[index];
               return Padding(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.symmetric(horizontal: getScreenSize(context, 0.01, 0.1, 'w')),
                   child: ArticleHorizontal(
                     listProd: producto,
                     id_tmp: _id_tmp,
