@@ -10,8 +10,8 @@ import 'package:factura_gozeri/providers/print_provider.dart';
 import 'package:factura_gozeri/widgets/registro_metodoPago_listas_widget.dart';
 import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
 import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
 
-import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -1008,18 +1008,18 @@ class _ViewTicketState extends State<ViewTicket> {
                               ),
                             ),
                           );
-                          final basestorage =
-                              await getApplicationDocumentsDirectory();
+
+                          final basestorage = await getApplicationDocumentsDirectory();
                           String url = data['link'];
+
                           ALDownloader.initialize();
-                          ALDownloader.configurePrint(
-                              enabled: true, frequentEnabled: false);
+                          ALDownloader.configurePrint(true, frequentEnabled: false);
+
                           ALDownloader.download(url,
                               directoryPath: basestorage!.path,
                               fileName: data['name'],
-                              downloaderHandlerInterface:
-                                  ALDownloaderHandlerInterface(
-                                      progressHandler: (progress) {
+                              handlerInterface:
+                              ALDownloaderHandlerInterface(progressHandler: (progress) {
                                 debugPrint(
                                     'ALDownloader | download progress = $progress, url = $url\n');
                               }, succeededHandler: () async {
@@ -1031,16 +1031,8 @@ class _ViewTicketState extends State<ViewTicket> {
                                 final String filePath =
                                     basestorage.path + '/' + data['name'];
 
-                                OpenFilex.open(filePath);
-                                /*Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Screenfile(filePath: filePath),
-                          ));*/
-                                /*final Uri _url = Uri.parse(basestorage.path+'/nuevo.pdf');
-                        if (!await launchUrl(_url)) {
-                          throw 'Could not launch $_url';
-                        }*/
+                                OpenFile.open(filePath);
+
                               }, failedHandler: () {
                                 Navigator.of(context, rootNavigator: true)
                                     .pop();
@@ -1066,14 +1058,8 @@ class _ViewTicketState extends State<ViewTicket> {
                                 debugPrint(
                                     'ALDownloader | download paused, url = $url\n');
                               }));
-                          /*await FileSaver.instance.saveFile(
-                                name: data['name'],
-                                filePath: basestorage.path,
-                                link: data['link'],
-                                ext: '.pdf'
-                              );
 
-                              //OpenFilex.open(basestorage.path+'/'+data['name']);*/
+
                         } else {
                           print('no permision');
                         }

@@ -87,27 +87,28 @@ class _ItemCondicionesPago extends State<ItemCondicionesPago> {
                   const SizedBox(
                     width: 5,
                   ),
-                  Container(
-                      padding: EdgeInsets.only(left: 10),
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                            color: Colors.grey,
-                            style: BorderStyle.solid,
-                            width: 1),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: DropdownButton(
-                        value: condicionSeleccionada,
-                        isExpanded: true,
-                        dropdownColor: Color.fromARGB(255, 241, 238, 241),
-                        items: menuItems,
-                        onChanged: (String? value) {
-                          condicionSeleccionada = value.toString();
-                          condiciones.queryCondicionesPagoTM(
-                              '1', 'TERMINOS', value.toString(), widget.id);
-                        },
-                      )),
+                  Expanded(
+                    child: Container(
+                        padding: EdgeInsets.only(left: 10),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              color: Colors.grey,
+                              style: BorderStyle.solid,
+                              width: 1),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: DropdownButton(
+                          value: condicionSeleccionada,
+                          isExpanded: true,
+                          dropdownColor: Color.fromARGB(255, 241, 238, 241),
+                          items: menuItems,
+                          onChanged: (String? value) {
+                            condicionSeleccionada = value.toString();
+                            condiciones.queryCondicionesPagoTM(
+                                '1', 'TERMINOS', value.toString(), widget.id);
+                          },
+                        )),
+                  ),
                 ]),
             SizedBox(
               height: 10,

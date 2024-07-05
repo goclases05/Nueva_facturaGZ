@@ -88,40 +88,41 @@ class _RegistroMetodoPagoState extends State<RegistroMetodoPago> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: EdgeInsets.only(left: 10),
-              width: MediaQuery.of(context).size.width * 0.9,
-              decoration: BoxDecoration(
-                border: Border.all(
-                    color: Colors.grey, style: BorderStyle.solid, width: 1),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: DropdownButton(
-                itemHeight: null,
-                value: initialSerie,
-                isExpanded: true,
-                dropdownColor: Color.fromARGB(255, 241, 238, 241),
-                onChanged: (String? newValue) async {
-                  if (newValue != '1' && newValue != '6' && newValue != '15') {
-                    Metodo.bancos();
-                  }
-                  setState(() {
-                    initialSerie = newValue!;
-                    initialBanco = '0';
-                    _controlPago.text = '';
-                    _controlReferencia.text = '';
-                  });
-                },
-                items: menuItems,
-                elevation: 0,
-                style: const TextStyle(
-                    color: Colors.black54,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
-                //icon: Icon(Icons.arrow_drop_down),
-                iconDisabledColor: Colors.red,
-                iconEnabledColor: widget.colorPrimary,
-                underline: SizedBox(),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.only(left: 10),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                      color: Colors.grey, style: BorderStyle.solid, width: 1),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: DropdownButton(
+                  itemHeight: null,
+                  value: initialSerie,
+                  isExpanded: true,
+                  dropdownColor: Color.fromARGB(255, 241, 238, 241),
+                  onChanged: (String? newValue) async {
+                    if (newValue != '1' && newValue != '6' && newValue != '15') {
+                      Metodo.bancos();
+                    }
+                    setState(() {
+                      initialSerie = newValue!;
+                      initialBanco = '0';
+                      _controlPago.text = '';
+                      _controlReferencia.text = '';
+                    });
+                  },
+                  items: menuItems,
+                  elevation: 0,
+                  style: const TextStyle(
+                      color: Colors.black54,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
+                  //icon: Icon(Icons.arrow_drop_down),
+                  iconDisabledColor: Colors.red,
+                  iconEnabledColor: widget.colorPrimary,
+                  underline: SizedBox(),
+                ),
               ),
             ),
           ],

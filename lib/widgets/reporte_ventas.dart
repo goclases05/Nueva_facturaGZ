@@ -12,7 +12,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:intl/intl.dart';
-import 'package:open_filex/open_filex.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -340,11 +340,7 @@ class _Reporte_VentasState extends State<Reporte_Ventas> {
                                                               await getApplicationDocumentsDirectory();
                                                           String url =
                                                               data['link'];
-                                                          ALDownloader
-                                                              .configurePrint(
-                                                                  enabled: true,
-                                                                  frequentEnabled:
-                                                                      false);
+                                                          ALDownloader.configurePrint(true, frequentEnabled: false);
                                                           ALDownloader.download(
                                                               url,
                                                               directoryPath:
@@ -352,10 +348,8 @@ class _Reporte_VentasState extends State<Reporte_Ventas> {
                                                                       .path,
                                                               fileName:
                                                                   data['name'],
-                                                              downloaderHandlerInterface:
-                                                                  ALDownloaderHandlerInterface(
-                                                                      progressHandler:
-                                                                          (progress) {
+                                                              handlerInterface:
+                                                              ALDownloaderHandlerInterface(progressHandler: (progress) {
                                                                 debugPrint(
                                                                     'ALDownloader | download progress = $progress, url = $url\n');
                                                               }, succeededHandler:
@@ -376,7 +370,7 @@ class _Reporte_VentasState extends State<Reporte_Ventas> {
                                                                         data[
                                                                             'name'];
 
-                                                                OpenFilex.open(
+                                                                OpenFile.open(
                                                                     filePath);
                                                                 /*Navigator.push(
                                                           context,
@@ -559,22 +553,15 @@ class _Reporte_VentasState extends State<Reporte_Ventas> {
                                                               await getApplicationDocumentsDirectory();
                                                           String url =
                                                               data['link'];
-                                                          ALDownloader
-                                                              .configurePrint(
-                                                                  enabled: true,
-                                                                  frequentEnabled:
-                                                                      false);
+                                                          ALDownloader.configurePrint(true, frequentEnabled: false);
                                                           ALDownloader.download(
                                                               url,
                                                               directoryPath:
-                                                                  basestorage!
-                                                                      .path,
+                                                                  basestorage.path,
                                                               fileName:
                                                                   data['name'],
-                                                              downloaderHandlerInterface:
-                                                                  ALDownloaderHandlerInterface(
-                                                                      progressHandler:
-                                                                          (progress) {
+                                                              handlerInterface:
+                                                              ALDownloaderHandlerInterface(progressHandler: (progress) {
                                                                 debugPrint(
                                                                     'ALDownloader | download progress = $progress, url = $url\n');
                                                               }, succeededHandler:
@@ -586,8 +573,8 @@ class _Reporte_VentasState extends State<Reporte_Ventas> {
                                                                         rootNavigator:
                                                                             true)
                                                                     .pop();
-                                                                //print('la ruta: '+basestorage.path+'/nuevo.pdf');
-                                                                final String
+                                                                print('la ruta: '+basestorage.path+'/'+data['name']);
+                                                                /*final String
                                                                     filePath =
                                                                     basestorage
                                                                             .path +
@@ -595,8 +582,10 @@ class _Reporte_VentasState extends State<Reporte_Ventas> {
                                                                         data[
                                                                             'name'];
 
-                                                                OpenFilex.open(
-                                                                    filePath);
+                                                                    print('ruta $filePath');*/
+
+                                                                OpenFile.open(
+                                                                    basestorage.path+'/'+data['name']);
                                                                 /*Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
