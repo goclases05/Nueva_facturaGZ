@@ -1010,7 +1010,9 @@ class _ViewTicketState extends State<ViewTicket> {
                           );
 
                           final basestorage = await getApplicationDocumentsDirectory();
+
                           String url = data['link'];
+
 
                           ALDownloader.initialize();
                           ALDownloader.configurePrint(true, frequentEnabled: false);
