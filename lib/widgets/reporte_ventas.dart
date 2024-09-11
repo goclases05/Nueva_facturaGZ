@@ -16,6 +16,7 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:share_pdf/share_pdf.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -307,11 +308,18 @@ class _Reporte_VentasState extends State<Reporte_Ventas> {
                                                             .pop();
 
                                                         ///descarga de archivos
-                                                        final status =
+                                                        /*final status =
                                                             await Permission
                                                                 .storage
-                                                                .request();
-                                                        if (status.isGranted) {
+                                                                .request();*/
+                                                        
+                                                        String url=data['link'];
+                                                        SharePDF sharePDF = SharePDF(
+                                                          url: url,
+                                                          subject: "Reporte",
+                                                        );
+                                                        await sharePDF.downloadAndShare();
+                                                        /*if (status.isGranted) {
                                                           showDialog(
                                                             context: context,
                                                             builder: (_) =>
@@ -425,7 +433,7 @@ class _Reporte_VentasState extends State<Reporte_Ventas> {
                                                               }));
                                                         } else {
                                                           print('no permision');
-                                                        }
+                                                        }*/
                                                       }
                                                     },
                                                     icon: Text(
@@ -520,7 +528,13 @@ class _Reporte_VentasState extends State<Reporte_Ventas> {
                                                             .pop();
 
                                                         ///descarga de archivos
-                                                        final status =
+                                                        String url=data['link'];
+                                                        SharePDF sharePDF = SharePDF(
+                                                          url: url,
+                                                          subject: "Reporte",
+                                                        );
+                                                        await sharePDF.downloadAndShare();
+                                                        /*final status =
                                                             await Permission
                                                                 .storage
                                                                 .request();
@@ -639,7 +653,7 @@ class _Reporte_VentasState extends State<Reporte_Ventas> {
                                                               }));
                                                         } else {
                                                           print('no permision');
-                                                        }
+                                                        }*/
                                                       }
                                                     },
                                                     icon: Text(

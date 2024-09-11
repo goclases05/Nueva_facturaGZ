@@ -15,6 +15,7 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:share_pdf/share_pdf.dart';
 import 'package:sunmi_printer_plus/column_maker.dart';
 import 'package:sunmi_printer_plus/enums.dart';
 import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
@@ -650,14 +651,19 @@ class _ViewTicketState extends State<ViewTicket> {
                             //serie y no
                             Row(
                               children: [
+                                 Expanded(
+                                    child: claveValor('No:  ', encabezado[0].no,
+                                        MainAxisAlignment.end))
+                              ],
+                            ),
+                            Row(
+                              children: [
                                 Expanded(
                                     child: claveValor(
                                         'Serie: ',
                                         encabezado[0].serie,
                                         MainAxisAlignment.start)),
-                                Expanded(
-                                    child: claveValor('No:  ', encabezado[0].no,
-                                        MainAxisAlignment.end))
+                               
                               ],
                             ),
                             //vendedor
@@ -972,9 +978,9 @@ class _ViewTicketState extends State<ViewTicket> {
                         ),
                       );
                       print('entro');
+
                       var data = await print_f.pdf_factura(widget.factura);
-                      print('fuera');
-                      print('fuera' + data.toString());
+                      
                       if (data['message'] == 'Ok') {
                         Navigator.of(context, rootNavigator: true).pop();
                         showDialog(
@@ -989,6 +995,16 @@ class _ViewTicketState extends State<ViewTicket> {
                           ),
                         );
                         Navigator.of(context, rootNavigator: true).pop();
+
+                        String url = data['link'];
+                        //String url="https://i.pinimg.com/originals/2c/ac/ae/2cacae63626e91d6887608bf51217907.jpg";
+                          print(url);
+
+                          SharePDF sharePDF = SharePDF(
+                            url: url,
+                            subject: "Factura",
+                          );
+                          await sharePDF.downloadAndShare();
 
                         ///descarga de archivos
                         final status = await Permission.storage.request();
@@ -1009,12 +1025,12 @@ class _ViewTicketState extends State<ViewTicket> {
                             ),
                           );
 
-                          final basestorage = await getApplicationDocumentsDirectory();
+                          //final basestorage = await getApplicationDocumentsDirectory();
 
-                          String url = data['link'];
+                          
 
 
-                          ALDownloader.initialize();
+                          /*ALDownloader.initialize();
                           ALDownloader.configurePrint(true, frequentEnabled: false);
 
                           ALDownloader.download(url,
@@ -1060,6 +1076,7 @@ class _ViewTicketState extends State<ViewTicket> {
                                 debugPrint(
                                     'ALDownloader | download paused, url = $url\n');
                               }));
+                              */
 
 
                         } else {
